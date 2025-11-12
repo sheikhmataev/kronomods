@@ -94,7 +94,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         y: 300,
         scale: 1.45,
         opacity: 1,
-        boxShadow: '0 64px 160px rgba(40, 80, 160, 0.45)',
       })
       gsap.set(leftCard, {
         transformOrigin: 'center center',
@@ -128,20 +127,18 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         .to(
           centerCard,
           {
-            y: 280,
+            y: 360,
             scale: 1.08,
             ease: 'power3.out',
-            boxShadow: '0 48px 120px rgba(36, 72, 138, 0.5)',
           },
           0,
         )
         .to(
           centerCard,
           {
-            y: 300,
+            y: 360,
             scale: 1,
             ease: 'power2.inOut',
-            boxShadow: '0 32px 80px rgba(28, 60, 112, 0.45)',
           },
           0.4,
         )
@@ -150,7 +147,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         leftCard,
         {
           xPercent: 0,
-          y: 280,
+          y: 360,
           scale: 1.02,
           opacity: 1,
         },
@@ -161,7 +158,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         rightCard,
         {
           xPercent: 0,
-          y: 280,
+          y: 360,
           scale: 1.02,
           opacity: 1,
         },
@@ -172,7 +169,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         [leftCard, rightCard],
         {
           scale: 0.88,
-          y: 300,
+          y: 360,
         },
         0.45,
       )
@@ -180,7 +177,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       timeline.to(
         heading,
         {
-          y: 220,
+          y: 360,
           opacity: 0,
         },
         0.15,
@@ -203,11 +200,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         <div className="relative mt-6 flex w-full flex-col items-center gap-6 md:mt-10 md:grid md:max-w-6xl md:grid-cols-3 md:gap-10">
           {cards.map((card, index) => {
             const baseClasses =
-              'glass-card will-change-transform flex h-[440px] w-full max-w-sm flex-col items-center justify-center gap-5 p-8 text-center transition-transform transition-shadow duration-300'
+              'glass-card will-change-transform flex h-[440px] w-full max-w-sm flex-col items-center justify-center gap-5 p-8 text-center transition-transform duration-300'
 
             const roleClasses: Record<CardRole, string> = {
-              center:
-                'md:col-start-2 md:col-end-3 md:row-start-1 md:self-start shadow-[0_32px_80px_rgba(28,60,112,0.45)]',
+              center: 'md:col-start-2 md:col-end-3 md:row-start-1 md:self-start',
               left: 'md:col-start-1 md:col-end-2 md:row-start-1 md:justify-self-end md:opacity-0',
               right: 'md:col-start-3 md:col-end-4 md:row-start-1 md:justify-self-start md:opacity-0',
             }
@@ -220,6 +216,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 }}
                 data-role={card.role}
                 className={`${baseClasses} ${roleClasses[card.role]}`}
+                style={
+                  card.role === 'center'
+                    ? {
+                        boxShadow:
+                          '0 42px 120px rgba(206, 168, 116, 0.32), 0 18px 40px rgba(255, 214, 170, 0.24)',
+                      }
+                    : undefined
+                }
               >
                 <span className="text-xs uppercase tracking-[0.4em] text-champagne/70">{card.title}</span>
                 <div className="accent-gradient flex h-24 w-24 items-center justify-center rounded-full text-night">
