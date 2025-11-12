@@ -91,22 +91,22 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
 
       gsap.set(centerCard, {
         transformOrigin: 'center center',
-        y: 110, // Adjust to change how high the center card starts
-        scale: 1.8, // Adjust to control how large the center card begins
+        y: 140,
+        scale: 1.45,
         opacity: 1,
       })
       gsap.set(leftCard, {
         transformOrigin: 'center center',
-        xPercent: -140,
-        y: 110,
-        scale: 0.85,
+        xPercent: -120,
+        y: 100,
+        scale: 0.8,
         opacity: 0,
       })
       gsap.set(rightCard, {
         transformOrigin: 'center center',
-        xPercent: 140,
-        y: 110,
-        scale: 0.85,
+        xPercent: 120,
+        y: 100,
+        scale: 0.8,
         opacity: 0,
       })
       gsap.set(heading, { y: 0, opacity: 1 })
@@ -117,24 +117,38 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           trigger: sectionRef.current,
           start: 'top top',
           end: '+=600',
-          scrub: true,
+          scrub: 0.75,
+          anticipatePin: 1,
           pin,
         },
       })
 
-      timeline.to(
-        centerCard,
-        {
-          y: 110,
-          scale: 0.85,
-        },
-        0,
-      )
+      timeline
+        .to(
+          centerCard,
+          {
+            y: 40,
+            scale: 1.08,
+            ease: 'power3.out',
+          },
+          0,
+        )
+        .to(
+          centerCard,
+          {
+            y: 110,
+            scale: 0.9,
+            ease: 'power2.inOut',
+          },
+          0.4,
+        )
 
       timeline.to(
         leftCard,
         {
           xPercent: 0,
+          y: 40,
+          scale: 1.02,
           opacity: 1,
         },
         0,
@@ -144,6 +158,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         rightCard,
         {
           xPercent: 0,
+          y: 40,
+          scale: 1.02,
           opacity: 1,
         },
         0,
@@ -152,10 +168,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       timeline.to(
         [leftCard, rightCard],
         {
-          scale: 0.85,
+          scale: 0.88,
           y: 110,
         },
-        0,
+        0.45,
       )
 
       timeline.to(
@@ -216,7 +232,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           ref={headingRef}
           className="mt-auto w-full max-w-3xl text-center pb-6 md:pb-12"
         >
-          <h2 className="font-display text-4xl text-porcelain sm:text-5xl md:text-6xl">
+          <h2 className="font-display text-4xl text-porcelain sm:text-5xl md:text-6xl translate-y-[-3rem]">
             Time converges where precision finds its counterpart.
           </h2>
         </div>
