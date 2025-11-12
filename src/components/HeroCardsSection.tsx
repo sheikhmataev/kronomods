@@ -91,21 +91,22 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
 
       gsap.set(centerCard, {
         transformOrigin: 'center center',
-        y: 140,
+        y: 300,
         scale: 1.45,
         opacity: 1,
+        boxShadow: '0 64px 160px rgba(40, 80, 160, 0.45)',
       })
       gsap.set(leftCard, {
         transformOrigin: 'center center',
         xPercent: -120,
-        y: 100,
+        y: 300,
         scale: 0.8,
         opacity: 0,
       })
       gsap.set(rightCard, {
         transformOrigin: 'center center',
         xPercent: 120,
-        y: 100,
+        y: 300,
         scale: 0.8,
         opacity: 0,
       })
@@ -127,18 +128,20 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         .to(
           centerCard,
           {
-            y: 40,
+            y: 280,
             scale: 1.08,
             ease: 'power3.out',
+            boxShadow: '0 48px 120px rgba(36, 72, 138, 0.5)',
           },
           0,
         )
         .to(
           centerCard,
           {
-            y: 110,
-            scale: 0.9,
+            y: 300,
+            scale: 1,
             ease: 'power2.inOut',
+            boxShadow: '0 32px 80px rgba(28, 60, 112, 0.45)',
           },
           0.4,
         )
@@ -147,7 +150,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         leftCard,
         {
           xPercent: 0,
-          y: 40,
+          y: 280,
           scale: 1.02,
           opacity: 1,
         },
@@ -158,7 +161,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         rightCard,
         {
           xPercent: 0,
-          y: 40,
+          y: 280,
           scale: 1.02,
           opacity: 1,
         },
@@ -169,7 +172,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         [leftCard, rightCard],
         {
           scale: 0.88,
-          y: 110,
+          y: 300,
         },
         0.45,
       )
@@ -200,10 +203,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         <div className="relative mt-6 flex w-full flex-col items-center gap-6 md:mt-10 md:grid md:max-w-6xl md:grid-cols-3 md:gap-10">
           {cards.map((card, index) => {
             const baseClasses =
-              'glass-card will-change-transform flex h-[440px] w-full max-w-sm flex-col items-center justify-center gap-5 p-8 text-center transition-transform duration-300'
+              'glass-card will-change-transform flex h-[440px] w-full max-w-sm flex-col items-center justify-center gap-5 p-8 text-center transition-transform transition-shadow duration-300'
 
             const roleClasses: Record<CardRole, string> = {
-              center: 'md:col-start-2 md:col-end-3 md:row-start-1 md:self-start',
+              center:
+                'md:col-start-2 md:col-end-3 md:row-start-1 md:self-start shadow-[0_32px_80px_rgba(28,60,112,0.45)]',
               left: 'md:col-start-1 md:col-end-2 md:row-start-1 md:justify-self-end md:opacity-0',
               right: 'md:col-start-3 md:col-end-4 md:row-start-1 md:justify-self-start md:opacity-0',
             }
@@ -232,7 +236,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           ref={headingRef}
           className="mt-auto w-full max-w-3xl text-center pb-6 md:pb-12"
         >
-          <h2 className="font-display text-4xl text-porcelain sm:text-5xl md:text-6xl translate-y-[-3rem]">
+          <h2 className="font-display text-4xl text-porcelain sm:text-5xl md:text-6xl translate-y-[2rem]">
             Time converges where precision finds its counterpart.
           </h2>
         </div>

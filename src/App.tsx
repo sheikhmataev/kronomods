@@ -1,31 +1,17 @@
+import logo from './assets/image2.png'
 import HeroCardsSection from './components/HeroCardsSection'
 
 const App = () => {
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-night text-porcelain">
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-between px-6 py-6 sm:px-10 lg:px-16">
-        <div className="pointer-events-auto flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-auric/40 bg-onyx/60 backdrop-blur">
-            <span className="font-display text-lg tracking-[0.4em] text-champagne">K</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-display text-lg uppercase tracking-[0.4em] text-champagne">Kronomods</span>
-            <span className="text-xs uppercase tracking-[0.5em] text-porcelain/40">Swiss Atelier</span>
-          </div>
+      <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-center px-6 py-0 sm:px-10 sm:py-1 lg:px-16 lg:py-0">
+        <div className="pointer-events-auto flex items-center">
+          <img
+            src={logo}
+            alt="Kronomods logo with Swiss Atelier tagline"
+            className="h-auto w-[200px] -translate-y-1 object-contain sm:w-[260px] sm:-translate-y-1.5 lg:w-[320px] lg:-translate-y-2"
+          />
         </div>
-
-        <button
-          type="button"
-          aria-label="Open navigation"
-          className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-onyx/50 backdrop-blur"
-        >
-          <span className="sr-only">Open navigation</span>
-          <div className="flex flex-col gap-1.5">
-            <span className="block h-[2px] w-6 rounded-full bg-porcelain" />
-            <span className="block h-[2px] w-6 rounded-full bg-porcelain" />
-            <span className="block h-[2px] w-6 rounded-full bg-porcelain" />
-          </div>
-        </button>
       </header>
 
       <main className="relative flex flex-col">
