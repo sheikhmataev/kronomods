@@ -53,6 +53,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   const cardsRef = useRef<Array<HTMLDivElement | null>>([])
   const headingRef = useRef<HTMLDivElement | null>(null)
   const macbookRef = useRef<HTMLDivElement | null>(null)
+  const backgroundRef = useRef<HTMLDivElement | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
 
   useGSAP(
@@ -96,6 +98,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       const rightCard = getCardByRole('right')
       const heading = headingRef.current
       const macbook = macbookRef.current
+      const container = containerRef.current
 
       if (!centerCard || !leftCard || !rightCard || !heading) {
         return
@@ -151,6 +154,15 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         willChange: 'transform, opacity',
       })
 
+      // Initialize background for smooth color transition
+      const background = backgroundRef.current
+      if (background) {
+        gsap.set(background, {
+          backgroundColor: '#05060A', // Start with night color
+          force3D: true,
+        })
+      }
+
       // Initialize Macbook Pro - hidden and scaled down initially
       if (macbook) {
         gsap.set(macbook, {
@@ -181,14 +193,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       const timeline = gsap.timeline({
         defaults: { ease: 'power3.out' },
         scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top top',
-          end: '+=200%',
-          pin,
-          anticipatePin: 1,
-          scrub: 1, // Smoother scrub to reduce glitches
-          invalidateOnRefresh: true,
-          refreshPriority: -1, // Refresh after other animations
+            trigger: sectionRef.current,
+            start: 'top top',
+            end: '+=150%', // Reduced scroll distance for easier zoom phase
+            pin,
+            anticipatePin: 1,
+            scrub: 2, // Higher scrub value = less scroll needed, smoother feel
+            invalidateOnRefresh: true,
+            refreshPriority: -1, // Refresh after other animations
         },
       })
 
@@ -217,11 +229,12 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           0.4,
         )
 
-      // Staggered reveal for side cards with 3D rotation - clear and sharp when visible
+      // Phase 1b: Side cards animate from sides to center - appear beside center card
+      // They need to complete this animation BEFORE moving upward together
       timeline.to(
         leftCard,
         {
-          xPercent: 0,
+          xPercent: 0, // Move from -120 to 0 (beside center)
           y: 360,
           scale: 1.02,
           opacity: 1,
@@ -230,14 +243,15 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           z: -20,
           filter: 'blur(0px)', // Clear when visible
           ease: 'power3.out',
+          duration: 0.5, // Explicit duration for side-to-center animation
         },
-        0.1, // Slight delay for staggered effect
+        0, // Start at same time as center card spawns
       )
 
       timeline.to(
         rightCard,
         {
-          xPercent: 0,
+          xPercent: 0, // Move from 120 to 0 (beside center)
           y: 360,
           scale: 1.02,
           opacity: 1,
@@ -246,22 +260,26 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           z: -20,
           filter: 'blur(0px)', // Clear when visible
           ease: 'power3.out',
+          duration: 0.5, // Explicit duration for side-to-center animation
         },
-        0.2, // Slightly more delay for orchestrated reveal
+        0, // Start at same time - both side cards animate together
       )
 
       // Phase 2: Side cards scale down with 3D depth - keep them clear while visible
+      // This happens AFTER side cards have moved beside center (at 0.5 when they complete)
+      // IMPORTANT: Don't set y here - let it stay at 360 so the upward animation works correctly
       timeline.to(
         [leftCard, rightCard],
         {
           scale: 0.88,
-          y: 360,
+          // DO NOT set y here - keep it at 360 so upward animation works
           rotationY: (_index, target) => (target === leftCard ? -15 : 15),
           z: -40,
           filter: 'blur(0px)', // Keep clear, only blur when fading out
           ease: 'power2.inOut',
+          duration: 0.2, // Quick scale down
         },
-        0.45,
+        0.5, // Start AFTER side cards have finished moving beside center
       )
 
       // Heading fade out
@@ -275,49 +293,59 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         0.15,
       )
 
-      // Phase 3: Staged Move & Fade with enhanced depth
+      // Phase 3: All cards animate up and fade away simultaneously before Macbook spawns
+      // This happens AFTER side cards have completed moving beside center (0.5) and scaling (0.7)
+      // So we start at 0.7 to ensure all three cards are beside each other first
       const fadeTargets = [centerCard, leftCard, rightCard]
 
-      // Continuous move with refined easing
+      // 1. ONE continuous move UP (eases "out", starts fast)
+      // All cards are currently at y: 360, we move them UP to y: 240 (120px upward movement)
+      // Using ABSOLUTE positioning to ensure the animation works correctly
       timeline.to(
         fadeTargets,
         {
-          y: 240,
+          y: 240, // Move to y: 240 (absolute position) - moves UP from 360 to 240
           ease: 'power2.out',
+          duration: 0.4, // Explicit duration for visible upward movement
         },
-        0.6,
+        0.7, // Start AFTER side cards have completed their side-to-center animation (0.5) and scale (0.7)
       )
 
-      // Fade out with depth-based blur increase - only blur during fade
+      // 2. The FADE (eases "in", starts slow) - starts at same time as upward move
+      // By setting the start time to 0.7, it begins *with* the upward move.
+      // Because of 'ease: "power2.in"', it will be "only by a little" at the start, then accelerate.
       timeline.to(
-        centerCard,
+        fadeTargets,
         {
-          autoAlpha: 0,
-          scale: 0.95,
-          z: -30,
-          filter: 'blur(4px)', // Light blur during fade only
+          autoAlpha: 0, // Fade out simultaneously - completely invisible
           ease: 'power2.in',
+          duration: 0.25, // Duration to complete fade
         },
-        0.6,
+        0.7, // Start at 0.7 (same as upward move), completes at 0.95 (before Macbook spawns)
       )
 
-      timeline.to(
-        [leftCard, rightCard],
-        {
-          autoAlpha: 0,
-          scale: 0.85,
-          z: -60,
-          filter: 'blur(4px)', // Light blur during fade only
-          ease: 'power2.in',
-        },
-        0.65, // Slight delay for layered fade
-      )
+      // Phase 3.5: Smooth background color transition - completes before Macbook spawns
+      // Transitions to lighter color so background is already the new color when Macbook appears
+      // Starts early and completes smoothly by Macbook spawn time
+      if (background) {
+        timeline.to(
+          background,
+          {
+            backgroundColor: '#0B0D12', // Transition to obsidian (lighter than night)
+            ease: 'power2.inOut',
+            duration: 0.65, // Smooth transition that completes by 0.95
+          },
+          0.3, // Start early during card animations, completes at 0.95 (when Macbook spawns)
+        )
+      }
 
       // Phase 4: Macbook Pro spawn-in - appears after cards are completely gone
+      // More scroll distance between card fade and Macbook spawn
       if (macbook) {
         const video = macbook.querySelector('video') as HTMLVideoElement
 
         // Phase 4a: Macbook container spawns in with premium 3D animation
+        // Appears after cards have completely faded (starts at 0.95, after fade completes)
         timeline.to(
           macbook,
           {
@@ -331,36 +359,171 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             ease: 'power3.out',
             duration: 1.2,
           },
-          0.85, // Start after cards are 100% faded
+          0.95, // Start after cards fade (which completes at 0.95)
         )
 
-        // Phase 4b: Video fades in smoothly after Macbook is fully visible
-        // Macbook animation: starts at 0.85, duration 1.2, ends at 2.05
-        // Video fade starts right after Macbook completes (2.05) for clean separation
+        // Phase 4b: Video automatically fades in after Macbook spawns in (not tied to scroll)
+        // Video fade-in happens automatically with 1.5s duration after Macbook completes
         if (video) {
-          // Start video playback slightly before fade-in so it's ready
+          // Trigger video fade-in automatically when Macbook animation completes
           timeline.call(
             () => {
               if (video) {
+                // Start video playback immediately
                 video.play().catch((error) => {
                   console.warn('Video autoplay failed:', error)
+                })
+
+                // Create a separate timeline for video fade-in (not tied to scroll)
+                gsap.to(video, {
+                  opacity: 1,
+                  scale: 1, // Zoom out from 1.05 to 1.0
+                  ease: 'power2.out',
+                  duration: 1.5, // 1.5 seconds as requested
+                  delay: 0, // No delay - starts immediately after Macbook spawns
                 })
               }
             },
             [],
-            1.9, // Start playing video 0.15s before fade-in (prepares for smooth reveal)
+            0.95 + 1.2, // Callback fires when Macbook animation completes (0.95 start + 1.2 duration = 2.15)
           )
+        }
+      }
 
-          // Smooth video fade-in with subtle zoom-out effect (premium reveal)
+      // Phase 5: Zoom into Macbook screen (inside the bezels) - makes it feel like entering the screen
+      // This happens further in the scroll timeline after video has appeared
+      if (macbook && container && background) {
+        // Get video element which is directly inside the screen area
+        const video = macbook.querySelector('video') as HTMLVideoElement
+        
+        if (!video) return
+
+        // Get actual positions at runtime for accurate calculation
+        // We'll use the video element's position since it's directly in the screen
+        const containerRect = container.getBoundingClientRect()
+        const macbookRect = macbook.getBoundingClientRect()
+        
+        // Screen area in SVG: x="74.52" y="21.32" width="501.22" height="323.85"
+        // Calculate left side of screen for zoom focus (slightly right of left edge)
+        // Screen starts at 74.52, we want to focus on left side but a bit to the right
+        const screenLeftFocusXInMacbook = (74.52 + 501.22 * 0.35) / 650 // ~35% into screen from left edge = ~34% from Macbook left
+        const screenLeftFocusYInMacbook = (21.32 + 323.85 * 0.5) / 400 // Center vertically (~46% from top)
+        
+        // Calculate screen left-side focus position relative to container
+        // Macbook is centered in container, so we need its position
+        const macbookXInContainer = macbookRect.left - containerRect.left
+        const macbookYInContainer = macbookRect.top - containerRect.top
+        
+        // Screen left-side focus position relative to container
+        const screenFocusXInContainer = macbookXInContainer + (macbookRect.width * screenLeftFocusXInMacbook)
+        const screenFocusYInContainer = macbookYInContainer + (macbookRect.height * screenLeftFocusYInMacbook)
+        
+        // Container center
+        const containerCenterX = containerRect.width / 2
+        const containerCenterY = containerRect.height / 2
+        
+        // Screen left-side focus offset from container center
+        const screenXFromCenter = screenFocusXInContainer - containerCenterX
+        const screenYFromCenter = screenFocusYInContainer - containerCenterY
+        
+        // Initialize container for zoom - start centered
+        gsap.set(container, {
+          transformOrigin: 'center center',
+          x: 0,
+          y: 0,
+          scale: 1,
+          force3D: true,
+        })
+
+        // Phase 5a: Initial zoom - smooth, fluid zoom into screen area
+        // Formula: when zooming from center by scale S, a point at offset P moves to P*S
+        // To keep point at center, shift container by -P*S
+        // Macbook spawns at 0.95, completes at 2.15, video fades in until ~3.65
+        const scale4 = 4
+        timeline.to(
+          container,
+          {
+            scale: scale4,
+            x: -screenXFromCenter * scale4, // Shift to keep screen focus point in viewport center
+            y: -screenYFromCenter * scale4,
+            ease: 'power1.inOut', // Smoother easing for fluid motion
+            duration: 1.4, // Longer duration for smoother feel
+          },
+          2.5, // Start further in the timeline (after video has faded in)
+        )
+
+        // Phase 5b: Continue zooming deeper - seamless continuation
+        const scale6 = 6
+        timeline.to(
+          container,
+          {
+            scale: scale6,
+            x: -screenXFromCenter * scale6,
+            y: -screenYFromCenter * scale6,
+            ease: 'power1.inOut', // Smooth, consistent easing
+            duration: 1.2, // Longer for smoother transition
+          },
+          2.5 + 1.3, // Slight overlap for seamless transition
+        )
+
+        // Phase 5c: Final deep zoom - ultra-smooth finish
+        const scale10 = 10
+        timeline.to(
+          container,
+          {
+            scale: scale10,
+            x: -screenXFromCenter * scale10,
+            y: -screenYFromCenter * scale10,
+            ease: 'power1.inOut', // Smooth easing throughout
+            duration: 1.0, // Longer duration for premium feel
+          },
+          2.5 + 2.3, // Seamless continuation
+        )
+
+        // Background transitions to screen color (inside Macbook) - synchronized with zoom
+        timeline.to(
+          background,
+          {
+            backgroundColor: '#1C181E', // Background color after zoom - we're inside the Macbook now
+            ease: 'power1.inOut', // Smoother easing to match zoom
+            duration: 2.0, // Longer duration for smoother, gradual transition
+          },
+          2.5, // Start with zoom for synchronized effect
+        )
+
+        // Fade out Macbook frame edges as we zoom deep into the screen
+        // The frame should disappear as we "enter" the screen
+        timeline.to(
+          macbook,
+          {
+            opacity: 0.3, // Make frame semi-transparent so screen content shows through
+            ease: 'power1.inOut', // Smoother fade for premium feel
+            duration: 1.2, // Longer duration for gradual fade
+          },
+          2.5 + 1.8, // Start fading as we're deep in the zoom
+        )
+
+        // Finally, fade out Macbook completely as we're fully inside
+        timeline.to(
+          macbook,
+          {
+            opacity: 0, // Completely fade out - we're inside the screen now
+            ease: 'power1.inOut', // Smooth, consistent easing
+            duration: 1.0, // Longer duration for smooth completion
+          },
+          2.5 + 2.8, // At the end of zoom sequence
+        )
+
+        // Optional: Zoom the video element separately for extra depth
+        if (video) {
           timeline.to(
             video,
             {
-              opacity: 1,
-              scale: 1, // Zoom out from 1.05 to 1.0
-              ease: 'power2.out',
-              duration: 0.9,
+              scale: 1.2, // Slight additional zoom on video for depth
+              ease: 'power1.inOut', // Smoother easing to match overall zoom
+              duration: 2.0, // Longer duration for smoother, gradual zoom
             },
-            2.05, // Start right after Macbook animation completes
+            2.5, // Start with Macbook zoom
           )
         }
       }
@@ -372,12 +535,25 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
 
   return (
     <section ref={sectionRef} className="relative min-h-[300vh]">
+      {/* Animated background color layer */}
+      <div
+        ref={backgroundRef}
+        className="pointer-events-none absolute inset-0 z-0"
+        aria-hidden="true"
+        style={{
+          backgroundColor: '#05060A', // Initial night color
+          transition: 'background-color 0.3s ease', // Fallback for reduced motion
+        }}
+      />
       {/* Background texture - removed parallax to prevent conflicts */}
       <div
-        className="pointer-events-none absolute inset-0 bg-grain opacity-[0.06]"
+        className="pointer-events-none absolute inset-0 z-[1] bg-grain opacity-[0.06]"
         aria-hidden="true"
       />
-      <div className="sticky top-[-12vh] flex h-screen flex-col items-center justify-start overflow-hidden px-6 py-16 sm:px-10 lg:px-16">
+      <div 
+        ref={containerRef}
+        className="sticky top-[-12vh] flex h-screen flex-col items-center justify-start overflow-hidden px-6 py-16 sm:px-10 lg:px-16"
+      >
         <div className="relative mt-6 flex w-full flex-col items-center gap-6 md:mt-10 md:grid md:max-w-6xl md:grid-cols-3 md:gap-10">
           {cards.map((card, index) => {
             // Enhanced CSS classes with 3D transform hints
@@ -434,7 +610,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           ref={headingRef}
           className="mt-auto w-full max-w-3xl text-center pb-6 md:pb-12"
         >
-          <h2 className="font-display text-4xl text-porcelain sm:text-5xl md:text-6xl">
+          <h2 className="font-display text-4xl text-porcelain sm:text-5xl md:text-5xl">
             Time converges where precision finds its counterpart.
           </h2>
         </div>
