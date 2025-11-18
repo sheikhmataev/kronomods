@@ -39,18 +39,6 @@ const App = () => {
 
           <main className="relative flex flex-col">
             <HeroCardsSection />
-            {/* Removed data-speed to prevent conflicts */}
-            <section className="relative z-10 px-6 pb-32 pt-24 sm:px-10 lg:px-16">
-              <div className="mx-auto max-w-4xl text-center">
-                <p className="font-display text-3xl text-champagne sm:text-4xl">
-                  Bespoke configurations available upon private consultation.
-                </p>
-                <p className="mt-6 text-base text-porcelain/70 sm:text-lg">
-                  Each Kronomods chronometer is assembled to order within our Neuchâtel atelier. Reserve a session to
-                  commission yours, tailored to your cadence and story.
-                </p>
-              </div>
-            </section>
           </main>
         </div>
       </div>

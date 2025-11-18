@@ -3,6 +3,8 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { MacbookPro } from '@/components/ui/macbook-pro'
+import { ImageAutoSlider } from '@/components/ui/image-auto-slider'
+import { ContactSection } from '@/components/ui/contact-section'
 import watchVideo from '@/assets/watch.mp4'
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
@@ -55,6 +57,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   const macbookRef = useRef<HTMLDivElement | null>(null)
   const backgroundRef = useRef<HTMLDivElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const imageSliderRef = useRef<HTMLDivElement | null>(null)
+  const contactRef = useRef<HTMLDivElement | null>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
 
   useGSAP(
@@ -86,6 +90,16 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               console.warn('Video autoplay failed:', error)
             })
           }
+        }
+        // Show image slider immediately for reduced motion
+        if (imageSliderRef.current) {
+          imageSliderRef.current.style.opacity = '1'
+          imageSliderRef.current.style.transform = 'none'
+        }
+        // Show contact section immediately for reduced motion
+        if (contactRef.current) {
+          contactRef.current.style.opacity = '1'
+          contactRef.current.style.transform = 'none'
         }
         return
       }
@@ -526,6 +540,95 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             2.5, // Start with Macbook zoom
           )
         }
+
+        // Phase 5d: Zoom out - reset container to normal scale before image slider appears
+        // Phase 5c ends at 2.5 + 2.3 + 1.0 = 5.8, so start zoom-out right after
+        timeline.to(
+          container,
+          {
+            scale: 1, // Reset to normal scale
+            x: 0, // Reset position
+            y: 0, // Reset position
+            ease: 'power2.out', // Smooth zoom out
+            duration: 1.5, // Smooth transition back to normal
+          },
+          2.5 + 2.3 + 1.0, // Start after Phase 5c completes (2.5 + 2.3 + 1.0 = 5.8)
+        )
+
+        // Reset video scale during zoom-out for consistency
+        if (video) {
+          timeline.to(
+            video,
+            {
+              scale: 1, // Reset video scale to normal
+              ease: 'power2.out', // Smooth zoom out
+              duration: 1.5, // Match container zoom-out duration
+            },
+            2.5 + 2.3 + 1.0, // Start same time as container zoom-out
+          )
+        }
+      }
+
+      // Phase 6: Image slider appears after zoom-out completes
+      // Zoom-out ends at 5.8 + 1.5 = 7.3, so start image slider around 7.5
+      const imageSlider = imageSliderRef.current
+      if (imageSlider) {
+        // Initialize image slider as hidden
+        gsap.set(imageSlider, {
+          opacity: 0,
+          y: 100,
+          scale: 0.95,
+          force3D: true,
+        })
+
+        // Phase 6a: Image slider fades in smoothly after zoom-out completes
+        timeline.to(
+          imageSlider,
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            ease: 'power2.out',
+            duration: 1.5,
+          },
+          7.5, // Start after zoom-out completes (zoom-out ends at ~7.3)
+        )
+      }
+
+      // Phase 7: Transition from image slider to contact section
+      // Image slider completes at 7.5 + 1.5 = 9.0, add some scroll time before transition
+      const contact = contactRef.current
+      if (contact) {
+        // Initialize contact section as hidden
+        gsap.set(contact, {
+          opacity: 0,
+          y: 50,
+          force3D: true,
+        })
+
+        // Phase 7a: Fade out image slider and fade in contact section
+        // Start transition after image slider has been visible for a while
+        timeline.to(
+          imageSlider,
+          {
+            opacity: 0,
+            y: -50,
+            ease: 'power2.in',
+            duration: 1.0,
+          },
+          10.0, // Start after image slider has been visible (7.5 + 1.5 + 1.0 = 10.0)
+        )
+
+        timeline.to(
+          contact,
+          {
+            opacity: 1,
+            y: 0,
+            ease: 'power2.out',
+            duration: 1.5,
+          },
+          10.2, // Slight overlap for smooth transition
+        )
       }
 
       timelineRef.current = timeline
@@ -534,7 +637,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   )
 
   return (
-    <section ref={sectionRef} className="relative min-h-[300vh]">
+    <section ref={sectionRef} className="relative min-h-[500vh]">
       {/* Animated background color layer */}
       <div
         ref={backgroundRef}
@@ -630,6 +733,24 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 color: '#05060A', // Night color for screen background
               }}
             />
+          </div>
+        </div>
+
+        {/* Image Auto Slider - appears after zoom completes */}
+        <div
+          ref={imageSliderRef}
+          className="absolute inset-0 z-40 pointer-events-none"
+        >
+          <ImageAutoSlider className="pointer-events-auto" />
+        </div>
+
+        {/* Contact Section - appears after image slider */}
+        <div
+          ref={contactRef}
+          className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
+        >
+          <div className="w-full pointer-events-auto">
+            <ContactSection />
           </div>
         </div>
       </div>
