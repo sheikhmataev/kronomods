@@ -419,9 +419,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         const macbookRect = macbook.getBoundingClientRect()
         
         // Screen area in SVG: x="74.52" y="21.32" width="501.22" height="323.85"
-        // Calculate left side of screen for zoom focus (slightly right of left edge)
-        // Screen starts at 74.52, we want to focus on left side but a bit to the right
-        const screenLeftFocusXInMacbook = (74.52 + 501.22 * 0.35) / 650 // ~35% into screen from left edge = ~34% from Macbook left
+        // Calculate left side of screen for zoom focus (more to the left)
+        // Screen starts at 74.52, we want to focus on left side, slightly more to the left
+        const screenLeftFocusXInMacbook = (74.52 + 501.22 * 0.30) / 650 // ~30% into screen from left edge = ~31% from Macbook left
         const screenLeftFocusYInMacbook = (21.32 + 323.85 * 0.5) / 400 // Center vertically (~46% from top)
         
         // Calculate screen left-side focus position relative to container
