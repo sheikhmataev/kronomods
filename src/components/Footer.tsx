@@ -2,7 +2,7 @@ import React from 'react'
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="relative z-10 px-6 py-8 sm:px-10 lg:px-16" style={{ backgroundColor: '#1C181E' }}>
+    <footer className="relative z-10 px-6 py-8 sm:px-10 lg:px-16" style={{ backgroundColor: '#5F5A56' }}>
       <div className="mx-auto max-w-7xl">
         <p className="text-center text-sm text-porcelain/60 font-sans">
           Designet for Kronomods - laget av{' '}

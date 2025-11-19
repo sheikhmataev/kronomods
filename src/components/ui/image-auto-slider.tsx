@@ -1,4 +1,12 @@
 import React from 'react'
+import carouselImg1 from '@/assets/carousel/carouselimg1.jpg'
+import carouselImg2 from '@/assets/carousel/carouselimg2.jpg'
+import carouselImg3 from '@/assets/carousel/carouselimg3.jpg'
+import carouselImg4 from '@/assets/carousel/carouselimg4.jpg'
+import carouselImg5 from '@/assets/carousel/carouselimg5.jpg'
+import carouselImg6 from '@/assets/carousel/carouselimg6.jpeg'
+import carouselImg7 from '@/assets/carousel/carouselimg7.jpeg'
+import carouselImg8 from '@/assets/carousel/carouselimg8.jpg'
 
 export interface ImageAutoSliderProps {
   images?: string[]
@@ -7,14 +15,14 @@ export interface ImageAutoSliderProps {
 
 export const ImageAutoSlider: React.FC<ImageAutoSliderProps> = ({
   images = [
-    'https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://images.unsplash.com/photo-1472396961693-142e6e269027?q=80&w=2152&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://images.unsplash.com/photo-1505142468610-359e7d316be0?q=80&w=2126&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://images.unsplash.com/photo-1482881497185-d4a9ddbe4151?q=80&w=1965&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://plus.unsplash.com/premium_photo-1673264933212-d78737f38e48?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://plus.unsplash.com/premium_photo-1711434824963-ca894373272e?q=80&w=2030&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://plus.unsplash.com/premium_photo-1675705721263-0bbeec261c49?q=80&w=1940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://images.unsplash.com/photo-1524799526615-766a9833dec0?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    carouselImg1,
+    carouselImg2,
+    carouselImg3,
+    carouselImg4,
+    carouselImg5,
+    carouselImg6,
+    carouselImg7,
+    carouselImg8,
   ],
   className = '',
 }) => {
@@ -73,13 +81,13 @@ export const ImageAutoSlider: React.FC<ImageAutoSliderProps> = ({
 
       <div 
         className={`w-full min-h-screen relative overflow-hidden flex items-center justify-center ${className}`}
-        style={{ backgroundColor: '#1C181E' }}
+        style={{ backgroundColor: '#5F5A56' }}
       >
         {/* Background gradient - using same color as Phase 5c zoom */}
         <div 
           className="absolute inset-0 z-0"
           style={{
-            background: 'linear-gradient(to bottom, #1C181E 0%, rgba(28, 24, 30, 0.9) 50%, #1C181E 100%)'
+            background: 'linear-gradient(to bottom, #5F5A56 0%, rgba(95, 90, 86, 0.9) 50%, #5F5A56 100%)'
           }}
         />
 
@@ -108,7 +116,7 @@ export const ImageAutoSlider: React.FC<ImageAutoSliderProps> = ({
         <div 
           className="absolute bottom-0 left-0 right-0 h-24 z-20"
           style={{
-            background: 'linear-gradient(to top, #1C181E 0%, transparent 100%)'
+            background: 'linear-gradient(to top, #5F5A56 0%, transparent 100%)'
           }}
         />
       </div>

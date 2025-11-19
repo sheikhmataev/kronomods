@@ -6,7 +6,7 @@ import { MacbookPro } from '@/components/ui/macbook-pro'
 import { ImageAutoSlider } from '@/components/ui/image-auto-slider'
 import { ContactSection } from '@/components/ui/contact-section'
 import { Footer } from '@/components/Footer'
-import watchVideo from '@/assets/watch.mp4'
+import watchVideo from '@/assets/Videos/watch.mp4'
 import watch1Image from '@/assets/watch1/watch1.png'
 import watch2Image from '@/assets/watch2/watch2.jpg'
 import watch3Image from '@/assets/watch3/watch3.jpg'
@@ -506,7 +506,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         timeline.to(
           background,
           {
-            backgroundColor: '#1C181E', // Background color after zoom - we're inside the Macbook now
+            backgroundColor: '#5F5A56', // Background color after zoom - we're inside the Macbook now
             ease: 'power1.inOut', // Smoother easing to match zoom
             duration: 2.0, // Longer duration for smoother, gradual transition
           },

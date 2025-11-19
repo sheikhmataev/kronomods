@@ -16,7 +16,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
       desc: 'Connect with our community of watch enthusiasts and collectors.',
       link: {
         name: 'Visit our Instagram',
-        href: 'javascript:void(0)',
+        href: 'https://www.instagram.com/kronomods_norge/',
       },
     },
     {
@@ -30,13 +30,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
       desc: 'Discover our exclusive watch collection and limited editions.',
       link: {
         name: 'Visit our Tise shop',
-        href: 'javascript:void(0)',
+        href: 'https://tise.com/kronomods_norge',
       },
     },
   ]
 
   return (
-    <div className={className} style={{ backgroundColor: '#1C181E', minHeight: '100%' }}>
+    <div className={className} style={{ backgroundColor: '#5F5A56', minHeight: '100%' }}>
       {/* Contact Methods Section */}
       <section className="py-14">
         <div className="max-w-screen-xl mx-auto px-4 gap-12 md:px-8 lg:flex">
