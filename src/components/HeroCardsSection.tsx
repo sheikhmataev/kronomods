@@ -7,6 +7,9 @@ import { ImageAutoSlider } from '@/components/ui/image-auto-slider'
 import { ContactSection } from '@/components/ui/contact-section'
 import { Footer } from '@/components/Footer'
 import watchVideo from '@/assets/watch.mp4'
+import watch1Image from '@/assets/watch1/watch1.png'
+import watch2Image from '@/assets/watch2/watch2.jpg'
+import watch3Image from '@/assets/watch3/watch3.jpg'
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
@@ -22,6 +25,7 @@ type CardConfig = {
   title: string
   subtitle: string
   accent: string
+  image: string
 }
 
 const cards: CardConfig[] = [
@@ -30,18 +34,21 @@ const cards: CardConfig[] = [
     title: 'Chrono Apex',
     subtitle: 'Flagship tourbillon · 120h reserve',
     accent: 'KA',
+    image: watch1Image,
   },
   {
     role: 'left',
     title: 'Obsidian GMT',
     subtitle: 'Dual timezone · Meteorite dial',
     accent: 'KG',
+    image: watch2Image,
   },
   {
     role: 'right',
     title: 'Eclipse No. 8',
     subtitle: 'Skeleton calibre · Night lume',
     accent: 'KE',
+    image: watch3Image,
   },
 ]
 
@@ -662,7 +669,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           {cards.map((card, index) => {
             // Enhanced CSS classes with 3D transform hints
             const baseClasses =
-              'glass-card will-change-transform will-change-opacity flex h-[440px] w-full max-w-sm flex-col items-center justify-center gap-5 p-8 text-center transition-transform duration-300'
+              'glass-card will-change-transform will-change-opacity flex h-[440px] w-full max-w-sm overflow-hidden transition-transform duration-300'
             
             // Preserve 3D transforms for enhanced depth
             const transformStyle = {
@@ -698,12 +705,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                     : transformStyle
                 }
               >
-                <span className="text-xs uppercase tracking-[0.4em] text-champagne/70">{card.title}</span>
-                <div className="accent-gradient flex h-24 w-24 items-center justify-center rounded-full text-night">
-                  <span className="font-display text-2xl">{card.accent}</span>
-                </div>
-                <h3 className="font-display text-3xl text-champagne sm:text-4xl">{card.title}</h3>
-                <p className="max-w-sm text-sm text-porcelain/60 sm:text-base">{card.subtitle}</p>
+                <img
+                  src={card.image}
+                  alt={card.title}
+                  className="w-full h-full object-cover"
+                />
               </div>
             )
           })}
