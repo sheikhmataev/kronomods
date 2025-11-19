@@ -36,7 +36,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
   ]
 
   return (
-    <div className={className} style={{ backgroundColor: '#1C181E', minHeight: '100vh' }}>
+    <div className={className} style={{ backgroundColor: '#1C181E', minHeight: '100%' }}>
       {/* Contact Methods Section */}
       <section className="py-14">
         <div className="max-w-screen-xl mx-auto px-4 gap-12 md:px-8 lg:flex">

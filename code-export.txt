@@ -1,0 +1,1546 @@
+=========================================
+FILE: src/App.tsx
+=========================================
+
+import { gsap } from 'gsap'
+import { ScrollSmoother } from 'gsap/ScrollSmoother'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+import logo from './assets/image2.png'
+import HeroCardsSection from './components/HeroCardsSection'
+import { Footer } from './components/Footer'
+
+gsap.registerPlugin(ScrollSmoother, ScrollTrigger, useGSAP)
+
+const App = () => {
+  useGSAP(() => {
+    // Create ScrollSmoother for premium smooth scrolling
+    // Note: ScrollSmoother is a Club GreenSock plugin that requires a license
+    // It will work in development, but you'll need a Club membership for production
+    ScrollSmoother.create({
+      smooth: 1.2, // Reduced from 1.5 for smoother feel (less lag)
+      effects: false, // Disable data-speed effects to prevent conflicts with ScrollTrigger
+      smoothTouch: 0.05, // Reduced for better mobile performance
+      normalizeScroll: true, // Normalize scroll across devices
+      ignoreMobileResize: true, // Prevent recalculations on mobile resize
+    })
+  }, [])
+
+  return (
+    <div className="relative min-h-screen overflow-x-hidden bg-night text-porcelain">
+      {/* ScrollSmoother wrapper structure */}
+      <div id="smooth-wrapper">
+        <div id="smooth-content">
+          {/* Removed data-speed to prevent conflicts with smooth scrolling */}
+          <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-center px-6 py-4 sm:px-10 lg:px-16">
+            <div className="pointer-events-auto flex items-center">
+              <img
+                src={logo}
+                className="h-auto w-[200px] object-contain sm:w-[260px] lg:w-[320px]"
+                alt="Kronomods"
+              />
+            </div>
+          </header>
+
+          <main className="relative flex flex-col">
+            <HeroCardsSection />
+          </main>
+
+          <Footer />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default App
+
+
+
+
+=========================================
+FILE: src/main.tsx
+=========================================
+
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.tsx'
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+
+=========================================
+FILE: src/components/ui/contact-section.tsx
+=========================================
+
+import React from 'react'
+
+export interface ContactSectionProps {
+  className?: string
+}
+
+export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }) => {
+  const contactMethods = [
+    {
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+          <path d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" />
+        </svg>
+      ),
+      title: 'Follow us on Instagram',
+      desc: 'Connect with our community of watch enthusiasts and collectors.',
+      link: {
+        name: 'Visit our Instagram',
+        href: 'javascript:void(0)',
+      },
+    },
+    {
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
+      ),
+      title: 'Shop on Tise',
+      desc: 'Discover our exclusive watch collection and limited editions.',
+      link: {
+        name: 'Visit our Tise shop',
+        href: 'javascript:void(0)',
+      },
+    },
+  ]
+
+  return (
+    <div className={className} style={{ backgroundColor: '#1C181E', minHeight: '100vh' }}>
+      {/* Contact Methods Section */}
+      <section className="py-14">
+        <div className="max-w-screen-xl mx-auto px-4 gap-12 md:px-8 lg:flex">
+          <div className="max-w-md">
+            <h3 className="text-porcelain text-3xl font-semibold sm:text-4xl font-display">
+              Let's connect
+            </h3>
+            <p className="mt-3 text-porcelain/60">
+              We're here to help and answer any question you might have. We look forward to hearing from you.
+            </p>
+          </div>
+          <div>
+            <ul className="mt-12 gap-y-6 gap-x-12 items-center md:flex lg:gap-x-0 lg:mt-0">
+              {contactMethods.map((item, idx) => (
+                <li
+                  key={idx}
+                  className="space-y-3 border-t border-onyx/30 py-6 md:max-w-sm md:py-0 md:border-t-0 lg:border-l lg:border-onyx/30 lg:px-12 lg:max-w-none"
+                >
+                  <div className="w-12 h-12 rounded-full border border-onyx/30 flex items-center justify-center text-champagne">
+                    {item.icon}
+                  </div>
+                  <h4 className="text-porcelain text-lg font-medium xl:text-xl font-display">
+                    {item.title}
+                  </h4>
+                  <p className="text-porcelain/60">{item.desc}</p>
+                  <a
+                    href={item.link.href}
+                    className="flex items-center gap-1 text-sm text-champagne duration-150 hover:text-auric font-medium"
+                  >
+                    {item.link.name}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5 10a.75.75 0 01.75-.75h6.638L10.23 7.29a.75.75 0 111.04-1.08l3.5 3.25a.75.75 0 010 1.08l-3.5 3.25a.75.75 0 11-1.04-1.08l2.158-1.96H5.75A.75.75 0 015 10z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Form Section */}
+      <section className="py-14">
+        <div className="max-w-screen-xl mx-auto px-4 md:px-8">
+          <div className="max-w-lg mx-auto space-y-3 sm:text-center">
+            <h3 className="text-champagne font-semibold font-display">Contact</h3>
+            <p className="text-porcelain text-3xl font-semibold sm:text-4xl font-display">
+              Get in touch
+            </p>
+            <p className="text-porcelain/60">
+              We'd love to hear from you! Please fill out the form below.
+            </p>
+          </div>
+          <div className="mt-12 max-w-lg mx-auto">
+            <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
+              <div className="flex flex-col items-center gap-y-5 gap-x-6 [&>*]:w-full sm:flex-row">
+                <div>
+                  <label className="font-medium text-porcelain">First name</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full mt-2 px-3 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne shadow-lg rounded-lg transition-colors placeholder:text-porcelain/40"
+                    placeholder="Enter your first name"
+                  />
+                </div>
+                <div>
+                  <label className="font-medium text-porcelain">Last name</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full mt-2 px-3 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne shadow-lg rounded-lg transition-colors placeholder:text-porcelain/40"
+                    placeholder="Enter your last name"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="font-medium text-porcelain">Email</label>
+                <input
+                  type="email"
+                  required
+                  className="w-full mt-2 px-3 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne shadow-lg rounded-lg transition-colors placeholder:text-porcelain/40"
+                  placeholder="Enter your email"
+                />
+              </div>
+              <div>
+                <label className="font-medium text-porcelain">Phone number</label>
+                <div className="relative mt-2">
+                  <div className="absolute inset-y-0 left-3 my-auto h-6 flex items-center border-r border-onyx/30 pr-2 z-10">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 640 480"
+                      className="w-6 h-4"
+                      style={{ filter: 'none', backdropFilter: 'none', imageRendering: 'crisp-edges' }}
+                    >
+                      <rect width="640" height="480" fill="#ba0c2f" />
+                      <rect x="180" width="140" height="480" fill="#fff" />
+                      <rect y="180" width="640" height="140" fill="#fff" />
+                      <rect x="200" width="100" height="480" fill="#00205b" />
+                      <rect y="200" width="640" height="100" fill="#00205b" />
+                    </svg>
+                  </div>
+                  <input
+                    type="tel"
+                    placeholder="912 34 567"
+                    pattern="[0-9 ]{9,11}"
+                    maxLength={11}
+                    required
+                    className="w-full pl-[3.5rem] pr-3 py-2 appearance-none bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne shadow-lg rounded-lg text-porcelain transition-colors placeholder:text-porcelain/40"
+                    onInput={(e) => {
+                      const target = e.target as HTMLInputElement
+                      let value = target.value.replace(/\D/g, '') // Remove all non-digits
+                      if (value.length > 8) value = value.slice(0, 8) // Limit to 8 digits (Norwegian format)
+                      // Format: XXX XX XXX (spaces after 3rd and 6th digit)
+                      if (value.length > 6) {
+                        value = `${value.slice(0, 3)} ${value.slice(3, 6)} ${value.slice(6)}`
+                      } else if (value.length > 3) {
+                        value = `${value.slice(0, 3)} ${value.slice(3)}`
+                      }
+                      target.value = value
+                    }}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="font-medium text-porcelain">Message</label>
+                <textarea
+                  required
+                  className="w-full mt-2 h-36 px-3 py-2 resize-none appearance-none bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne shadow-lg rounded-lg text-porcelain transition-colors placeholder:text-porcelain/40"
+                  placeholder="Enter your message"
+                ></textarea>
+              </div>
+              <button
+                type="submit"
+                className="w-full px-4 py-2 text-night font-medium bg-champagne hover:bg-auric active:bg-champagne rounded-lg duration-150 transition-colors"
+              >
+                Submit
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+
+=========================================
+FILE: src/components/ui/image-auto-slider.tsx
+=========================================
+
+import React from 'react'
+
+export interface ImageAutoSliderProps {
+  images?: string[]
+  className?: string
+}
+
+export const ImageAutoSlider: React.FC<ImageAutoSliderProps> = ({
+  images = [
+    'https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1472396961693-142e6e269027?q=80&w=2152&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1505142468610-359e7d316be0?q=80&w=2126&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1482881497185-d4a9ddbe4151?q=80&w=1965&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://plus.unsplash.com/premium_photo-1673264933212-d78737f38e48?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://plus.unsplash.com/premium_photo-1711434824963-ca894373272e?q=80&w=2030&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://plus.unsplash.com/premium_photo-1675705721263-0bbeec261c49?q=80&w=1940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1524799526615-766a9833dec0?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  ],
+  className = '',
+}) => {
+  // Duplicate images for seamless infinite loop
+  const duplicatedImages = [...images, ...images]
+
+  return (
+    <>
+      <style>{`
+        html, body {
+          margin: 0;
+          padding: 0;
+          overflow-x: hidden;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        @keyframes scroll-right {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+
+        .infinite-scroll {
+          animation: scroll-right 20s linear infinite;
+        }
+
+        .scroll-container {
+          mask: linear-gradient(
+            90deg,
+            transparent 0%,
+            black 10%,
+            black 90%,
+            transparent 100%
+          );
+          -webkit-mask: linear-gradient(
+            90deg,
+            transparent 0%,
+            black 10%,
+            black 90%,
+            transparent 100%
+          );
+        }
+
+        .image-item {
+          transition: transform 0.3s ease, filter 0.3s ease;
+        }
+
+        .image-item:hover {
+          transform: scale(1.05);
+          filter: brightness(1.1);
+        }
+      `}</style>
+
+      <div 
+        className={`w-full min-h-screen relative overflow-hidden flex items-center justify-center ${className}`}
+        style={{ backgroundColor: '#1C181E' }}
+      >
+        {/* Background gradient - using same color as Phase 5c zoom */}
+        <div 
+          className="absolute inset-0 z-0"
+          style={{
+            background: 'linear-gradient(to bottom, #1C181E 0%, rgba(28, 24, 30, 0.9) 50%, #1C181E 100%)'
+          }}
+        />
+
+        {/* Scrolling images container */}
+        <div className="relative z-10 w-full flex items-center justify-center py-8">
+          <div className="scroll-container w-full max-w-6xl">
+            <div className="infinite-scroll flex gap-6 w-max">
+              {duplicatedImages.map((image, index) => (
+                <div
+                  key={index}
+                  className="image-item flex-shrink-0 w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 rounded-xl overflow-hidden shadow-2xl"
+                >
+                  <img
+                    src={image}
+                    alt={`Gallery image ${(index % images.length) + 1}`}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom gradient overlay */}
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-24 z-20"
+          style={{
+            background: 'linear-gradient(to top, #1C181E 0%, transparent 100%)'
+          }}
+        />
+      </div>
+    </>
+  )
+}
+
+
+
+=========================================
+FILE: src/components/ui/macbook-pro.tsx
+=========================================
+
+import type { SVGProps } from "react";
+import { useId } from "react";
+
+export interface MacbookProProps extends SVGProps<SVGSVGElement> {
+  width?: number;
+  height?: number;
+  src?: string;
+  videoSrc?: string;
+  videoPoster?: string;
+}
+
+export function MacbookPro({
+  width = 650,
+  height = 400,
+  src,
+  videoSrc,
+  videoPoster,
+  ...props
+}: MacbookProProps) {
+  const clipPathId = useId();
+  
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        fill="#a4a5a7"
+        d="M79.56,13.18h491.32c7.23,0,13.1,5.87,13.1,13.1v336.61H66.46V26.28c0-7.23,5.87-13.1,13.1-13.1Z"
+      />
+      <path
+        fill="#222"
+        d="M79.96,14.24h490.45c6.83,0,12.37,5.54,12.37,12.37v336.28H67.59V26.6c0-6.83,5.54-12.37,12.37-12.37Z"
+      />
+      <path
+        fill="#000"
+        d="M570.25,15.74H80.34c-6.12,0-11.08,4.96-11.08,11.08v336.07h512.08V26.82c0-6.12-4.96-11.08-11.08-11.08ZM575.74,345.17H74.52V27.31c0-3.31,2.68-5.99,5.99-5.99h489.24c3.31,0,5.99,2.68,5.99,5.99v317.86Z"
+      />
+      <rect
+        fill="currentColor"
+        x="74.52"
+        y="21.32"
+        width="501.22"
+        rx="5"
+        ry="5"
+        height="323.85"
+      />
+      {src && !videoSrc && (
+        <image
+          href={src}
+          x="74.52"
+          y="21.32"
+          width="501.22"
+          height="323.85"
+          preserveAspectRatio="xMidYMid slice"
+          clipPath={`url(#${clipPathId})`}
+        />
+      )}
+      {videoSrc && (
+        <foreignObject
+          x="74.52"
+          y="21.32"
+          width="501.22"
+          height="323.85"
+          clipPath={`url(#${clipPathId})`}
+        >
+          <div
+            xmlns="http://www.w3.org/1999/xhtml"
+            style={{
+              width: '100%',
+              height: '100%',
+              overflow: 'hidden',
+              borderRadius: '5px',
+            }}
+          >
+            <video
+              src={videoSrc}
+              poster={videoPoster}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block',
+                opacity: 0, // Initially hidden, GSAP will animate this
+              }}
+            />
+          </div>
+        </foreignObject>
+      )}
+      <rect fill="#1d1d1d" x="69.09" y="350.51" width="512.11" height="12.48" />
+      <path
+        fill="#000"
+        d="M298.14,21.02h54.07v6.5c0,1.56-1.27,2.82-2.82,2.82h-48.42c-1.56,0-2.82-1.27-2.82-2.82v-6.5h0Z"
+      />
+      <path
+        fill="#acadaf"
+        d="M19.04,362.77h611.92v10.39c0,5.95-4.83,10.79-10.79,10.79H29.83c-5.95,0-10.79-4.83-10.79-10.79v-10.39h0Z"
+      />
+      <path
+        fill="#080d4c"
+        d="M325.11,25.14c-1.99.03-1.99-3.09,0-3.06,1.99-.03,1.99,3.09,0,3.06Z"
+      />
+      <polygon
+        fill="#b9b9bb"
+        points="600.06 385.39 567.29 385.39 565.84 383.95 601.82 383.95 600.06 385.39"
+      />
+      <polygon
+        fill="#292929"
+        points="598.73 386.82 568.64 386.82 567.32 385.39 600.35 385.39 598.73 386.82"
+      />
+      <polygon
+        fill="#b9b9bb"
+        points="82.64 385.39 49.87 385.39 48.43 383.95 84.41 383.95 82.64 385.39"
+      />
+      <polygon
+        fill="#292929"
+        points="81.31 386.82 51.23 386.82 49.9 385.39 82.93 385.39 81.31 386.82"
+      />
+      <path
+        fill="#8f9091"
+        d="M278.11,362.6h94.05c0,3.63-2.95,6.58-6.58,6.58h-80.89c-3.63,0-6.58-2.95-6.58-6.58h0Z"
+      />
+      <defs>
+        <clipPath id={clipPathId}>
+          <rect
+            fill="#ffffff"
+            x="74.52"
+            y="21.32"
+            width="501.22"
+            height="323.85"
+            rx="5"
+            ry="5"
+          />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
+
+
+
+=========================================
+FILE: src/components/HeroCardsSection.tsx
+=========================================
+
+import { useRef } from 'react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+import { MacbookPro } from '@/components/ui/macbook-pro'
+import { ImageAutoSlider } from '@/components/ui/image-auto-slider'
+import { ContactSection } from '@/components/ui/contact-section'
+import watchVideo from '@/assets/watch.mp4'
+
+gsap.registerPlugin(ScrollTrigger, useGSAP)
+
+export type HeroCardsSectionProps = {
+  /** Enable or disable ScrollTrigger pinning. Defaults to true. */
+  pin?: boolean
+}
+
+type CardRole = 'center' | 'left' | 'right'
+
+type CardConfig = {
+  role: CardRole
+  title: string
+  subtitle: string
+  accent: string
+}
+
+const cards: CardConfig[] = [
+  {
+    role: 'center',
+    title: 'Chrono Apex',
+    subtitle: 'Flagship tourbillon · 120h reserve',
+    accent: 'KA',
+  },
+  {
+    role: 'left',
+    title: 'Obsidian GMT',
+    subtitle: 'Dual timezone · Meteorite dial',
+    accent: 'KG',
+  },
+  {
+    role: 'right',
+    title: 'Eclipse No. 8',
+    subtitle: 'Skeleton calibre · Night lume',
+    accent: 'KE',
+  },
+]
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+const isMobileViewport = () =>
+  typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+
+const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
+  const sectionRef = useRef<HTMLElement | null>(null)
+  const cardsRef = useRef<Array<HTMLDivElement | null>>([])
+  const headingRef = useRef<HTMLDivElement | null>(null)
+  const macbookRef = useRef<HTMLDivElement | null>(null)
+  const backgroundRef = useRef<HTMLDivElement | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const imageSliderRef = useRef<HTMLDivElement | null>(null)
+  const contactRef = useRef<HTMLDivElement | null>(null)
+  const timelineRef = useRef<gsap.core.Timeline | null>(null)
+
+  useGSAP(
+    () => {
+      if (!sectionRef.current) {
+        return
+      }
+
+      const shouldReduceMotion = prefersReducedMotion() || isMobileViewport()
+
+      if (shouldReduceMotion) {
+        cardsRef.current.forEach((card) => {
+          if (!card) return
+          card.style.opacity = '1'
+          card.style.transform = 'none'
+        })
+        if (headingRef.current) {
+          headingRef.current.style.opacity = '0'
+          headingRef.current.style.transform = 'translate3d(0, 220px, 0)'
+        }
+        // Show Macbook and video immediately for reduced motion
+        if (macbookRef.current) {
+          macbookRef.current.style.opacity = '1'
+          macbookRef.current.style.transform = 'none'
+          const video = macbookRef.current.querySelector('video') as HTMLVideoElement
+          if (video) {
+            video.style.opacity = '1'
+            video.play().catch((error) => {
+              console.warn('Video autoplay failed:', error)
+            })
+          }
+        }
+        // Show image slider immediately for reduced motion
+        if (imageSliderRef.current) {
+          imageSliderRef.current.style.opacity = '1'
+          imageSliderRef.current.style.transform = 'none'
+        }
+        // Show contact section immediately for reduced motion
+        if (contactRef.current) {
+          contactRef.current.style.opacity = '1'
+          contactRef.current.style.transform = 'none'
+        }
+        return
+      }
+
+      const getCardByRole = (role: CardRole) =>
+        cardsRef.current.find((card) => card?.dataset.role === role) ?? null
+
+      const centerCard = getCardByRole('center')
+      const leftCard = getCardByRole('left')
+      const rightCard = getCardByRole('right')
+      const heading = headingRef.current
+      const macbook = macbookRef.current
+      const container = containerRef.current
+
+      if (!centerCard || !leftCard || !rightCard || !heading) {
+        return
+      }
+
+      // Enhanced initial setup with 3D transforms and GPU acceleration
+      gsap.set(centerCard, {
+        transformOrigin: 'center center',
+        y: 300,
+        scale: 1.45,
+        opacity: 1,
+        rotationY: 0,
+        rotationX: 0,
+        z: 0,
+        filter: 'blur(0px)',
+        force3D: true,
+        transformStyle: 'preserve-3d',
+      })
+
+      gsap.set(leftCard, {
+        transformOrigin: 'center center',
+        xPercent: -120,
+        y: 300,
+        scale: 0.8,
+        opacity: 0,
+        rotationY: -25,
+        rotationX: 5,
+        z: -50,
+        filter: 'blur(0px)', // Start with no blur
+        force3D: true,
+        transformStyle: 'preserve-3d',
+      })
+
+      gsap.set(rightCard, {
+        transformOrigin: 'center center',
+        xPercent: 120,
+        y: 300,
+        scale: 0.8,
+        opacity: 0,
+        rotationY: 25,
+        rotationX: 5,
+        z: -50,
+        filter: 'blur(0px)', // Start with no blur
+        force3D: true,
+        transformStyle: 'preserve-3d',
+      })
+
+      gsap.set(heading, {
+        y: 0,
+        opacity: 1,
+        force3D: true,
+        // Ensure smooth text rendering
+        willChange: 'transform, opacity',
+      })
+
+      // Initialize background for smooth color transition
+      const background = backgroundRef.current
+      if (background) {
+        gsap.set(background, {
+          backgroundColor: '#05060A', // Start with night color
+          force3D: true,
+        })
+      }
+
+      // Initialize Macbook Pro - hidden and scaled down initially
+      if (macbook) {
+        gsap.set(macbook, {
+          opacity: 0,
+          scale: 0.8,
+          y: 100,
+          rotationY: -10,
+          rotationX: 5,
+          z: -50,
+          filter: 'blur(8px)',
+          force3D: true,
+          transformStyle: 'preserve-3d',
+          willChange: 'transform, opacity, filter',
+        })
+
+        // Initialize video inside Macbook - hidden initially
+        const video = macbook.querySelector('video') as HTMLVideoElement
+        if (video) {
+          gsap.set(video, {
+            opacity: 0,
+            scale: 1.05, // Slight zoom for premium reveal
+            force3D: true,
+          })
+        }
+      }
+
+      // Enhanced timeline with refined easing and 3D transforms
+      const timeline = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top top',
+            end: 'bottom bottom', // CHANGED: Matches the exact end of the physical container
+            pin,
+            anticipatePin: 1,
+            scrub: 1, // Higher scrub value = less scroll needed, smoother feel
+            invalidateOnRefresh: true,
+            refreshPriority: -1, // Refresh after other animations
+        },
+      })
+
+      // Phase 1: Spawn-in with 3D transforms and staggered timing
+      timeline
+        .to(
+          centerCard,
+          {
+            y: 360,
+            scale: 1.08,
+            rotationY: 0,
+            rotationX: 0,
+            z: 20,
+            filter: 'blur(0px)',
+            ease: 'power3.out',
+          },
+          0,
+        )
+        .to(
+          centerCard,
+          {
+            y: 360,
+            scale: 1,
+            ease: 'power2.inOut',
+          },
+          0.4,
+        )
+
+      // Phase 1b: Side cards animate from sides to center - appear beside center card
+      // They need to complete this animation BEFORE moving upward together
+      timeline.to(
+        leftCard,
+        {
+          xPercent: 0, // Move from -120 to 0 (beside center)
+          y: 360,
+          scale: 1.02,
+          opacity: 1,
+          rotationY: -10,
+          rotationX: 0,
+          z: -20,
+          filter: 'blur(0px)', // Clear when visible
+          ease: 'power3.out',
+          duration: 0.5, // Explicit duration for side-to-center animation
+        },
+        0, // Start at same time as center card spawns
+      )
+
+      timeline.to(
+        rightCard,
+        {
+          xPercent: 0, // Move from 120 to 0 (beside center)
+          y: 360,
+          scale: 1.02,
+          opacity: 1,
+          rotationY: 10,
+          rotationX: 0,
+          z: -20,
+          filter: 'blur(0px)', // Clear when visible
+          ease: 'power3.out',
+          duration: 0.5, // Explicit duration for side-to-center animation
+        },
+        0, // Start at same time - both side cards animate together
+      )
+
+      // Phase 2: Side cards scale down with 3D depth - keep them clear while visible
+      // This happens AFTER side cards have moved beside center (at 0.5 when they complete)
+      // IMPORTANT: Don't set y here - let it stay at 360 so the upward animation works correctly
+      timeline.to(
+        [leftCard, rightCard],
+        {
+          scale: 0.88,
+          // DO NOT set y here - keep it at 360 so upward animation works
+          rotationY: (_index, target) => (target === leftCard ? -15 : 15),
+          z: -40,
+          filter: 'blur(0px)', // Keep clear, only blur when fading out
+          ease: 'power2.inOut',
+          duration: 0.2, // Quick scale down
+        },
+        0.5, // Start AFTER side cards have finished moving beside center
+      )
+
+      // Heading fade out
+      timeline.to(
+        heading,
+        {
+          y: 360,
+          opacity: 0,
+          ease: 'power2.in',
+        },
+        0.15,
+      )
+
+      // Phase 3: All cards animate up and fade away simultaneously before Macbook spawns
+      // This happens AFTER side cards have completed moving beside center (0.5) and scaling (0.7)
+      // So we start at 0.7 to ensure all three cards are beside each other first
+      const fadeTargets = [centerCard, leftCard, rightCard]
+
+      // 1. ONE continuous move UP (eases "out", starts fast)
+      // All cards are currently at y: 360, we move them UP to y: 240 (120px upward movement)
+      // Using ABSOLUTE positioning to ensure the animation works correctly
+      timeline.to(
+        fadeTargets,
+        {
+          y: 240, // Move to y: 240 (absolute position) - moves UP from 360 to 240
+          ease: 'power2.out',
+          duration: 0.4, // Explicit duration for visible upward movement
+        },
+        0.7, // Start AFTER side cards have completed their side-to-center animation (0.5) and scale (0.7)
+      )
+
+      // 2. The FADE (eases "in", starts slow) - starts at same time as upward move
+      // By setting the start time to 0.7, it begins *with* the upward move.
+      // Because of 'ease: "power2.in"', it will be "only by a little" at the start, then accelerate.
+      timeline.to(
+        fadeTargets,
+        {
+          autoAlpha: 0, // Fade out simultaneously - completely invisible
+          ease: 'power2.in',
+          duration: 0.25, // Duration to complete fade
+        },
+        0.7, // Start at 0.7 (same as upward move), completes at 0.95 (before Macbook spawns)
+      )
+
+      // Phase 3.5: Smooth background color transition - completes before Macbook spawns
+      // Transitions to lighter color so background is already the new color when Macbook appears
+      // Starts early and completes smoothly by Macbook spawn time
+      if (background) {
+        timeline.to(
+          background,
+          {
+            backgroundColor: '#0B0D12', // Transition to obsidian (lighter than night)
+            ease: 'power2.inOut',
+            duration: 0.65, // Smooth transition that completes by 0.95
+          },
+          0.3, // Start early during card animations, completes at 0.95 (when Macbook spawns)
+        )
+      }
+
+      // Phase 4: Macbook Pro spawn-in - appears after cards are completely gone
+      // More scroll distance between card fade and Macbook spawn
+      if (macbook) {
+        const video = macbook.querySelector('video') as HTMLVideoElement
+
+        // Phase 4a: Macbook container spawns in with premium 3D animation
+        // Appears after cards have completely faded (starts at 0.95, after fade completes)
+        timeline.to(
+          macbook,
+          {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            rotationY: 0,
+            rotationX: 0,
+            z: 0,
+            filter: 'blur(0px)',
+            ease: 'power3.out',
+            duration: 1.2,
+          },
+          0.95, // Start after cards fade (which completes at 0.95)
+        )
+
+        // Phase 4b: Video automatically fades in after Macbook spawns in (not tied to scroll)
+        // Video fade-in happens automatically with 1.5s duration after Macbook completes
+        if (video) {
+          // Trigger video fade-in automatically when Macbook animation completes
+          timeline.call(
+            () => {
+              if (video) {
+                // Start video playback immediately
+                video.play().catch((error) => {
+                  console.warn('Video autoplay failed:', error)
+                })
+
+                // Create a separate timeline for video fade-in (not tied to scroll)
+                gsap.to(video, {
+                  opacity: 1,
+                  scale: 1, // Zoom out from 1.05 to 1.0
+                  ease: 'power2.out',
+                  duration: 1.5, // 1.5 seconds as requested
+                  delay: 0, // No delay - starts immediately after Macbook spawns
+                })
+              }
+            },
+            [],
+            0.95 + 1.2, // Callback fires when Macbook animation completes (0.95 start + 1.2 duration = 2.15)
+          )
+        }
+      }
+
+      // Phase 5: Zoom into Macbook screen (inside the bezels) - makes it feel like entering the screen
+      // This happens further in the scroll timeline after video has appeared
+      if (macbook && container && background) {
+        // Get video element which is directly inside the screen area
+        const video = macbook.querySelector('video') as HTMLVideoElement
+        
+        if (!video) return
+
+        // Get actual positions at runtime for accurate calculation
+        // We'll use the video element's position since it's directly in the screen
+        const containerRect = container.getBoundingClientRect()
+        const macbookRect = macbook.getBoundingClientRect()
+        
+        // Screen area in SVG: x="74.52" y="21.32" width="501.22" height="323.85"
+        // Calculate left side of screen for zoom focus (slightly right of left edge)
+        // Screen starts at 74.52, we want to focus on left side but a bit to the right
+        const screenLeftFocusXInMacbook = (74.52 + 501.22 * 0.35) / 650 // ~35% into screen from left edge = ~34% from Macbook left
+        const screenLeftFocusYInMacbook = (21.32 + 323.85 * 0.5) / 400 // Center vertically (~46% from top)
+        
+        // Calculate screen left-side focus position relative to container
+        // Macbook is centered in container, so we need its position
+        const macbookXInContainer = macbookRect.left - containerRect.left
+        const macbookYInContainer = macbookRect.top - containerRect.top
+        
+        // Screen left-side focus position relative to container
+        const screenFocusXInContainer = macbookXInContainer + (macbookRect.width * screenLeftFocusXInMacbook)
+        const screenFocusYInContainer = macbookYInContainer + (macbookRect.height * screenLeftFocusYInMacbook)
+        
+        // Container center
+        const containerCenterX = containerRect.width / 2
+        const containerCenterY = containerRect.height / 2
+        
+        // Screen left-side focus offset from container center
+        const screenXFromCenter = screenFocusXInContainer - containerCenterX
+        const screenYFromCenter = screenFocusYInContainer - containerCenterY
+        
+        // Initialize container for zoom - start centered
+        gsap.set(container, {
+          transformOrigin: 'center center',
+          x: 0,
+          y: 0,
+          scale: 1,
+          force3D: true,
+        })
+
+        // Phase 5a: Initial zoom - smooth, fluid zoom into screen area
+        // Formula: when zooming from center by scale S, a point at offset P moves to P*S
+        // To keep point at center, shift container by -P*S
+        // Macbook spawns at 0.95, completes at 2.15, video fades in until ~3.65
+        const scale4 = 4
+        timeline.to(
+          container,
+          {
+            scale: scale4,
+            x: -screenXFromCenter * scale4, // Shift to keep screen focus point in viewport center
+            y: -screenYFromCenter * scale4,
+            ease: 'power1.inOut', // Smoother easing for fluid motion
+            duration: 1.4, // Longer duration for smoother feel
+          },
+          2.5, // Start further in the timeline (after video has faded in)
+        )
+
+        // Phase 5b: Continue zooming deeper - seamless continuation
+        const scale6 = 6
+        timeline.to(
+          container,
+          {
+            scale: scale6,
+            x: -screenXFromCenter * scale6,
+            y: -screenYFromCenter * scale6,
+            ease: 'power1.inOut', // Smooth, consistent easing
+            duration: 1.2, // Longer for smoother transition
+          },
+          2.5 + 1.3, // Slight overlap for seamless transition
+        )
+
+        // Phase 5c: Final deep zoom - ultra-smooth finish
+        const scale10 = 10
+        timeline.to(
+          container,
+          {
+            scale: scale10,
+            x: -screenXFromCenter * scale10,
+            y: -screenYFromCenter * scale10,
+            ease: 'power1.inOut', // Smooth easing throughout
+            duration: 1.0, // Longer duration for premium feel
+          },
+          2.5 + 2.3, // Seamless continuation
+        )
+
+        // Background transitions to screen color (inside Macbook) - synchronized with zoom
+        timeline.to(
+          background,
+          {
+            backgroundColor: '#1C181E', // Background color after zoom - we're inside the Macbook now
+            ease: 'power1.inOut', // Smoother easing to match zoom
+            duration: 2.0, // Longer duration for smoother, gradual transition
+          },
+          2.5, // Start with zoom for synchronized effect
+        )
+
+        // Fade out Macbook frame edges as we zoom deep into the screen
+        // The frame should disappear as we "enter" the screen
+        timeline.to(
+          macbook,
+          {
+            opacity: 0.3, // Make frame semi-transparent so screen content shows through
+            ease: 'power1.inOut', // Smoother fade for premium feel
+            duration: 1.2, // Longer duration for gradual fade
+          },
+          2.5 + 1.8, // Start fading as we're deep in the zoom
+        )
+
+        // Finally, fade out Macbook completely as we're fully inside
+        timeline.to(
+          macbook,
+          {
+            opacity: 0, // Completely fade out - we're inside the screen now
+            ease: 'power1.inOut', // Smooth, consistent easing
+            duration: 1.0, // Longer duration for smooth completion
+          },
+          2.5 + 2.8, // At the end of zoom sequence
+        )
+
+        // Optional: Zoom the video element separately for extra depth
+        if (video) {
+          timeline.to(
+            video,
+            {
+              scale: 1.2, // Slight additional zoom on video for depth
+              ease: 'power1.inOut', // Smoother easing to match overall zoom
+              duration: 2.0, // Longer duration for smoother, gradual zoom
+            },
+            2.5, // Start with Macbook zoom
+          )
+        }
+
+        // Phase 5d: Zoom out - reset container to normal scale before image slider appears
+        // Phase 5c ends at 2.5 + 2.3 + 1.0 = 5.8, so start zoom-out right after
+        timeline.to(
+          container,
+          {
+            scale: 1, // Reset to normal scale
+            x: 0, // Reset position
+            y: 0, // Reset position
+            ease: 'power2.out', // Smooth zoom out
+            duration: 1.5, // Smooth transition back to normal
+          },
+          2.5 + 2.3 + 1.0, // Start after Phase 5c completes (2.5 + 2.3 + 1.0 = 5.8)
+        )
+
+        // Reset video scale during zoom-out for consistency
+        if (video) {
+          timeline.to(
+            video,
+            {
+              scale: 1, // Reset video scale to normal
+              ease: 'power2.out', // Smooth zoom out
+              duration: 1.5, // Match container zoom-out duration
+            },
+            2.5 + 2.3 + 1.0, // Start same time as container zoom-out
+          )
+        }
+      }
+
+      // Phase 6: Image slider appears after zoom-out completes
+      // Zoom-out ends at 5.8 + 1.5 = 7.3, so start image slider around 7.5
+      const imageSlider = imageSliderRef.current
+      if (imageSlider) {
+        // Initialize image slider as hidden
+        gsap.set(imageSlider, {
+          opacity: 0,
+          y: 100,
+          scale: 0.95,
+          force3D: true,
+        })
+
+        // Phase 6a: Image slider fades in smoothly after zoom-out completes
+        timeline.to(
+          imageSlider,
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            ease: 'power2.out',
+            duration: 1.5,
+          },
+          7.5, // Start after zoom-out completes (zoom-out ends at ~7.3)
+        )
+      }
+
+      // Phase 7: Transition from image slider to contact section
+      // Image slider completes at 7.5 + 1.5 = 9.0, add some scroll time before transition
+      const contact = contactRef.current
+      if (contact) {
+        // Initialize contact section as hidden
+        gsap.set(contact, {
+          opacity: 0,
+          y: 50,
+          force3D: true,
+        })
+
+        // Phase 7a: Fade out image slider and fade in contact section
+        // Start transition after image slider has been visible for a while
+        timeline.to(
+          imageSlider,
+          {
+            opacity: 0,
+            y: -50,
+            ease: 'power2.in',
+            duration: 1.0,
+          },
+          10.0, // Start after image slider has been visible (7.5 + 1.5 + 1.0 = 10.0)
+        )
+
+        timeline.to(
+          contact,
+          {
+            opacity: 1,
+            y: 0,
+            ease: 'linear',
+            duration: 1.5,
+          },
+          10.2, // Slight overlap for smooth transition
+        )
+      }
+
+      timelineRef.current = timeline
+    },
+    { scope: sectionRef, dependencies: [pin] },
+  )
+
+  return (
+  <section ref={sectionRef} className="relative h-[500vh]">      
+  {/* Animated background color layer */}
+      <div
+        ref={backgroundRef}
+        className="pointer-events-none absolute inset-0 z-0"
+        aria-hidden="true"
+        style={{
+          backgroundColor: '#05060A', // Initial night color
+          transition: 'background-color 0.3s ease', // Fallback for reduced motion
+        }}
+      />
+      {/* Background texture - removed parallax to prevent conflicts */}
+      <div
+        className="pointer-events-none absolute inset-0 z-[1] bg-grain opacity-[0.06]"
+        aria-hidden="true"
+      />
+      <div 
+        ref={containerRef}
+        className="sticky top-[-12vh] flex h-screen flex-col items-center justify-start overflow-hidden px-6 py-16 sm:px-10 lg:px-16"
+      >
+        <div className="relative mt-6 flex w-full flex-col items-center gap-6 md:mt-10 md:grid md:max-w-6xl md:grid-cols-3 md:gap-10">
+          {cards.map((card, index) => {
+            // Enhanced CSS classes with 3D transform hints
+            const baseClasses =
+              'glass-card will-change-transform will-change-opacity flex h-[440px] w-full max-w-sm flex-col items-center justify-center gap-5 p-8 text-center transition-transform duration-300'
+            
+            // Preserve 3D transforms for enhanced depth
+            const transformStyle = {
+              transformStyle: 'preserve-3d' as const,
+              backfaceVisibility: 'hidden' as const,
+              perspective: 1000,
+            }
+
+            const roleClasses: Record<CardRole, string> = {
+              center: 'md:col-start-2 md:col-end-3 md:row-start-1 md:self-start',
+              left: 'md:col-start-1 md:col-end-2 md:row-start-1 md:justify-self-end md:opacity-0',
+              right: 'md:col-start-3 md:col-end-4 md:row-start-1 md:justify-self-start md:opacity-0',
+            }
+
+            // Remove parallax from cards as it conflicts with ScrollTrigger animations
+            // Parallax is handled by GSAP animations, not data-speed attributes
+            
+            return (
+              <div
+                key={card.role}
+                ref={(el) => {
+                  cardsRef.current[index] = el
+                }}
+                data-role={card.role}
+                className={`${baseClasses} ${roleClasses[card.role]}`}
+                style={
+                  card.role === 'center'
+                    ? {
+                        boxShadow:
+                          '0 42px 120px rgba(206, 168, 116, 0.32), 0 18px 40px rgba(255, 214, 170, 0.24)',
+                        ...transformStyle,
+                      }
+                    : transformStyle
+                }
+              >
+                <span className="text-xs uppercase tracking-[0.4em] text-champagne/70">{card.title}</span>
+                <div className="accent-gradient flex h-24 w-24 items-center justify-center rounded-full text-night">
+                  <span className="font-display text-2xl">{card.accent}</span>
+                </div>
+                <h3 className="font-display text-3xl text-champagne sm:text-4xl">{card.title}</h3>
+                <p className="max-w-sm text-sm text-porcelain/60 sm:text-base">{card.subtitle}</p>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Heading - removed parallax to prevent text glitches, GSAP handles animation */}
+        <div
+          ref={headingRef}
+          className="mt-auto w-full max-w-3xl text-center pb-6 md:pb-12"
+        >
+          <h2 className="font-display text-4xl text-porcelain sm:text-5xl md:text-5xl">
+            Time converges where precision finds its counterpart.
+          </h2>
+        </div>
+
+        {/* Macbook Pro - appears after cards disappear */}
+        <div
+          ref={macbookRef}
+          className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none"
+        >
+          <div className="relative w-full max-w-4xl">
+            <MacbookPro
+              width={650}
+              height={400}
+              videoSrc={watchVideo}
+              className="w-full h-auto max-w-full"
+              style={{
+                color: '#05060A', // Night color for screen background
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Image Auto Slider - appears after zoom completes */}
+        <div
+          ref={imageSliderRef}
+          className="absolute inset-0 z-40 pointer-events-none"
+        >
+          <ImageAutoSlider className="pointer-events-auto" />
+        </div>
+
+        {/* Contact Section - appears after image slider */}
+        <div
+          ref={contactRef}
+          className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
+        >
+          <div className="w-full pointer-events-auto">
+            <ContactSection />
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default HeroCardsSection
+
+=========================================
+FILE: src/components/WatchScene.tsx
+=========================================
+
+import { useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
+import type { Mesh } from 'three'
+
+const WatchScene = () => {
+  const dialRef = useRef<Mesh>(null)
+  const minuteHandRef = useRef<Mesh>(null)
+  const hourHandRef = useRef<Mesh>(null)
+
+  useFrame((state) => {
+    const elapsed = state.clock.getElapsedTime()
+
+    if (dialRef.current) {
+      dialRef.current.rotation.y = elapsed * 0.2
+      dialRef.current.rotation.x = Math.sin(elapsed * 0.1) * 0.2
+    }
+
+    if (minuteHandRef.current) {
+      minuteHandRef.current.rotation.z = -elapsed * 0.8
+    }
+
+    if (hourHandRef.current) {
+      hourHandRef.current.rotation.z = -elapsed * 0.2
+    }
+  })
+
+  return (
+    <group position={[0, -0.4, 0]}>
+      <mesh position={[0, -1.4, 0]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+        <cylinderGeometry args={[0.4, 1.4, 0.05, 48]} />
+        <meshStandardMaterial color="#05060A" transparent opacity={0.35} />
+      </mesh>
+
+      <group>
+        <mesh ref={dialRef} castShadow>
+          <cylinderGeometry args={[1.2, 1.2, 0.42, 64]} />
+          <meshPhysicalMaterial
+            color="#B89648"
+            roughness={0.2}
+            metalness={1}
+            clearcoat={0.8}
+            clearcoatRoughness={0.2}
+          />
+        </mesh>
+
+        <mesh position={[0, 0, 0.25]} castShadow>
+          <cylinderGeometry args={[1, 1, 0.08, 64]} />
+          <meshPhysicalMaterial color="#05060A" roughness={0.4} metalness={0.3} />
+        </mesh>
+
+        <mesh position={[0, 0, 0.32]}>
+          <icosahedronGeometry args={[0.12, 0]} />
+          <meshStandardMaterial color="#F5F1E6" emissive="#F5F1E6" emissiveIntensity={0.2} />
+        </mesh>
+
+        <mesh ref={minuteHandRef} position={[0, 0, 0.36]} castShadow>
+          <boxGeometry args={[0.06, 0.9, 0.06]} />
+          <meshStandardMaterial color="#F5F1E6" />
+        </mesh>
+
+        <mesh ref={hourHandRef} position={[0, 0, 0.34]} castShadow>
+          <boxGeometry args={[0.08, 0.6, 0.06]} />
+          <meshStandardMaterial color="#F5F1E6" />
+        </mesh>
+      </group>
+
+      <group position={[0, 0.9, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh castShadow>
+          <torusGeometry args={[0.9, 0.16, 32, 100]} />
+          <meshStandardMaterial color="#232733" roughness={0.5} metalness={0.4} />
+        </mesh>
+        <mesh position={[0, 0, 0.2]} castShadow>
+          <torusGeometry args={[0.9, 0.12, 32, 100]} />
+          <meshStandardMaterial color="#0B0D12" roughness={0.3} metalness={0.6} />
+        </mesh>
+      </group>
+
+      <group position={[0, -0.9, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh castShadow>
+          <torusGeometry args={[0.9, 0.16, 32, 100]} />
+          <meshStandardMaterial color="#232733" roughness={0.5} metalness={0.4} />
+        </mesh>
+        <mesh position={[0, 0, -0.2]} castShadow>
+          <torusGeometry args={[0.9, 0.12, 32, 100]} />
+          <meshStandardMaterial color="#0B0D12" roughness={0.3} metalness={0.6} />
+        </mesh>
+      </group>
+    </group>
+  )
+}
+
+export default WatchScene
+
+
+=========================================
+FILE: src/components/Footer.tsx
+=========================================
+
+import React from 'react'
+
+export const Footer: React.FC = () => {
+  return (
+    <footer className="relative z-10 px-6 py-8 sm:px-10 lg:px-16" style={{ backgroundColor: '#1C181E' }}>
+      <div className="mx-auto max-w-7xl">
+        <p className="text-center text-sm text-porcelain/60 font-sans">
+          Designet for Kronomods - laget av{' '}
+          <span className="text-champagne/80 hover:text-champagne transition-colors">
+            MASH Partners AS
+          </span>{' '}
+          - © 2025
+        </p>
+      </div>
+    </footer>
+  )
+}
+
+
+
+=========================================
+FILE: src/App.css
+=========================================
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+
+=========================================
+FILE: src/index.css
+=========================================
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body {
+    @apply h-full bg-night text-porcelain font-sans antialiased;
+  }
+
+  body {
+    @apply bg-gradient-to-b from-night via-obsidian to-graphite;
+  }
+
+  #root {
+    @apply min-h-full;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply rounded-3xl bg-onyx/70 backdrop-blur-xl border border-white/5 shadow-card-glow;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  .accent-gradient {
+    @apply bg-gradient-to-br from-auric via-champagne to-auric;
+  }
+}
+
+/* ScrollSmoother wrapper styles */
+#smooth-wrapper {
+  overflow: hidden;
+}
+
+#smooth-content {
+  will-change: transform;
+}
+
+/* Prevent text glitches during animations - only apply font smoothing */
+h1, h2, h3, h4, h5, h6,
+p, span, div {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+

@@ -5,6 +5,7 @@ import { useGSAP } from '@gsap/react'
 import { MacbookPro } from '@/components/ui/macbook-pro'
 import { ImageAutoSlider } from '@/components/ui/image-auto-slider'
 import { ContactSection } from '@/components/ui/contact-section'
+import { Footer } from '@/components/Footer'
 import watchVideo from '@/assets/watch.mp4'
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
@@ -209,10 +210,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         scrollTrigger: {
             trigger: sectionRef.current,
             start: 'top top',
-            end: '+=150%', // Reduced scroll distance for easier zoom phase
+            end: 'bottom bottom', // CHANGED: Matches the exact end of the physical container
             pin,
             anticipatePin: 1,
-            scrub: 2, // Higher scrub value = less scroll needed, smoother feel
+            scrub: 1, // Higher scrub value = less scroll needed, smoother feel
             invalidateOnRefresh: true,
             refreshPriority: -1, // Refresh after other animations
         },
@@ -624,7 +625,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           {
             opacity: 1,
             y: 0,
-            ease: 'power2.out',
+            ease: 'linear',
             duration: 1.5,
           },
           10.2, // Slight overlap for smooth transition
@@ -637,7 +638,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   )
 
   return (
-    <section ref={sectionRef} className="relative min-h-[500vh]">
+    <section ref={sectionRef} className="relative h-[400vh]">
       {/* Animated background color layer */}
       <div
         ref={backgroundRef}
@@ -655,9 +656,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       />
       <div 
         ref={containerRef}
-        className="sticky top-[-12vh] flex h-screen flex-col items-center justify-start overflow-hidden px-6 py-16 sm:px-10 lg:px-16"
+        className="sticky top-0 flex h-screen flex-col items-center justify-start overflow-hidden px-6 py-16 sm:px-10 lg:px-16"
       >
-        <div className="relative mt-6 flex w-full flex-col items-center gap-6 md:mt-10 md:grid md:max-w-6xl md:grid-cols-3 md:gap-10">
+        <div className="relative flex w-full flex-col items-center gap-6 md:grid md:max-w-6xl md:grid-cols-3 md:gap-10">
           {cards.map((card, index) => {
             // Enhanced CSS classes with 3D transform hints
             const baseClasses =
@@ -747,10 +748,13 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         {/* Contact Section - appears after image slider */}
         <div
           ref={contactRef}
-          className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
+          className="absolute inset-0 z-50 flex flex-col items-center justify-between pointer-events-none"
         >
-          <div className="w-full pointer-events-auto">
+          <div className="w-full flex-1 flex flex-col justify-center pointer-events-auto">
             <ContactSection />
+          </div>
+          <div className="w-full pointer-events-auto">
+            <Footer />
           </div>
         </div>
       </div>
