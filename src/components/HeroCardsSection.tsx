@@ -75,7 +75,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         return
       }
 
-      const shouldReduceMotion = prefersReducedMotion() || isMobileViewport()
+      const shouldReduceMotion = prefersReducedMotion()
 
       if (shouldReduceMotion) {
         cardsRef.current.forEach((card) => {
