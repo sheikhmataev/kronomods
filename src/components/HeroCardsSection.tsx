@@ -55,9 +55,6 @@ const cards: CardConfig[] = [
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-const isMobileViewport = () =>
-  typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
-
 const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   const sectionRef = useRef<HTMLElement | null>(null)
   const cardsRef = useRef<Array<HTMLDivElement | null>>([])
