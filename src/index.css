@@ -9,7 +9,7 @@
 
   html,
   body {
-    @apply h-full bg-night text-porcelain font-sans antialiased;
+    @apply h-full bg-night text-porcelain font-sans antialiased m-0 p-0;
   }
 
   body {

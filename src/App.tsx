@@ -27,8 +27,8 @@ const App = () => {
       <div id="smooth-wrapper">
         <div id="smooth-content">
           {/* Removed data-speed to prevent conflicts with smooth scrolling */}
-          <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-center px-6 py-4 sm:px-10 lg:px-16">
-            <div className="pointer-events-auto flex items-center">
+          <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center p-0 m-0 px-6 sm:px-10 lg:px-16">
+            <div className="pointer-events-auto relative p-0 m-0 -top-4 sm:-top-8 lg:-top-20">
               <img
                 src={logo}
                 className="h-auto w-[200px] object-contain sm:w-[260px] lg:w-[320px]"

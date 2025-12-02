@@ -85,7 +85,12 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         })
         if (headingRef.current) {
           headingRef.current.style.opacity = '0'
-          headingRef.current.style.transform = 'translate3d(0, 220px, 0)'
+          // Responsive heading position for reduced motion
+          const viewportWidth = window.innerWidth
+          const isMobile = viewportWidth < 640
+          const isTablet = viewportWidth >= 640 && viewportWidth < 1024
+          const headingY = isMobile ? 80 : isTablet ? 120 : 160
+          headingRef.current.style.transform = `translate3d(0, ${headingY}px, 0)`
         }
         // Show Macbook and video immediately for reduced motion
         if (macbookRef.current) {
@@ -126,11 +131,30 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         return
       }
 
+      // Get viewport width for responsive positioning
+      const viewportWidth = window.innerWidth
+      const isMobile = viewportWidth < 640
+      const isTablet = viewportWidth >= 640 && viewportWidth < 1024
+      
+      // Responsive Y positions based on device
+      const getResponsiveY = (mobile: number, tablet: number, desktop: number) => {
+        if (isMobile) return mobile
+        if (isTablet) return tablet
+        return desktop
+      }
+      
+      // Responsive scales based on device
+      const getResponsiveScale = (mobile: number, tablet: number, desktop: number) => {
+        if (isMobile) return mobile
+        if (isTablet) return tablet
+        return desktop
+      }
+
       // Enhanced initial setup with 3D transforms and GPU acceleration
       gsap.set(centerCard, {
         transformOrigin: 'center center',
-        y: 300,
-        scale: 1.45,
+        y: getResponsiveY(120, 160, 200),
+        scale: getResponsiveScale(1.2, 1.3, 1.45),
         opacity: 1,
         rotationY: 0,
         rotationX: 0,
@@ -143,8 +167,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       gsap.set(leftCard, {
         transformOrigin: 'center center',
         xPercent: -120,
-        y: 300,
-        scale: 0.8,
+        y: getResponsiveY(120, 160, 200),
+        scale: getResponsiveScale(0.7, 0.75, 0.8),
         opacity: 0,
         rotationY: -25,
         rotationX: 5,
@@ -157,8 +181,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       gsap.set(rightCard, {
         transformOrigin: 'center center',
         xPercent: 120,
-        y: 300,
-        scale: 0.8,
+        y: getResponsiveY(120, 160, 200),
+        scale: getResponsiveScale(0.7, 0.75, 0.8),
         opacity: 0,
         rotationY: 25,
         rotationX: 5,
@@ -231,8 +255,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         .to(
           centerCard,
           {
-            y: 360,
-            scale: 1.08,
+            y: getResponsiveY(180, 230, 280),
+            scale: getResponsiveScale(1.1, 1.15, 1.08),
             rotationY: 0,
             rotationX: 0,
             z: 20,
@@ -244,8 +268,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         .to(
           centerCard,
           {
-            y: 360,
-            scale: 1,
+            y: getResponsiveY(180, 230, 280),
+            scale: getResponsiveScale(1.0, 1.0, 1.0),
             ease: 'power2.inOut',
           },
           0.4,
@@ -257,8 +281,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         leftCard,
         {
           xPercent: 0, // Move from -120 to 0 (beside center)
-          y: 360,
-          scale: 1.02,
+          y: getResponsiveY(180, 230, 280),
+          scale: getResponsiveScale(0.9, 0.95, 1.02),
           opacity: 1,
           rotationY: -10,
           rotationX: 0,
@@ -274,8 +298,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         rightCard,
         {
           xPercent: 0, // Move from 120 to 0 (beside center)
-          y: 360,
-          scale: 1.02,
+          y: getResponsiveY(180, 230, 280),
+          scale: getResponsiveScale(0.9, 0.95, 1.02),
           opacity: 1,
           rotationY: 10,
           rotationX: 0,
@@ -308,7 +332,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       timeline.to(
         heading,
         {
-          y: 360,
+          y: getResponsiveY(180, 230, 280),
           opacity: 0,
           ease: 'power2.in',
         },
@@ -321,29 +345,29 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       const fadeTargets = [centerCard, leftCard, rightCard]
 
       // 1. ONE continuous move UP (eases "out", starts fast)
-      // All cards are currently at y: 360, we move them UP to y: 240 (120px upward movement)
+      // All cards are currently at responsive Y position, we move them UP to a lower position
       // Using ABSOLUTE positioning to ensure the animation works correctly
       timeline.to(
         fadeTargets,
         {
-          y: 240, // Move to y: 240 (absolute position) - moves UP from 360 to 240
+          y: getResponsiveY(80, 120, 160), // Move UP from current position
           ease: 'power2.out',
           duration: 0.4, // Explicit duration for visible upward movement
         },
         0.7, // Start AFTER side cards have completed their side-to-center animation (0.5) and scale (0.7)
       )
 
-      // 2. The FADE (eases "in", starts slow) - starts at same time as upward move
-      // By setting the start time to 0.7, it begins *with* the upward move.
-      // Because of 'ease: "power2.in"', it will be "only by a little" at the start, then accelerate.
+      // 2. The FADE (eases "in", starts slow) - starts after cards are positioned beside center
+      // Cards need time to complete their side-to-center movement (0.5) and scale (0.2) = 0.7 total
+      // Then give them time to be visible before fading
       timeline.to(
         fadeTargets,
         {
           autoAlpha: 0, // Fade out simultaneously - completely invisible
-          ease: 'power2.in',
-          duration: 0.25, // Duration to complete fade
+          ease: 'power2.inOut', // Smoother easing instead of sharp 'in'
+          duration: 0.4, // Longer duration for smoother fade
         },
-        0.7, // Start at 0.7 (same as upward move), completes at 0.95 (before Macbook spawns)
+        1.2, // Start much later (was 0.9) to ensure cards reach their positions first
       )
 
       // Phase 3.5: Smooth background color transition - completes before Macbook spawns
@@ -367,7 +391,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         const video = macbook.querySelector('video') as HTMLVideoElement
 
         // Phase 4a: Macbook container spawns in with premium 3D animation
-        // Appears after cards have completely faded (starts at 0.95, after fade completes)
+        // Appears after cards have completely faded (starts at 1.6, after fade completes)
         timeline.to(
           macbook,
           {
@@ -381,7 +405,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             ease: 'power3.out',
             duration: 1.2,
           },
-          0.95, // Start after cards fade (which completes at 0.95)
+          1.6, // Start after cards fade (fade starts at 1.2, duration 0.4, completes at 1.6)
         )
 
         // Phase 4b: Video automatically fades in after Macbook spawns in (not tied to scroll)
@@ -407,7 +431,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               }
             },
             [],
-            0.95 + 1.2, // Callback fires when Macbook animation completes (0.95 start + 1.2 duration = 2.15)
+            1.6 + 1.2, // Callback fires when Macbook animation completes (1.6 start + 1.2 duration = 2.8)
           )
         }
       }
@@ -663,13 +687,13 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       />
       <div 
         ref={containerRef}
-        className="sticky top-0 flex h-screen flex-col items-center justify-start overflow-hidden px-6 py-16 sm:px-10 lg:px-16"
+        className="sticky top-0 flex h-screen flex-col items-center justify-start overflow-hidden px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16"
       >
-        <div className="relative flex w-full flex-col items-center gap-6 md:grid md:max-w-6xl md:grid-cols-3 md:gap-10">
+        <div className="relative flex w-full flex-col items-center gap-4 sm:gap-6 md:grid md:max-w-6xl md:grid-cols-3 md:gap-8 lg:gap-10">
           {cards.map((card, index) => {
             // Enhanced CSS classes with 3D transform hints
             const baseClasses =
-              'glass-card will-change-transform will-change-opacity flex h-[440px] w-full max-w-sm overflow-hidden transition-transform duration-300'
+              'glass-card will-change-transform will-change-opacity flex h-[280px] sm:h-[320px] md:h-[380px] lg:h-[420px] w-full max-w-xs sm:max-w-sm overflow-hidden transition-transform duration-300'
             
             // Preserve 3D transforms for enhanced depth
             const transformStyle = {
@@ -718,9 +742,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         {/* Heading - removed parallax to prevent text glitches, GSAP handles animation */}
         <div
           ref={headingRef}
-          className="mt-auto w-full max-w-3xl text-center pb-6 md:pb-12"
+          className="w-full max-w-3xl text-center pt-8 sm:pt-12 md:pt-64 lg:pt-80 pb-4 sm:pb-6 md:pb-20 lg:pb-24"
         >
-          <h2 className="font-display text-4xl text-porcelain sm:text-5xl md:text-5xl">
+          <h2 className="font-display text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-porcelain">
             Time converges where precision finds its counterpart.
           </h2>
         </div>
