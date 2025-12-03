@@ -150,7 +150,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       // Enhanced initial setup with 3D transforms and GPU acceleration
       gsap.set(centerCard, {
         transformOrigin: 'center center',
-        y: getResponsiveY(120, 160, 200),
+        y: getResponsiveY(20, 160, 200),
         scale: getResponsiveScale(1.2, 1.3, 1.45),
         opacity: 1,
         rotationY: 0,
@@ -164,7 +164,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       gsap.set(leftCard, {
         transformOrigin: 'center center',
         xPercent: -120,
-        y: getResponsiveY(120, 160, 200),
+        y: getResponsiveY(20, 160, 200),
         scale: getResponsiveScale(0.7, 0.75, 0.8),
         opacity: 0,
         rotationY: -25,
@@ -178,7 +178,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       gsap.set(rightCard, {
         transformOrigin: 'center center',
         xPercent: 120,
-        y: getResponsiveY(120, 160, 200),
+        y: getResponsiveY(20, 160, 200),
         scale: getResponsiveScale(0.7, 0.75, 0.8),
         opacity: 0,
         rotationY: 25,
@@ -684,13 +684,13 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       />
       <div 
         ref={containerRef}
-        className="sticky top-0 flex h-screen flex-col items-center justify-start overflow-hidden px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16"
+        className="sticky top-0 flex h-screen flex-col items-center justify-start overflow-hidden px-2 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16"
       >
-        <div className="relative flex w-full flex-col items-center gap-4 sm:gap-6 md:grid md:max-w-6xl md:grid-cols-3 md:gap-8 lg:gap-10">
+        <div className="relative grid w-full grid-cols-3 content-center items-center gap-2 sm:gap-6 md:max-w-6xl md:gap-8 lg:gap-10 grow md:grow-0">
           {cards.map((card, index) => {
             // Enhanced CSS classes with 3D transform hints
             const baseClasses =
-              'glass-card will-change-transform will-change-opacity flex h-[280px] sm:h-[320px] md:h-[380px] lg:h-[420px] w-full max-w-xs sm:max-w-sm overflow-hidden transition-transform duration-300'
+              'glass-card will-change-transform will-change-opacity flex h-[200px] min-[400px]:h-[240px] sm:h-[320px] md:h-[380px] lg:h-[420px] w-full overflow-hidden transition-transform duration-300'
             
             // Preserve 3D transforms for enhanced depth
             const transformStyle = {
@@ -700,9 +700,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             }
 
             const roleClasses: Record<CardRole, string> = {
-              center: 'md:col-start-2 md:col-end-3 md:row-start-1 md:self-start',
-              left: 'md:col-start-1 md:col-end-2 md:row-start-1 md:justify-self-end md:opacity-0',
-              right: 'md:col-start-3 md:col-end-4 md:row-start-1 md:justify-self-start md:opacity-0',
+              center: 'col-start-2 col-end-3 row-start-1 self-start z-10',
+              left: 'col-start-1 col-end-2 row-start-1 justify-self-end opacity-0',
+              right: 'col-start-3 col-end-4 row-start-1 justify-self-start opacity-0',
             }
 
             // Remove parallax from cards as it conflicts with ScrollTrigger animations
@@ -739,7 +739,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         {/* Heading - removed parallax to prevent text glitches, GSAP handles animation */}
         <div
           ref={headingRef}
-          className="w-full max-w-3xl text-center pt-8 sm:pt-12 md:pt-64 lg:pt-80 pb-4 sm:pb-6 md:pb-20 lg:pb-24"
+          className="w-full max-w-3xl text-center pt-0 sm:pt-0 md:pt-64 lg:pt-80 pb-16 sm:pb-20 md:pb-20 lg:pb-24"
         >
           <h2 className="font-display text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-porcelain">
             Time converges where precision finds its counterpart.
@@ -775,13 +775,32 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         {/* Contact Section - appears after image slider */}
         <div
           ref={contactRef}
-          className="absolute inset-0 z-50 flex flex-col items-center justify-between pointer-events-none"
+          className="absolute inset-0 z-50 pointer-events-none"
         >
-          <div className="w-full flex-1 flex flex-col justify-center pointer-events-auto">
-            <ContactSection />
-          </div>
-          <div className="w-full pointer-events-auto">
-            <Footer />
+          {/* SCROLL CONTAINER: 
+              1. h-full & overflow-y-auto: Allows scrolling on small phones.
+              2. pointer-events-auto: Re-enables touch.
+              3. bg-[#5F5A56]: Ensures it covers the layers behind it.
+          */}
+          <div 
+            className="h-full w-full overflow-y-auto overflow-x-hidden pointer-events-auto"
+            style={{ 
+              backgroundColor: '#5F5A56',
+              WebkitOverflowScrolling: 'touch' // Smooth scroll on iOS
+            }}
+          >
+            {/* Flex layout with guaranteed footer visibility */}
+            <div className="flex flex-col" style={{ minHeight: '100vh' }}>
+              {/* Header clearance and main content */}
+              <div className="pt-24 sm:pt-28 flex-1">
+                <ContactSection />
+              </div>
+              
+              {/* Footer - always visible at bottom */}
+              <div className="flex-shrink-0 py-8">
+                <Footer />
+              </div>
+            </div>
           </div>
         </div>
       </div>
