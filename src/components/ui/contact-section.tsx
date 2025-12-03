@@ -32,9 +32,9 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
       
       {/* Social Links Section - Compact Padding */}
       <section className="py-2 min-[400px]:py-4 sm:py-6 flex items-center justify-center">
-        <div className="max-w-screen-xl mx-auto px-4 w-full">
-          <div className="text-center mb-3 min-[400px]:mb-5 sm:mb-6">
-            <h3 className="text-porcelain text-xl min-[400px]:text-2xl sm:text-2xl font-semibold font-display mb-1">
+        <div className="max-w-screen-xl mx-auto px-3 w-full">
+          <div className="text-center mb-2 min-[400px]:mb-3 sm:mb-4">
+            <h3 className="text-porcelain text-base min-[400px]:text-xl sm:text-2xl font-semibold font-display mb-1">
               Let's connect
             </h3>
             <p className="text-porcelain/60 text-xs sm:text-sm max-w-md mx-auto hidden sm:block">
@@ -49,7 +49,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                 href={item.link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group block p-3 min-[400px]:p-4 sm:p-4 border border-onyx/30 rounded-md hover:border-champagne/50 transition-all duration-300 hover:shadow-md bg-onyx/10"
+                className="group block p-2 min-[400px]:p-3 sm:p-4 border border-onyx/30 rounded-md hover:border-champagne/50 transition-all duration-300 hover:shadow-md bg-onyx/10"
               >
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded border border-onyx/30 flex items-center justify-center text-champagne transition-colors duration-300 group-hover:border-champagne group-hover:text-auric group-hover:bg-champagne/10 shrink-0">
@@ -69,11 +69,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
       </section>
 
       {/* Form Section - Compact Layout for Mobile */}
-      <section className="py-2 min-[400px]:py-4 sm:py-6 flex items-start justify-center pb-8">
-        <div className="max-w-screen-xl mx-auto px-4 w-full">
-          <div className="text-center mb-3 min-[400px]:mb-5 sm:mb-6">
-            <h3 className="text-champagne text-xs sm:text-sm font-semibold font-display mb-1">Contact</h3>
-            <p className="text-porcelain text-xl min-[400px]:text-2xl sm:text-3xl font-semibold font-display mb-1">
+      <section className="py-3 min-[400px]:py-5 sm:py-6 flex items-start justify-center pb-2">
+        <div className="max-w-screen-xl mx-auto px-3 w-full">
+          <div className="text-center mb-2 min-[400px]:mb-3 sm:mb-4">
+            <h3 className="text-champagne text-xs min-[400px]:text-sm sm:text-sm font-semibold font-display mb-1">Contact</h3>
+            <p className="text-porcelain text-base min-[400px]:text-xl sm:text-3xl font-semibold font-display mb-1">
               Get in touch
             </p>
           </div>
@@ -81,13 +81,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
           <div className="max-w-lg mx-auto">
             {/* Reduced space-y from 4 to 2 for tighter mobile layout */}
             <form onSubmit={(e) => e.preventDefault()} className="space-y-2 min-[400px]:space-y-3 sm:space-y-4">
-              <div className="grid grid-cols-2 gap-2 min-[400px]:gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 gap-1.5 min-[400px]:gap-2 sm:gap-4">
                 <div>
                   <label className="font-medium text-porcelain text-xs block mb-1 ml-1">First name</label>
                   <input
                     type="text"
                     required
-                    className="w-full px-3 py-2 min-[400px]:py-2.5 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
+                    className="w-full px-2 py-1 min-[400px]:py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
                     placeholder="First"
                   />
                 </div>
@@ -96,7 +96,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                   <input
                     type="text"
                     required
-                    className="w-full px-3 py-2 min-[400px]:py-2.5 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
+                    className="w-full px-2 py-1 min-[400px]:py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
                     placeholder="Last"
                   />
                 </div>
@@ -107,7 +107,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                 <input
                   type="email"
                   required
-                  className="w-full px-3 py-2 min-[400px]:py-2.5 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
+                  className="w-full px-2 py-1 min-[400px]:py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
                   placeholder="name@example.com"
                 />
               </div>
@@ -115,13 +115,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
               <div>
                 <label className="font-medium text-porcelain text-xs block mb-1 ml-1">Phone</label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-3 my-auto h-5 flex items-center border-r border-onyx/30 pr-2 z-10">
+                  <div className="absolute inset-y-0 left-2 my-auto h-5 flex items-center border-r border-onyx/30 pr-2 z-10">
                     <span className="text-xs text-porcelain/60 mr-1">🇳🇴</span>
                   </div>
                   <input
                     type="tel"
                     placeholder="912 34 567"
-                    className="w-full pl-10 pr-3 py-2 min-[400px]:py-2.5 bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
+                    className="w-full pl-9 pr-2 py-1 min-[400px]:py-2 bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
                   />
                 </div>
               </div>
@@ -131,14 +131,14 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                 <textarea
                   required
                   // Reduced height from h-32 to h-24 to save space
-                  className="w-full h-24 min-[400px]:h-28 sm:h-32 px-3 py-2 min-[400px]:py-2.5 resize-none bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
+                  className="w-full h-14 min-[400px]:h-18 sm:h-32 px-2 py-1 min-[400px]:py-2 resize-none bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
                   placeholder="How can we help?"
                 ></textarea>
               </div>
               
               <button
                 type="submit"
-                className="w-full px-4 py-3 text-night font-bold bg-champagne hover:bg-auric active:bg-champagne rounded-md transition-colors text-sm mt-2"
+                className="w-full px-4 py-2 min-[400px]:py-2.5 text-night font-bold bg-champagne hover:bg-auric active:bg-champagne rounded-md transition-colors text-sm mt-1"
               >
                 Send Message
               </button>
