@@ -808,7 +808,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             {/* Flex layout with guaranteed footer visibility */}
             <div className="flex flex-col" style={{ minHeight: '100vh' }}>
               {/* Header clearance and main content */}
-              <div className="pt-16 sm:pt-20 min-[400px]:pt-22 flex-1 min-h-0">
+              <div className="pt-14 sm:pt-20 min-[400px]:pt-22 flex-1 min-h-0">
                 <ContactSection />
               </div>
               
