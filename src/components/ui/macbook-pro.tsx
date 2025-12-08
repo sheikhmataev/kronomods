@@ -93,6 +93,9 @@ export function MacbookPro({
                 objectFit: 'cover',
                 display: 'block',
                 opacity: 0, // Initially hidden, GSAP will animate this
+                // Force clip-path to match border radius, fixing overflow on mobile
+                clipPath: 'inset(0px round 5px)',
+                WebkitClipPath: 'inset(0px round 5px)',
               }}
             />
           </div>

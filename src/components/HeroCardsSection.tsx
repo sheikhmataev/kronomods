@@ -805,23 +805,23 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               3. bg-[#5F5A56]: Ensures it covers the layers behind it.
           */}
           <div 
-            className="h-full w-full overflow-y-auto overflow-x-hidden pointer-events-auto"
+            className="h-full w-full overflow-hidden pointer-events-auto"
             style={{ 
               backgroundColor: '#5F5A56',
-              WebkitOverflowScrolling: 'touch', // Smooth scroll on iOS
               height: '100dvh', // Force dynamic viewport height
               maxHeight: '100dvh' // Double enforcement
             }}
           >
             {/* Flex layout with guaranteed footer visibility */}
-            <div className="flex flex-col h-full min-h-[100dvh]">
+            <div className="flex flex-col h-[100dvh]">
               {/* Header clearance and main content - further reduced for ultra-wide phones */}
-              <div className="pt-8 sm:pt-12 min-[400px]:pt-14 flex-1 min-h-0 overflow-y-auto">
+              {/* Added overflow-y-auto here to make ONLY this section scrollable */}
+              <div className="pt-8 sm:pt-12 min-[400px]:pt-14 flex-1 min-h-0 overflow-y-auto overscroll-contain">
                 <ContactSection />
               </div>
               
-              {/* Footer - always visible at bottom */}
-              <div className="flex-shrink-0 py-2 sm:py-4 md:py-6 mt-auto">
+              {/* Footer - always visible at bottom, outside the scroll area */}
+              <div className="flex-shrink-0 py-2 sm:py-4 md:py-6 bg-[#5F5A56] z-10 relative">
                 <Footer />
               </div>
             </div>
