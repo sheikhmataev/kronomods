@@ -128,10 +128,13 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         return
       }
 
-      // Get viewport width for responsive positioning
-      const viewportWidth = window.innerWidth
-      const isMobile = viewportWidth < 640
-      const isTablet = viewportWidth >= 640 && viewportWidth < 1024
+        // Get viewport width and aspect ratio for responsive positioning
+        const viewportWidth = window.innerWidth
+        const viewportHeight = window.innerHeight
+        const aspectRatio = viewportWidth / viewportHeight
+        const isMobile = viewportWidth < 640
+        const isTablet = viewportWidth >= 640 && viewportWidth < 1024
+        const isUltraWide = aspectRatio > 2.1 // iPhone 17 Pro and similar ultra-wide devices
       
       // Responsive Y positions based on device
       const getResponsiveY = (mobile: number, tablet: number, desktop: number) => {
@@ -456,7 +459,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         }
         
         const getResponsiveFocusY = () => {
-          if (isMobile) return 0.35 // Higher on mobile to prevent downward drift
+          if (isMobile) {
+            if (isUltraWide) return 0.3 // Much higher for ultra-wide phones to prevent video overflow
+            return 0.35 // Higher on mobile to prevent downward drift
+          }
           if (isTablet) return 0.4 // Higher on tablet
           return 0.45 // Desktop: slightly higher than center to counter downward drift
         }
@@ -498,7 +504,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         // Formula: when zooming from center by scale S, a point at offset P moves to P*S
         // To keep point at center, shift container by -P*S
         // Macbook spawns at 0.95, completes at 2.15, video fades in until ~3.65
-        const scale4 = isMobile ? 3 : isTablet ? 4 : 4
+        const scale4 = isMobile ? (isUltraWide ? 2.5 : 3) : isTablet ? 4 : 4
         timeline.to(
           container,
           {
@@ -512,7 +518,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         )
 
         // Phase 5b: Continue zooming deeper - seamless continuation
-        const scale6 = isMobile ? 5 : isTablet ? 6 : 6
+        const scale6 = isMobile ? (isUltraWide ? 4 : 5) : isTablet ? 6 : 6
         timeline.to(
           container,
           {
@@ -526,7 +532,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         )
 
         // Phase 5c: Final deep zoom - ultra-smooth finish
-        const scale10 = isMobile ? 8 : isTablet ? 10 : 10
+        const scale10 = isMobile ? (isUltraWide ? 6 : 8) : isTablet ? 10 : 10
         timeline.to(
           container,
           {
@@ -802,18 +808,19 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             className="h-full w-full overflow-y-auto overflow-x-hidden pointer-events-auto"
             style={{ 
               backgroundColor: '#5F5A56',
-              WebkitOverflowScrolling: 'touch' // Smooth scroll on iOS
+              WebkitOverflowScrolling: 'touch', // Smooth scroll on iOS
+              maxHeight: '100dvh' // Use dynamic viewport height for mobile browsers
             }}
           >
             {/* Flex layout with guaranteed footer visibility */}
-            <div className="flex flex-col" style={{ minHeight: '100vh' }}>
-              {/* Header clearance and main content */}
-              <div className="pt-16 sm:pt-20 min-[400px]:pt-22 flex-1 min-h-0">
+            <div className="flex flex-col" style={{ minHeight: '100dvh' }}>
+              {/* Header clearance and main content - further reduced for ultra-wide phones */}
+              <div className="pt-8 sm:pt-12 min-[400px]:pt-14 flex-1 min-h-0 overflow-y-auto">
                 <ContactSection />
               </div>
               
               {/* Footer - always visible at bottom */}
-              <div className="flex-shrink-0 py-3 sm:py-6 md:py-8">
+              <div className="flex-shrink-0 py-2 sm:py-4 md:py-6">
                 <Footer />
               </div>
             </div>
