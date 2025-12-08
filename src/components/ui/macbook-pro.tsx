@@ -26,6 +26,7 @@ export function MacbookPro({
       viewBox={`0 0 ${width} ${height}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      style={{ overflow: 'hidden' }} // Ensure SVG clips content
       {...props}
     >
       <path
@@ -67,13 +68,15 @@ export function MacbookPro({
           width="501.22"
           height="323.85"
           clipPath={`url(#${clipPathId})`}
+          style={{ overflow: 'hidden' }} // Enforce clipping
         >
           <div
             style={{
               width: '100%',
               height: '100%',
-              overflow: 'hidden',
+              overflow: 'hidden', // Enforce clipping on container
               borderRadius: '5px',
+              position: 'relative', // Ensure positioning context
             }}
           >
             <video

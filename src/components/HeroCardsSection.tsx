@@ -809,18 +809,19 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             style={{ 
               backgroundColor: '#5F5A56',
               WebkitOverflowScrolling: 'touch', // Smooth scroll on iOS
-              maxHeight: '100dvh' // Use dynamic viewport height for mobile browsers
+              height: '100dvh', // Force dynamic viewport height
+              maxHeight: '100dvh' // Double enforcement
             }}
           >
             {/* Flex layout with guaranteed footer visibility */}
-            <div className="flex flex-col" style={{ minHeight: '100dvh' }}>
+            <div className="flex flex-col h-full min-h-[100dvh]">
               {/* Header clearance and main content - further reduced for ultra-wide phones */}
               <div className="pt-8 sm:pt-12 min-[400px]:pt-14 flex-1 min-h-0 overflow-y-auto">
                 <ContactSection />
               </div>
               
               {/* Footer - always visible at bottom */}
-              <div className="flex-shrink-0 py-2 sm:py-4 md:py-6">
+              <div className="flex-shrink-0 py-2 sm:py-4 md:py-6 mt-auto">
                 <Footer />
               </div>
             </div>
