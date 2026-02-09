@@ -814,9 +814,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         if (stackCards.length) {
           gsap.set(stackCards, {
             xPercent: 0,
-            y: 40,
-            scale: 0.96,
-            opacity: 0,
+            y: 0,
+            scale: 1,
+            opacity: 1,
             rotationY: 0,
             rotationX: 0,
             z: 0,
@@ -829,8 +829,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         }
 
         gsap.set(heading, {
-          opacity: 0,
-          y: 20,
+          opacity: 1,
+          y: 0,
           force3D: true,
           willChange: 'transform, opacity',
         })
@@ -887,9 +887,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             stackCards,
             {
               opacity: 1,
-              y: 0,
-              duration: 0.6,
-              stagger: 0.15,
+              y: -8,
+              duration: 0.25,
+              stagger: 0.06,
+              ease: 'power1.out'
             },
             0.1,
           )
@@ -1229,7 +1230,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           ref={headingRef}
           className="w-full max-w-3xl text-center pt-0 sm:pt-0 md:pt-64 lg:pt-80 pb-16 sm:pb-20 md:pb-20 lg:pb-24"
         >
-          <h2 className="font-display text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-porcelain">
+          <h2 className="font-display text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-white sm:text-porcelain">
             Time converges where precision finds its counterpart.
           </h2>
         </div>
