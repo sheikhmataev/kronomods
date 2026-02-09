@@ -55,6 +55,85 @@ const cards: CardConfig[] = [
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+// Safari-specific video autoplay helper with user interaction detection
+const attemptVideoPlay = async (video: HTMLVideoElement): Promise<boolean> => {
+  if (!video) return false
+  
+  try {
+    // Ensure video is muted (required for autoplay in Safari)
+    video.muted = true
+    
+    // Ensure video is loaded and ready
+    if (video.readyState < 2) {
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          video.removeEventListener('canplay', handleCanPlay)
+          video.removeEventListener('error', handleError)
+          reject(new Error('Video load timeout'))
+        }, 5000) // 5 second timeout
+        
+        const handleCanPlay = () => {
+          clearTimeout(timeout)
+          video.removeEventListener('canplay', handleCanPlay)
+          video.removeEventListener('error', handleError)
+          resolve(true)
+        }
+        const handleError = () => {
+          clearTimeout(timeout)
+          video.removeEventListener('canplay', handleCanPlay)
+          video.removeEventListener('error', handleError)
+          reject(new Error('Video load failed'))
+        }
+        video.addEventListener('canplay', handleCanPlay)
+        video.addEventListener('error', handleError)
+        
+        // Start loading if not already
+        if (video.readyState < 1) {
+          video.load()
+        }
+      })
+    }
+    
+    // Attempt to play with user interaction context
+    const playPromise = video.play()
+    if (playPromise !== undefined) {
+      await playPromise
+      return true
+    }
+    return false
+  } catch (error) {
+    console.warn('Video autoplay failed:', error)
+    return false
+  }
+}
+
+// Global user interaction tracking
+let hasUserInteracted = false
+
+// Setup user interaction listeners
+const setupUserInteractionTracking = () => {
+  if (typeof window === 'undefined' || hasUserInteracted) return
+  
+  const interactionEvents = ['click', 'touch', 'keydown', 'mousedown', 'pointerdown']
+  
+  const handleInteraction = () => {
+    hasUserInteracted = true
+    interactionEvents.forEach(event => {
+      document.removeEventListener(event, handleInteraction)
+    })
+  }
+  
+  interactionEvents.forEach(event => {
+    document.addEventListener(event, handleInteraction, { once: true, passive: true })
+  })
+}
+
+// Detect Safari browser
+const isSafari = () => {
+  return typeof window !== 'undefined' && 
+    /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+}
+
 const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   const sectionRef = useRef<HTMLElement | null>(null)
   const cardsRef = useRef<Array<HTMLDivElement | null>>([])
@@ -65,11 +144,33 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   const imageSliderRef = useRef<HTMLDivElement | null>(null)
   const contactRef = useRef<HTMLDivElement | null>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const videoPlayAttemptedRef = useRef(false)
+
+  // Setup user interaction tracking on mount
+  useGSAP(() => {
+    setupUserInteractionTracking()
+  }, [])
 
   useGSAP(
     () => {
-      if (!sectionRef.current) {
+      const section = sectionRef.current
+      if (!section) {
         return
+      }
+
+      const heading = headingRef.current
+      const macbook = macbookRef.current
+      const background = backgroundRef.current
+      const container = containerRef.current
+      const imageSlider = imageSliderRef.current
+      const contact = contactRef.current
+      const mm = gsap.matchMedia()
+
+      const killTimeline = () => {
+        if (timelineRef.current) {
+          timelineRef.current.kill()
+          timelineRef.current = null
+        }
       }
 
       const shouldReduceMotion = prefersReducedMotion()
@@ -79,419 +180,661 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           if (!card) return
           card.style.opacity = '1'
           card.style.transform = 'none'
+          card.style.willChange = 'auto'
         })
-        if (headingRef.current) {
-          headingRef.current.style.opacity = '0'
-          // Responsive heading position for reduced motion
+        if (heading) {
+          heading.style.opacity = '0'
           const viewportWidth = window.innerWidth
           const isMobile = viewportWidth < 640
           const isTablet = viewportWidth >= 640 && viewportWidth < 1024
           const headingY = isMobile ? 80 : isTablet ? 120 : 160
-          headingRef.current.style.transform = `translate3d(0, ${headingY}px, 0)`
+          heading.style.transform = `translate3d(0, ${headingY}px, 0)`
+          heading.style.willChange = 'auto'
         }
-        // Show Macbook and video immediately for reduced motion
-        if (macbookRef.current) {
-          macbookRef.current.style.opacity = '1'
-          macbookRef.current.style.transform = 'none'
-          const video = macbookRef.current.querySelector('video') as HTMLVideoElement
+        if (macbook) {
+          macbook.style.opacity = '1'
+          macbook.style.transform = 'none'
+          macbook.style.willChange = 'auto'
+          const video = macbook.querySelector('video') as HTMLVideoElement
           if (video) {
             video.style.opacity = '1'
-            video.play().catch((error) => {
-              console.warn('Video autoplay failed:', error)
-            })
+            // Safari-specific handling with immediate play attempt
+            if (isSafari()) {
+              // For Safari, try to play immediately on reduced motion if user has interacted
+              if (hasUserInteracted) {
+                attemptVideoPlay(video)
+              }
+            } else {
+              video.play().catch((error) => {
+                console.warn('Video autoplay failed:', error)
+              })
+            }
           }
         }
-        // Show image slider immediately for reduced motion
-        if (imageSliderRef.current) {
-          imageSliderRef.current.style.opacity = '1'
-          imageSliderRef.current.style.transform = 'none'
+        if (imageSlider) {
+          imageSlider.style.opacity = '1'
+          imageSlider.style.transform = 'none'
         }
-        // Show contact section immediately for reduced motion
-        if (contactRef.current) {
-          contactRef.current.style.opacity = '1'
-          contactRef.current.style.transform = 'none'
+        if (contact) {
+          contact.style.opacity = '1'
+          contact.style.transform = 'none'
+          contact.style.visibility = 'visible'
         }
-        return
+        return () => {
+          killTimeline()
+          mm.revert()
+        }
       }
 
       const getCardByRole = (role: CardRole) =>
         cardsRef.current.find((card) => card?.dataset.role === role) ?? null
 
-      const centerCard = getCardByRole('center')
-      const leftCard = getCardByRole('left')
-      const rightCard = getCardByRole('right')
-      const heading = headingRef.current
-      const macbook = macbookRef.current
-      const container = containerRef.current
-
-      if (!centerCard || !leftCard || !rightCard || !heading) {
-        return
+      const primeLayersForSafari = () => {
+        const cardTargets = cardsRef.current.filter(Boolean)
+        if (cardTargets.length) {
+          gsap.set(cardTargets, {
+            willChange: 'transform, opacity',
+            zIndex: (index) => 30 - index,
+            force3D: true,
+            transformStyle: 'preserve-3d',
+          })
+        }
+        if (heading) {
+          gsap.set(heading, { willChange: 'transform, opacity', zIndex: 40, force3D: true })
+        }
+        if (macbook) {
+          gsap.set(macbook, { willChange: 'transform, opacity, filter', zIndex: 35, force3D: true })
+        }
+        if (imageSlider) {
+          gsap.set(imageSlider, { willChange: 'transform, opacity', zIndex: 45, force3D: true })
+        }
+        if (contact) {
+          gsap.set(contact, { willChange: 'transform, opacity', zIndex: 50, force3D: true })
+        }
       }
 
-        // Get viewport width and aspect ratio for responsive positioning
+      primeLayersForSafari()
+
+      mm.add('(min-width: 1024px)', () => {
+        killTimeline()
+
+        const centerCard = getCardByRole('center')
+        const leftCard = getCardByRole('left')
+        const rightCard = getCardByRole('right')
+
+        if (!centerCard || !leftCard || !rightCard || !heading) {
+          return
+        }
+
         const viewportWidth = window.innerWidth
         const viewportHeight = window.innerHeight
         const aspectRatio = viewportWidth / viewportHeight
         const isMobile = viewportWidth < 640
         const isTablet = viewportWidth >= 640 && viewportWidth < 1024
-        const isUltraWide = aspectRatio > 2.1 // iPhone 17 Pro and similar ultra-wide devices
-      
-      // Responsive Y positions based on device
-      const getResponsiveY = (mobile: number, tablet: number, desktop: number) => {
-        if (isMobile) return mobile
-        if (isTablet) return tablet
-        return desktop
-      }
-      
-      // Responsive scales based on device
-      const getResponsiveScale = (mobile: number, tablet: number, desktop: number) => {
-        if (isMobile) return mobile
-        if (isTablet) return tablet
-        return desktop
-      }
+        const isUltraWide = aspectRatio > 2.1
 
-      // Enhanced initial setup with 3D transforms and GPU acceleration
-      gsap.set(centerCard, {
-        transformOrigin: 'center center',
-        y: getResponsiveY(20, 160, 200),
-        scale: getResponsiveScale(1.2, 1.3, 1.45),
-        opacity: 1,
-        rotationY: 0,
-        rotationX: 0,
-        z: 0,
-        filter: 'blur(0px)',
-        force3D: true,
-        transformStyle: 'preserve-3d',
-      })
+        const getResponsiveY = (mobile: number, tablet: number, desktop: number) => {
+          if (isMobile) return mobile
+          if (isTablet) return tablet
+          return desktop
+        }
 
-      gsap.set(leftCard, {
-        transformOrigin: 'center center',
-        xPercent: -120,
-        y: getResponsiveY(20, 160, 200),
-        scale: getResponsiveScale(0.7, 0.75, 0.8),
-        opacity: 0,
-        rotationY: -25,
-        rotationX: 5,
-        z: -50,
-        filter: 'blur(0px)', // Start with no blur
-        force3D: true,
-        transformStyle: 'preserve-3d',
-      })
+        const getResponsiveScale = (mobile: number, tablet: number, desktop: number) => {
+          if (isMobile) return mobile
+          if (isTablet) return tablet
+          return desktop
+        }
 
-      gsap.set(rightCard, {
-        transformOrigin: 'center center',
-        xPercent: 120,
-        y: getResponsiveY(20, 160, 200),
-        scale: getResponsiveScale(0.7, 0.75, 0.8),
-        opacity: 0,
-        rotationY: 25,
-        rotationX: 5,
-        z: -50,
-        filter: 'blur(0px)', // Start with no blur
-        force3D: true,
-        transformStyle: 'preserve-3d',
-      })
-
-      gsap.set(heading, {
-        y: 0,
-        opacity: 1,
-        force3D: true,
-        // Ensure smooth text rendering
-        willChange: 'transform, opacity',
-      })
-
-      // Initialize background for smooth color transition
-      const background = backgroundRef.current
-      if (background) {
-        gsap.set(background, {
-          backgroundColor: '#05060A', // Start with night color
-          force3D: true,
-        })
-      }
-
-      // Initialize Macbook Pro - hidden and scaled down initially
-      if (macbook) {
-        gsap.set(macbook, {
-          opacity: 0,
-          scale: 0.8,
-          y: 100,
-          rotationY: -10,
-          rotationX: 5,
-          z: -50,
-          filter: 'blur(8px)',
+        gsap.set(centerCard, {
+          transformOrigin: 'center center',
+          y: getResponsiveY(20, 160, 200),
+          scale: getResponsiveScale(1.2, 1.3, 1.45),
+          opacity: 1,
+          rotationY: 0,
+          rotationX: 0,
+          z: 10,
+          filter: 'blur(0px)',
           force3D: true,
           transformStyle: 'preserve-3d',
-          willChange: 'transform, opacity, filter',
+          willChange: 'transform, opacity',
         })
 
-        // Initialize video inside Macbook - hidden initially
-        const video = macbook.querySelector('video') as HTMLVideoElement
-        if (video) {
-          gsap.set(video, {
-            opacity: 0,
-            scale: 1.05, // Slight zoom for premium reveal
+        gsap.set(leftCard, {
+          transformOrigin: 'center center',
+          xPercent: -120,
+          y: getResponsiveY(20, 160, 200),
+          scale: getResponsiveScale(0.7, 0.75, 0.8),
+          opacity: 0,
+          rotationY: -25,
+          rotationX: 5,
+          z: -50,
+          filter: 'blur(0px)',
+          force3D: true,
+          transformStyle: 'preserve-3d',
+          willChange: 'transform, opacity',
+        })
+
+        gsap.set(rightCard, {
+          transformOrigin: 'center center',
+          xPercent: 120,
+          y: getResponsiveY(20, 160, 200),
+          scale: getResponsiveScale(0.7, 0.75, 0.8),
+          opacity: 0,
+          rotationY: 25,
+          rotationX: 5,
+          z: -50,
+          filter: 'blur(0px)',
+          force3D: true,
+          transformStyle: 'preserve-3d',
+          willChange: 'transform, opacity',
+        })
+
+        gsap.set(heading, {
+          y: 0,
+          opacity: 1,
+          force3D: true,
+          willChange: 'transform, opacity',
+        })
+
+        if (background) {
+          gsap.set(background, {
+            backgroundColor: '#05060A',
             force3D: true,
           })
         }
-      }
 
-      // Enhanced timeline with refined easing and 3D transforms
-      const timeline = gsap.timeline({
-        defaults: { ease: 'power3.out' },
-        scrollTrigger: {
-            trigger: sectionRef.current,
+        if (macbook) {
+          gsap.set(macbook, {
+            opacity: 0,
+            scale: 0.8,
+            y: 100,
+            rotationY: -10,
+            rotationX: 5,
+            z: -50,
+            filter: 'blur(8px)',
+            force3D: true,
+            transformStyle: 'preserve-3d',
+            willChange: 'transform, opacity, filter',
+          })
+
+          const video = macbook.querySelector('video') as HTMLVideoElement
+          if (video) {
+            gsap.set(video, {
+              opacity: 0,
+              scale: 1.05,
+              force3D: true,
+            })
+          }
+        }
+
+        const timeline = gsap.timeline({
+          defaults: { ease: 'power3.out' },
+          scrollTrigger: {
+            trigger: section,
             start: 'top top',
-            end: 'bottom bottom', // CHANGED: Matches the exact end of the physical container
+            end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            scrub: 1, // Higher scrub value = less scroll needed, smoother feel
+            scrub: 1,
             invalidateOnRefresh: true,
-            refreshPriority: -1, // Refresh after other animations
-        },
-      })
+            refreshPriority: -1,
+          },
+        })
 
-      // Phase 1: Spawn-in with 3D transforms and staggered timing
-      timeline
-        .to(
-          centerCard,
+        timeline
+          .to(
+            centerCard,
+            {
+              y: getResponsiveY(180, 230, 280),
+              scale: getResponsiveScale(1.1, 1.15, 1.08),
+              rotationY: 0,
+              rotationX: 0,
+              z: 20,
+              filter: 'blur(0px)',
+              ease: 'power3.out',
+            },
+            0,
+          )
+          .to(
+            centerCard,
+            {
+              y: getResponsiveY(180, 230, 280),
+              scale: getResponsiveScale(1.0, 1.0, 1.0),
+              ease: 'power2.inOut',
+            },
+            0.4,
+          )
+
+        timeline.to(
+          leftCard,
           {
+            xPercent: 0,
             y: getResponsiveY(180, 230, 280),
-            scale: getResponsiveScale(1.1, 1.15, 1.08),
-            rotationY: 0,
+            scale: getResponsiveScale(0.9, 0.95, 1.02),
+            opacity: 1,
+            rotationY: -10,
             rotationX: 0,
-            z: 20,
+            z: -20,
             filter: 'blur(0px)',
             ease: 'power3.out',
+            duration: 0.5,
           },
           0,
         )
-        .to(
-          centerCard,
+
+        timeline.to(
+          rightCard,
+          {
+            xPercent: 0,
+            y: getResponsiveY(180, 230, 280),
+            scale: getResponsiveScale(0.9, 0.95, 1.02),
+            opacity: 1,
+            rotationY: 10,
+            rotationX: 0,
+            z: -20,
+            filter: 'blur(0px)',
+            ease: 'power3.out',
+            duration: 0.5,
+          },
+          0,
+        )
+
+        timeline.to(
+          [leftCard, rightCard],
+          {
+            scale: 0.88,
+            rotationY: (_index, target) => (target === leftCard ? -15 : 15),
+            z: -40,
+            filter: 'blur(0px)',
+            ease: 'power2.inOut',
+            duration: 0.2,
+          },
+          0.5,
+        )
+
+        timeline.to(
+          heading,
           {
             y: getResponsiveY(180, 230, 280),
-            scale: getResponsiveScale(1.0, 1.0, 1.0),
-            ease: 'power2.inOut',
+            opacity: 0,
+            ease: 'power2.in',
           },
-          0.4,
+          0.15,
         )
 
-      // Phase 1b: Side cards animate from sides to center - appear beside center card
-      // They need to complete this animation BEFORE moving upward together
-      timeline.to(
-        leftCard,
-        {
-          xPercent: 0, // Move from -120 to 0 (beside center)
-          y: getResponsiveY(180, 230, 280),
-          scale: getResponsiveScale(0.9, 0.95, 1.02),
-          opacity: 1,
-          rotationY: -10,
-          rotationX: 0,
-          z: -20,
-          filter: 'blur(0px)', // Clear when visible
-          ease: 'power3.out',
-          duration: 0.5, // Explicit duration for side-to-center animation
-        },
-        0, // Start at same time as center card spawns
-      )
+        const fadeTargets = [centerCard, leftCard, rightCard]
 
-      timeline.to(
-        rightCard,
-        {
-          xPercent: 0, // Move from 120 to 0 (beside center)
-          y: getResponsiveY(180, 230, 280),
-          scale: getResponsiveScale(0.9, 0.95, 1.02),
-          opacity: 1,
-          rotationY: 10,
-          rotationX: 0,
-          z: -20,
-          filter: 'blur(0px)', // Clear when visible
-          ease: 'power3.out',
-          duration: 0.5, // Explicit duration for side-to-center animation
-        },
-        0, // Start at same time - both side cards animate together
-      )
-
-      // Phase 2: Side cards scale down with 3D depth - keep them clear while visible
-      // This happens AFTER side cards have moved beside center (at 0.5 when they complete)
-      // IMPORTANT: Don't set y here - let it stay at 360 so the upward animation works correctly
-      timeline.to(
-        [leftCard, rightCard],
-        {
-          scale: 0.88,
-          // DO NOT set y here - keep it at 360 so upward animation works
-          rotationY: (_index, target) => (target === leftCard ? -15 : 15),
-          z: -40,
-          filter: 'blur(0px)', // Keep clear, only blur when fading out
-          ease: 'power2.inOut',
-          duration: 0.2, // Quick scale down
-        },
-        0.5, // Start AFTER side cards have finished moving beside center
-      )
-
-      // Heading fade out
-      timeline.to(
-        heading,
-        {
-          y: getResponsiveY(180, 230, 280),
-          opacity: 0,
-          ease: 'power2.in',
-        },
-        0.15,
-      )
-
-      // Phase 3: All cards animate up and fade away simultaneously before Macbook spawns
-      // This happens AFTER side cards have completed moving beside center (0.5) and scaling (0.7)
-      // So we start at 0.7 to ensure all three cards are beside each other first
-      const fadeTargets = [centerCard, leftCard, rightCard]
-
-      // 1. ONE continuous move UP (eases "out", starts fast)
-      // All cards are currently at responsive Y position, we move them UP to a lower position
-      // Using ABSOLUTE positioning to ensure the animation works correctly
-      timeline.to(
-        fadeTargets,
-        {
-          y: getResponsiveY(80, 120, 160), // Move UP from current position
-          ease: 'power2.out',
-          duration: 0.4, // Explicit duration for visible upward movement
-        },
-        0.7, // Start AFTER side cards have completed their side-to-center animation (0.5) and scale (0.7)
-      )
-
-      // 2. The FADE (eases "in", starts slow) - starts after cards are positioned beside center
-      // Cards need time to complete their side-to-center movement (0.5) and scale (0.2) = 0.7 total
-      // Then give them time to be visible before fading
-      timeline.to(
-        fadeTargets,
-        {
-          autoAlpha: 0, // Fade out simultaneously - completely invisible
-          ease: 'power2.inOut', // Smoother easing instead of sharp 'in'
-          duration: 0.4, // Longer duration for smoother fade
-        },
-        1.2, // Start much later (was 0.9) to ensure cards reach their positions first
-      )
-
-      // Phase 3.5: Smooth background color transition - completes before Macbook spawns
-      // Transitions to lighter color so background is already the new color when Macbook appears
-      // Starts early and completes smoothly by Macbook spawn time
-      if (background) {
         timeline.to(
-          background,
+          fadeTargets,
           {
-            backgroundColor: '#0B0D12', // Transition to obsidian (lighter than night)
-            ease: 'power2.inOut',
-            duration: 0.65, // Smooth transition that completes by 0.95
+            y: getResponsiveY(80, 120, 160),
+            ease: 'power2.out',
+            duration: 0.4,
           },
-          0.3, // Start early during card animations, completes at 0.95 (when Macbook spawns)
+          0.7,
         )
-      }
 
-      // Phase 4: Macbook Pro spawn-in - appears after cards are completely gone
-      // More scroll distance between card fade and Macbook spawn
-      if (macbook) {
-        const video = macbook.querySelector('video') as HTMLVideoElement
-
-        // Phase 4a: Macbook container spawns in with premium 3D animation
-        // Appears after cards have completely faded (starts at 1.6, after fade completes)
         timeline.to(
-          macbook,
+          fadeTargets,
           {
-            opacity: 1,
-            scale: 1,
+            autoAlpha: 0,
+            ease: 'power2.inOut',
+            duration: 0.4,
+          },
+          1.2,
+        )
+
+        if (background) {
+          timeline.to(
+            background,
+            {
+              backgroundColor: '#0B0D12',
+              ease: 'power2.inOut',
+              duration: 0.65,
+            },
+            0.3,
+          )
+        }
+
+        if (macbook) {
+          const video = macbook.querySelector('video') as HTMLVideoElement
+
+          timeline.to(
+            macbook,
+            {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              rotationY: 0,
+              rotationX: 0,
+              z: 0,
+              filter: 'blur(0px)',
+              ease: 'power3.out',
+              duration: 1.2,
+            },
+            1.6,
+          )
+
+          if (video) {
+            timeline.call(
+              () => {
+                if (video && !videoPlayAttemptedRef.current) {
+                  videoPlayAttemptedRef.current = true
+                  
+                  // Use enhanced video play helper for Safari compatibility
+                  if (isSafari() && !hasUserInteracted) {
+                    // For Safari without user interaction, add click handler
+                    const handleClick = () => {
+                      attemptVideoPlay(video).then((success) => {
+                        if (success) {
+                          gsap.to(video, {
+                            opacity: 1,
+                            scale: 1,
+                            ease: 'power2.out',
+                            duration: 1.5,
+                          })
+                        }
+                      })
+                      // Remove listener after successful play
+                      video.removeEventListener('click', handleClick)
+                    }
+                    
+                    video.addEventListener('click', handleClick)
+                    video.style.cursor = 'pointer'
+                    
+                    // Show video with reduced opacity as cue
+                    gsap.to(video, {
+                      opacity: 0.5,
+                      scale: 1,
+                      ease: 'power2.out',
+                      duration: 1.5,
+                    })
+                  } else {
+                    // Normal autoplay attempt
+                    attemptVideoPlay(video).then((success) => {
+                      if (success) {
+                        gsap.to(video, {
+                          opacity: 1,
+                          scale: 1,
+                          ease: 'power2.out',
+                          duration: 1.5,
+                        })
+                      } else {
+                        // Fallback: show video even if play failed
+                        gsap.to(video, {
+                          opacity: 0.7,
+                          scale: 1,
+                          ease: 'power2.out',
+                          duration: 1.5,
+                        })
+                      }
+                    })
+                  }
+                }
+              },
+              [],
+              2.8,
+            )
+          }
+        }
+
+        if (macbook && container && background) {
+          const video = macbook.querySelector('video') as HTMLVideoElement
+          if (!video) {
+            return
+          }
+
+          const containerRect = container.getBoundingClientRect()
+          const macbookRect = macbook.getBoundingClientRect()
+
+          const getResponsiveFocusX = () => {
+            if (isMobile) return 0.35
+            if (isTablet) return 0.4
+            return 0.45
+          }
+
+          const getResponsiveFocusY = () => {
+            if (isMobile) {
+              if (isUltraWide) return 0.3
+              return 0.35
+            }
+            if (isTablet) return 0.4
+            return 0.45
+          }
+
+          const focusX = getResponsiveFocusX()
+          const focusY = getResponsiveFocusY()
+
+          const screenFocusXInMacbook = (74.52 + 501.22 * focusX) / 650
+          const screenFocusYInMacbook = (21.32 + 323.85 * focusY) / 400
+
+          const macbookXInContainer = macbookRect.left - containerRect.left
+          const macbookYInContainer = macbookRect.top - containerRect.top
+
+          const screenFocusXInContainer = macbookXInContainer + macbookRect.width * screenFocusXInMacbook
+          const screenFocusYInContainer = macbookYInContainer + macbookRect.height * screenFocusYInMacbook
+
+          const containerCenterX = containerRect.width / 2
+          const containerCenterY = containerRect.height / 2
+
+          const screenXFromCenter = screenFocusXInContainer - containerCenterX
+          const screenYFromCenter = screenFocusYInContainer - containerCenterY
+
+          gsap.set(container, {
+            transformOrigin: 'center center',
+            x: 0,
             y: 0,
+            scale: 1,
+            force3D: true,
+          })
+
+          const scale4 = isMobile ? (isUltraWide ? 2.5 : 3) : isTablet ? 4 : 4
+          timeline.to(
+            container,
+            {
+              scale: scale4,
+              x: -screenXFromCenter * scale4,
+              y: -screenYFromCenter * scale4,
+              ease: 'power1.inOut',
+              duration: 1.4,
+            },
+            2.5,
+          )
+
+          const scale6 = isMobile ? (isUltraWide ? 4 : 5) : isTablet ? 6 : 6
+          timeline.to(
+            container,
+            {
+              scale: scale6,
+              x: -screenXFromCenter * scale6,
+              y: -screenYFromCenter * scale6,
+              ease: 'power1.inOut',
+              duration: 1.2,
+            },
+            3.8,
+          )
+
+          const scale10 = isMobile ? (isUltraWide ? 6 : 8) : isTablet ? 10 : 10
+          timeline.to(
+            container,
+            {
+              scale: scale10,
+              x: -screenXFromCenter * scale10,
+              y: -screenYFromCenter * scale10,
+              ease: 'power1.inOut',
+              duration: 1.0,
+            },
+            5.1,
+          )
+
+          timeline.to(
+            background,
+            {
+              backgroundColor: '#5F5A56',
+              ease: 'power1.inOut',
+              duration: 2.0,
+            },
+            2.5,
+          )
+
+          timeline.to(
+            macbook,
+            {
+              opacity: 0.3,
+              ease: 'power1.inOut',
+              duration: 1.2,
+            },
+            4.3,
+          )
+
+          timeline.to(
+            macbook,
+            {
+              opacity: 0,
+              ease: 'power1.inOut',
+              duration: 1.0,
+            },
+            5.3,
+          )
+
+          timeline.to(
+            video,
+            {
+              scale: 1.2,
+              ease: 'power1.inOut',
+              duration: 2.0,
+            },
+            2.5,
+          )
+
+          timeline.to(
+            container,
+            {
+              scale: 1,
+              x: 0,
+              y: 0,
+              ease: 'power2.out',
+              duration: 1.5,
+            },
+            6.1,
+          )
+
+          timeline.to(
+            video,
+            {
+              scale: 1,
+              ease: 'power2.out',
+              duration: 1.5,
+            },
+            6.1,
+          )
+        }
+
+        const imageSliderTarget = imageSliderRef.current
+        if (imageSliderTarget) {
+          gsap.set(imageSliderTarget, {
+            opacity: 0,
+            y: 100,
+            scale: 0.95,
+            force3D: true,
+          })
+
+          timeline.to(
+            imageSliderTarget,
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              ease: 'power2.out',
+              duration: 1.5,
+            },
+            7.5,
+          )
+        }
+
+        const contactTarget = contactRef.current
+        if (contactTarget) {
+          gsap.set(contactTarget, {
+            // autoAlpha toggles both opacity + visibility.
+            // visibility:hidden prevents the hidden absolute layer from capturing clicks.
+            autoAlpha: 0,
+            y: 50,
+            force3D: true,
+          })
+
+          const contactStart = imageSliderTarget ? 10.2 : 8.0
+
+          if (imageSliderTarget) {
+            timeline.to(
+              imageSliderTarget,
+              {
+                opacity: 0,
+                y: -50,
+                ease: 'power2.in',
+                duration: 1.0,
+              },
+              10.0,
+            )
+          }
+
+          timeline.to(
+            contactTarget,
+            {
+              autoAlpha: 1,
+              y: 0,
+              ease: 'linear',
+              duration: 1.5,
+            },
+            contactStart,
+          )
+        }
+
+        timelineRef.current = timeline
+
+        return () => killTimeline()
+      })
+
+      mm.add('(max-width: 1023px)', () => {
+        killTimeline()
+
+        const stackCards = cardsRef.current.filter(Boolean)
+
+        if (!heading || !macbook || !container) {
+          return
+        }
+
+        const viewportWidth = window.innerWidth
+        const viewportHeight = window.innerHeight
+        const isUltraWide = viewportWidth / viewportHeight > 2.1
+
+        if (background) {
+          gsap.set(background, { backgroundColor: '#05060A', force3D: true })
+        }
+
+        if (stackCards.length) {
+          gsap.set(stackCards, {
+            xPercent: 0,
+            y: 40,
+            scale: 0.96,
+            opacity: 0,
             rotationY: 0,
             rotationX: 0,
             z: 0,
-            filter: 'blur(0px)',
-            ease: 'power3.out',
-            duration: 1.2,
-          },
-          1.6, // Start after cards fade (fade starts at 1.2, duration 0.4, completes at 1.6)
-        )
-
-        // Phase 4b: Video automatically fades in after Macbook spawns in (not tied to scroll)
-        // Video fade-in happens automatically with 1.5s duration after Macbook completes
-        if (video) {
-          // Trigger video fade-in automatically when Macbook animation completes
-          timeline.call(
-            () => {
-              if (video) {
-                // Start video playback immediately
-                video.play().catch((error) => {
-                  console.warn('Video autoplay failed:', error)
-                })
-
-                // Create a separate timeline for video fade-in (not tied to scroll)
-                gsap.to(video, {
-                  opacity: 1,
-                  scale: 1, // Zoom out from 1.05 to 1.0
-                  ease: 'power2.out',
-                  duration: 1.5, // 1.5 seconds as requested
-                  delay: 0, // No delay - starts immediately after Macbook spawns
-                })
-              }
-            },
-            [],
-            1.6 + 1.2, // Callback fires when Macbook animation completes (1.6 start + 1.2 duration = 2.8)
-          )
+            zIndex: (index) => 20 - index,
+            force3D: true,
+            transformOrigin: 'center center',
+            transformStyle: 'preserve-3d',
+            willChange: 'transform, opacity',
+          })
         }
-      }
 
-      // Phase 5: Zoom into Macbook screen (inside the bezels) - makes it feel like entering the screen
-      // This happens further in the scroll timeline after video has appeared
-      if (macbook && container && background) {
-        // Get video element which is directly inside the screen area
-        const video = macbook.querySelector('video') as HTMLVideoElement
-        
-        if (!video) return
+        gsap.set(heading, {
+          opacity: 0,
+          y: 20,
+          force3D: true,
+          willChange: 'transform, opacity',
+        })
 
-        // Get actual positions at runtime for accurate calculation
-        // We'll use the video element's position since it's directly in the screen
-        const containerRect = container.getBoundingClientRect()
-        const macbookRect = macbook.getBoundingClientRect()
-        
-        // Screen area in SVG: x="74.52" y="21.32" width="501.22" height="323.85"
-        // Calculate screen center position for zoom focus
-        // Responsive focus point: slightly higher for mobile, centered for desktop
-        const getResponsiveFocusX = () => {
-          if (isMobile) return 0.35 // Slightly left of center on mobile for better composition
-          if (isTablet) return 0.4 // Closer to center on tablet
-          return 0.45 // Desktop: slightly left of center to focus on watch content
-        }
-        
-        const getResponsiveFocusY = () => {
-          if (isMobile) {
-            if (isUltraWide) return 0.3 // Much higher for ultra-wide phones to prevent video overflow
-            return 0.35 // Higher on mobile to prevent downward drift
-          }
-          if (isTablet) return 0.4 // Higher on tablet
-          return 0.45 // Desktop: slightly higher than center to counter downward drift
-        }
-        
-        const focusX = getResponsiveFocusX()
-        const focusY = getResponsiveFocusY()
-        
-        // Screen focus position relative to Macbook
-        const screenFocusXInMacbook = (74.52 + 501.22 * focusX) / 650
-        const screenFocusYInMacbook = (21.32 + 323.85 * focusY) / 400
-        
-        // Calculate screen focus position relative to container
-        // Macbook is centered in container, so we need its position
-        const macbookXInContainer = macbookRect.left - containerRect.left
-        const macbookYInContainer = macbookRect.top - containerRect.top
-        
-        // Screen focus position relative to container
-        const screenFocusXInContainer = macbookXInContainer + (macbookRect.width * screenFocusXInMacbook)
-        const screenFocusYInContainer = macbookYInContainer + (macbookRect.height * screenFocusYInMacbook)
-        
-        // Container center
-        const containerCenterX = containerRect.width / 2
-        const containerCenterY = containerRect.height / 2
-        
-        // Screen focus offset from container center
-        const screenXFromCenter = screenFocusXInContainer - containerCenterX
-        const screenYFromCenter = screenFocusYInContainer - containerCenterY
-        
-        // Initialize container for zoom - start centered
         gsap.set(container, {
           transformOrigin: 'center center',
           x: 0,
@@ -500,189 +843,312 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           force3D: true,
         })
 
-        // Phase 5a: Initial zoom - smooth, fluid zoom into screen area
-        // Formula: when zooming from center by scale S, a point at offset P moves to P*S
-        // To keep point at center, shift container by -P*S
-        // Macbook spawns at 0.95, completes at 2.15, video fades in until ~3.65
-        const scale4 = isMobile ? (isUltraWide ? 2.5 : 3) : isTablet ? 4 : 4
-        timeline.to(
-          container,
-          {
-            scale: scale4,
-            x: -screenXFromCenter * scale4, // Shift to keep screen focus point in viewport center
-            y: -screenYFromCenter * scale4,
-            ease: 'power1.inOut', // Smoother easing for fluid motion
-            duration: 1.4, // Longer duration for smoother feel
-          },
-          2.5, // Start further in the timeline (after video has faded in)
-        )
-
-        // Phase 5b: Continue zooming deeper - seamless continuation
-        const scale6 = isMobile ? (isUltraWide ? 4 : 5) : isTablet ? 6 : 6
-        timeline.to(
-          container,
-          {
-            scale: scale6,
-            x: -screenXFromCenter * scale6,
-            y: -screenYFromCenter * scale6,
-            ease: 'power1.inOut', // Smooth, consistent easing
-            duration: 1.2, // Longer for smoother transition
-          },
-          2.5 + 1.3, // Slight overlap for seamless transition
-        )
-
-        // Phase 5c: Final deep zoom - ultra-smooth finish
-        const scale10 = isMobile ? (isUltraWide ? 6 : 8) : isTablet ? 10 : 10
-        timeline.to(
-          container,
-          {
-            scale: scale10,
-            x: -screenXFromCenter * scale10,
-            y: -screenYFromCenter * scale10,
-            ease: 'power1.inOut', // Smooth easing throughout
-            duration: 1.0, // Longer duration for premium feel
-          },
-          2.5 + 2.3, // Seamless continuation
-        )
-
-        // Background transitions to screen color (inside Macbook) - synchronized with zoom
-        timeline.to(
-          background,
-          {
-            backgroundColor: '#5F5A56', // Background color after zoom - we're inside the Macbook now
-            ease: 'power1.inOut', // Smoother easing to match zoom
-            duration: 2.0, // Longer duration for smoother, gradual transition
-          },
-          2.5, // Start with zoom for synchronized effect
-        )
-
-        // Fade out Macbook frame edges as we zoom deep into the screen
-        // The frame should disappear as we "enter" the screen
-        timeline.to(
-          macbook,
-          {
-            opacity: 0.3, // Make frame semi-transparent so screen content shows through
-            ease: 'power1.inOut', // Smoother fade for premium feel
-            duration: 1.2, // Longer duration for gradual fade
-          },
-          2.5 + 1.8, // Start fading as we're deep in the zoom
-        )
-
-        // Finally, fade out Macbook completely as we're fully inside
-        timeline.to(
-          macbook,
-          {
-            opacity: 0, // Completely fade out - we're inside the screen now
-            ease: 'power1.inOut', // Smooth, consistent easing
-            duration: 1.0, // Longer duration for smooth completion
-          },
-          2.5 + 2.8, // At the end of zoom sequence
-        )
-
-        // Optional: Zoom the video element separately for extra depth
-        if (video) {
-          timeline.to(
-            video,
-            {
-              scale: 1.2, // Slight additional zoom on video for depth
-              ease: 'power1.inOut', // Smoother easing to match overall zoom
-              duration: 2.0, // Longer duration for smoother, gradual zoom
-            },
-            2.5, // Start with Macbook zoom
-          )
-        }
-
-        // Phase 5d: Zoom out - reset container to normal scale before image slider appears
-        // Phase 5c ends at 2.5 + 2.3 + 1.0 = 5.8, so start zoom-out right after
-        timeline.to(
-          container,
-          {
-            scale: 1, // Reset to normal scale
-            x: 0, // Reset position
-            y: 0, // Reset position
-            ease: 'power2.out', // Smooth zoom out
-            duration: 1.5, // Smooth transition back to normal
-          },
-          2.5 + 2.3 + 1.0, // Start after Phase 5c completes (2.5 + 2.3 + 1.0 = 5.8)
-        )
-
-        // Reset video scale during zoom-out for consistency
-        if (video) {
-          timeline.to(
-            video,
-            {
-              scale: 1, // Reset video scale to normal
-              ease: 'power2.out', // Smooth zoom out
-              duration: 1.5, // Match container zoom-out duration
-            },
-            2.5 + 2.3 + 1.0, // Start same time as container zoom-out
-          )
-        }
-      }
-
-      // Phase 6: Image slider appears after zoom-out completes
-      // Zoom-out ends at 5.8 + 1.5 = 7.3, so start image slider around 7.5
-      const imageSlider = imageSliderRef.current
-      if (imageSlider) {
-        // Initialize image slider as hidden
-        gsap.set(imageSlider, {
+        gsap.set(macbook, {
           opacity: 0,
-          y: 100,
-          scale: 0.95,
+          scale: 0.9,
+          y: 80,
+          filter: 'blur(10px)',
           force3D: true,
+          transformStyle: 'preserve-3d',
+          willChange: 'transform, opacity, filter',
         })
 
-        // Phase 6a: Image slider fades in smoothly after zoom-out completes
+        const video = macbook.querySelector('video') as HTMLVideoElement
+        if (video) {
+          gsap.set(video, { opacity: 0, scale: 1.04, force3D: true })
+        }
+
+        const timeline = gsap.timeline({
+          defaults: { ease: 'power2.out' },
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: 'bottom bottom',
+            pin,
+            anticipatePin: 1,
+            scrub: 1,
+            invalidateOnRefresh: true,
+            refreshPriority: -1,
+          },
+        })
+
         timeline.to(
-          imageSlider,
+          heading,
           {
             opacity: 1,
             y: 0,
-            scale: 1,
-            ease: 'power2.out',
-            duration: 1.5,
+            duration: 0.35,
           },
-          7.5, // Start after zoom-out completes (zoom-out ends at ~7.3)
+          0,
         )
-      }
 
-      // Phase 7: Transition from image slider to contact section
-      // Image slider completes at 7.5 + 1.5 = 9.0, add some scroll time before transition
-      const contact = contactRef.current
-      if (contact) {
-        // Initialize contact section as hidden
-        gsap.set(contact, {
-          opacity: 0,
-          y: 50,
-          force3D: true,
-        })
+        if (stackCards.length) {
+          timeline.to(
+            stackCards,
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              stagger: 0.15,
+            },
+            0.1,
+          )
 
-        // Phase 7a: Fade out image slider and fade in contact section
-        // Start transition after image slider has been visible for a while
+          timeline.to(
+            stackCards,
+            {
+              y: -30,
+              opacity: 0,
+              duration: 0.5,
+              stagger: 0.12,
+              ease: 'power2.inOut',
+            },
+            1.1,
+          )
+        }
+
+        if (background) {
+          timeline.to(
+            background,
+            { backgroundColor: '#0B0D12', duration: 0.6, ease: 'power2.inOut' },
+            0.3,
+          )
+        }
+
         timeline.to(
-          imageSlider,
+          macbook,
           {
-            opacity: 0,
-            y: -50,
-            ease: 'power2.in',
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            duration: 0.9,
+            ease: 'power3.out',
+          },
+          1.6,
+        )
+
+        if (video) {
+          timeline.to(
+            video,
+            {
+              opacity: 1,
+              scale: 1,
+              duration: 1.2,
+              ease: 'power2.out',
+              onStart: () => {
+                // Enhanced video play for Safari compatibility
+                if (isSafari() && !hasUserInteracted) {
+                  // Add click handler for Safari without user interaction
+                  const handleClick = () => {
+                    attemptVideoPlay(video)
+                    video.removeEventListener('click', handleClick)
+                    video.style.cursor = 'default'
+                  }
+                  video.addEventListener('click', handleClick)
+                  video.style.cursor = 'pointer'
+                } else {
+                  attemptVideoPlay(video).then((success) => {
+                    if (!success) {
+                      console.warn('Mobile video autoplay failed, video will be visible but paused')
+                    }
+                  })
+                }
+              },
+            },
+            2.2,
+          )
+        }
+
+        const containerRect = container.getBoundingClientRect()
+        const macbookRect = macbook.getBoundingClientRect()
+
+        const getResponsiveFocusX = () => 0.36
+        const getResponsiveFocusY = () => (isUltraWide ? 0.28 : 0.32)
+
+        const focusX = getResponsiveFocusX()
+        const focusY = getResponsiveFocusY()
+
+        const screenFocusXInMacbook = (74.52 + 501.22 * focusX) / 650
+        const screenFocusYInMacbook = (21.32 + 323.85 * focusY) / 400
+
+        const macbookXInContainer = macbookRect.left - containerRect.left
+        const macbookYInContainer = macbookRect.top - containerRect.top
+
+        const screenFocusXInContainer = macbookXInContainer + macbookRect.width * screenFocusXInMacbook
+        const screenFocusYInContainer = macbookYInContainer + macbookRect.height * screenFocusYInMacbook
+
+        const containerCenterX = containerRect.width / 2
+        const containerCenterY = containerRect.height / 2
+
+        const screenXFromCenter = screenFocusXInContainer - containerCenterX
+        const screenYFromCenter = screenFocusYInContainer - containerCenterY
+
+        const midZoom = Math.min(5.2, Math.max(3.6, viewportHeight / (macbookRect.height * 0.45)))
+        const deepZoom = midZoom + 0.9
+        const finalZoom = deepZoom + 0.7
+
+        timeline.to(
+          container,
+          {
+            scale: midZoom,
+            x: -screenXFromCenter * midZoom,
+            y: -screenYFromCenter * midZoom,
+            ease: 'power1.inOut',
+            duration: 1.1,
+          },
+          2.6,
+        )
+
+        timeline.to(
+          container,
+          {
+            scale: deepZoom,
+            x: -screenXFromCenter * deepZoom,
+            y: -screenYFromCenter * deepZoom,
+            ease: 'power1.inOut',
+            duration: 1.1,
+          },
+          3.8,
+        )
+
+        timeline.to(
+          container,
+          {
+            scale: finalZoom,
+            x: -screenXFromCenter * finalZoom,
+            y: -screenYFromCenter * finalZoom,
+            ease: 'power1.inOut',
             duration: 1.0,
           },
-          10.0, // Start after image slider has been visible (7.5 + 1.5 + 1.0 = 10.0)
+          4.9,
+        )
+
+        if (video) {
+          timeline.to(
+            video,
+            {
+              scale: 1.1,
+              ease: 'power1.inOut',
+              duration: 1.6,
+            },
+            2.6,
+          )
+        }
+
+        if (background) {
+          timeline.to(
+            background,
+            {
+              backgroundColor: '#5F5A56',
+              ease: 'power1.inOut',
+              duration: 1.6,
+            },
+            2.6,
+          )
+        }
+
+        timeline.to(
+          macbook,
+          {
+            opacity: 0.35,
+            duration: 1.0,
+            ease: 'power1.inOut',
+          },
+          4.2,
         )
 
         timeline.to(
-          contact,
+          macbook,
           {
-            opacity: 1,
-            y: 0,
-            ease: 'linear',
-            duration: 1.5,
+            opacity: 0,
+            duration: 0.9,
+            ease: 'power1.inOut',
           },
-          10.2, // Slight overlap for smooth transition
+          5.1,
         )
-      }
 
-      timelineRef.current = timeline
+        timeline.to(
+          container,
+          {
+            scale: 1,
+            x: 0,
+            y: 0,
+            ease: 'power2.out',
+            duration: 1.2,
+          },
+          5.9,
+        )
+
+        if (video) {
+          timeline.to(
+            video,
+            {
+              scale: 1,
+              ease: 'power2.out',
+              duration: 1.0,
+            },
+            5.9,
+          )
+        }
+
+        const imageSliderTarget = imageSliderRef.current
+        if (imageSliderTarget) {
+          gsap.set(imageSliderTarget, { opacity: 0, y: 60, scale: 0.98, force3D: true })
+
+          timeline.to(
+            imageSliderTarget,
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 1.2,
+              ease: 'power2.out',
+            },
+            7.0,
+          )
+        }
+
+        const contactTarget = contactRef.current
+        if (contactTarget) {
+  gsap.set(contactTarget, { autoAlpha: 0, y: 40, force3D: true })
+
+          const contactStart = imageSliderTarget ? 9.2 : 7.8
+
+          if (imageSliderTarget) {
+            timeline.to(
+              imageSliderTarget,
+              {
+                opacity: 0,
+                y: -40,
+                ease: 'power2.in',
+                duration: 0.8,
+              },
+              9.0,
+            )
+          }
+
+          timeline.to(
+            contactTarget,
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 1.0,
+              ease: 'power1.out',
+            },
+            contactStart,
+          )
+        }
+
+        timelineRef.current = timeline
+
+        return () => killTimeline()
+      })
+
+      return () => {
+        killTimeline()
+        mm.revert()
+      }
     },
     { scope: sectionRef, dependencies: [pin] },
   )
@@ -708,7 +1174,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         ref={containerRef}
         className="sticky top-0 flex h-screen flex-col items-center justify-start overflow-hidden px-2 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16"
       >
-        <div className="relative grid w-full grid-cols-3 content-center items-center gap-2 sm:gap-6 md:max-w-6xl md:gap-8 lg:gap-10 grow md:grow-0">
+        <div className="relative grid w-full grid-cols-1 lg:grid-cols-3 content-center items-center gap-2 sm:gap-6 md:max-w-6xl md:gap-8 lg:gap-10 grow md:grow-0">
           {cards.map((card, index) => {
             // Enhanced CSS classes with 3D transform hints
             const baseClasses =
@@ -722,9 +1188,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             }
 
             const roleClasses: Record<CardRole, string> = {
-              center: 'col-start-2 col-end-3 row-start-1 self-start z-10',
-              left: 'col-start-1 col-end-2 row-start-1 justify-self-end opacity-0',
-              right: 'col-start-3 col-end-4 row-start-1 justify-self-start opacity-0',
+              center: 'col-span-1 lg:col-start-2 lg:col-end-3 row-start-1 self-start z-10',
+              left: 'col-span-1 lg:col-start-1 lg:col-end-2 row-start-1 lg:justify-self-end opacity-0',
+              right: 'col-span-1 lg:col-start-3 lg:col-end-4 row-start-1 lg:justify-self-start opacity-0',
             }
 
             // Remove parallax from cards as it conflicts with ScrollTrigger animations
