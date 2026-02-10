@@ -812,21 +812,23 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         }
 
         if (stackCards.length) {
-          gsap.set(stackCards, {
+          // Show first card immediately. Others are hidden until a little scroll.
+          gsap.set(stackCards, (i: number) => ({
             xPercent: 0,
-            y: 0,
-            scale: 1,
-            opacity: 1,
+            y: i === 0 ? 0 : 40,
+            scale: i === 0 ? 1 : 0.96,
+            opacity: i === 0 ? 1 : 0,
             rotationY: 0,
             rotationX: 0,
             z: 0,
-            zIndex: (index) => 20 - index,
+            zIndex: 20 - i,
             force3D: true,
             transformOrigin: 'center center',
             transformStyle: 'preserve-3d',
             willChange: 'transform, opacity',
-          })
+          }))
         }
+
 
         gsap.set(heading, {
           opacity: 1,
@@ -894,6 +896,21 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             },
             0.1,
           )
+
+          if (stackCards.length > 1) {
+            timeline.to(
+              stackCards.slice(1),
+              {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 0.5,
+                stagger: 0.12,
+                ease: 'power2.out',
+              },
+              0.15,
+            )
+          }
 
           timeline.to(
             stackCards,
@@ -1173,7 +1190,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       />
       <div 
         ref={containerRef}
-        className="sticky top-0 flex h-screen flex-col items-center justify-start overflow-hidden px-2 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16"
+        className="sticky top-0 flex h-screen flex-col items-center justify-start overflow-hidden px-2 sm:px-6 lg:px-8 pt-24 pb-8 sm:pt-12 sm:pb-12 lg:pt-16 lg:pb-16"
       >
         <div className="relative grid w-full grid-cols-1 lg:grid-cols-3 content-center items-center gap-2 sm:gap-6 md:max-w-6xl md:gap-8 lg:gap-10 grow md:grow-0">
           {cards.map((card, index) => {
@@ -1190,8 +1207,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
 
             const roleClasses: Record<CardRole, string> = {
               center: 'col-span-1 lg:col-start-2 lg:col-end-3 row-start-1 self-start z-10',
-              left: 'col-span-1 lg:col-start-1 lg:col-end-2 row-start-1 lg:justify-self-end opacity-0',
-              right: 'col-span-1 lg:col-start-3 lg:col-end-4 row-start-1 lg:justify-self-start opacity-0',
+              left: 'col-span-1 lg:col-start-1 lg:col-end-2 row-start-1 lg:justify-self-end lg:opacity-0',
+              right: 'col-span-1 lg:col-start-3 lg:col-end-4 row-start-1 lg:justify-self-start lg:opacity-0',
             }
 
             // Remove parallax from cards as it conflicts with ScrollTrigger animations
