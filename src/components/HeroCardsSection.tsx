@@ -1,4 +1,5 @@
-import { useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
@@ -145,6 +146,12 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   const contactRef = useRef<HTMLDivElement | null>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const videoPlayAttemptedRef = useRef(false)
+
+  const [portalReady, setPortalReady] = useState(false)
+
+  useEffect(() => {
+    setPortalReady(true)
+  }, [])
 
   // Setup user interaction tracking on mount
   useGSAP(() => {
@@ -1327,25 +1334,38 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         </div>
 
         {/* Contact Section - appears after image slider */}
-<div ref={contactRef} className="fixed inset-0 z-50" style={{ pointerEvents: 'none' }}>
-  <div
-    className="w-full overflow-y-auto overscroll-contain"
-    style={{
-      backgroundColor: '#5F5A56',
-      height: '100svh',              // iOS stable viewport
-      maxHeight: '100svh',
-      WebkitOverflowScrolling: 'touch',
-      paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
-      paddingBottom: 'calc(env(safe-area-inset-bottom) + 32px)',
-      touchAction: 'pan-y',
-      pointerEvents: 'auto',
-    }}
-  >
-    {/* ONE scroll flow: content + footer */}
-    <ContactSection className="pb-10" />
-    <Footer />
-  </div>
-</div>
+        {portalReady &&
+          createPortal(
+            <div
+              ref={contactRef}
+              className="fixed inset-0 z-50"
+              style={{
+                // IMPORTANT: do NOT disable pointer events on parent on iOS
+                pointerEvents: 'auto',
+              }}
+            >
+              <div
+                className="w-full overflow-y-auto overscroll-contain"
+                style={{
+                  backgroundColor: '#5F5A56',
+                  // Use minHeight instead of height to avoid iOS scroll weirdness
+                  minHeight: '100svh',
+                  WebkitOverflowScrolling: 'touch',
+                  paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
+                  paddingBottom: 'calc(env(safe-area-inset-bottom) + 48px)',
+                  touchAction: 'pan-y',
+                }}
+              >
+                {/* Add extra bottom spacing so footer is always reachable */}
+                <div className="pb-24">
+                  <ContactSection className="pb-10" />
+                  <Footer />
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )
+        }
       </div>
     </section>
   )

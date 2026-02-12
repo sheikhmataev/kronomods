@@ -148,7 +148,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                   id="message"
                   name="message"
                   required
-                  className="w-full h-[88px] min-[400px]:h-[104px] sm:h-32 px-2 py-2 resize-none bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm overscroll-contain"
+                  className="w-full min-h-[120px] resize-y px-2 py-2 bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
                   placeholder="How can we help?"
                 ></textarea>
               </div>
