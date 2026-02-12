@@ -1327,27 +1327,23 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         </div>
 
         {/* Contact Section - appears after image slider */}
-<div
-  ref={contactRef}
-  className="fixed inset-0 z-50 pointer-events-none"
->
+<div ref={contactRef} className="fixed inset-0 z-50" style={{ pointerEvents: 'none' }}>
   <div
-    className="w-full pointer-events-auto overflow-y-auto overscroll-contain"
+    className="w-full overflow-y-auto overscroll-contain"
     style={{
       backgroundColor: '#5F5A56',
-      height: '100svh', // stable viewport on iOS Safari (better than 100dvh for scrolling)
+      height: '100svh',              // iOS stable viewport
       maxHeight: '100svh',
       WebkitOverflowScrolling: 'touch',
       paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
-      paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)',
+      paddingBottom: 'calc(env(safe-area-inset-bottom) + 32px)',
       touchAction: 'pan-y',
+      pointerEvents: 'auto',
     }}
   >
-    {/* One scroll flow: content + footer */}
-    <ContactSection />
-    <div className="py-4 sm:py-6">
-      <Footer />
-    </div>
+    {/* ONE scroll flow: content + footer */}
+    <ContactSection className="pb-10" />
+    <Footer />
   </div>
 </div>
       </div>
