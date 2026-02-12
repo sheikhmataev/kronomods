@@ -1327,29 +1327,29 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         </div>
 
         {/* Contact Section - appears after image slider */}
-        <div
-          ref={contactRef}
-          className="absolute inset-0 z-50 pointer-events-none"
-        >
-          <div
-            className="w-full pointer-events-auto overflow-y-auto overscroll-contain"
-            style={{
-              backgroundColor: '#5F5A56',
-              height: '100svh',      // stable viewport on iOS
-              maxHeight: '100svh',
-              WebkitOverflowScrolling: 'touch',
-              paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)',
-            }}
-          >
-            {/* Top spacing so content doesn't sit under the notch/status bar */}
-            <div style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}>
-              <ContactSection />
-              <div className="py-4 sm:py-6">
-                <Footer />
-              </div>
-            </div>
-          </div>
-        </div>
+<div
+  ref={contactRef}
+  className="fixed inset-0 z-50 pointer-events-none"
+>
+  <div
+    className="w-full pointer-events-auto overflow-y-auto overscroll-contain"
+    style={{
+      backgroundColor: '#5F5A56',
+      height: '100svh', // stable viewport on iOS Safari (better than 100dvh for scrolling)
+      maxHeight: '100svh',
+      WebkitOverflowScrolling: 'touch',
+      paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
+      paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)',
+      touchAction: 'pan-y',
+    }}
+  >
+    {/* One scroll flow: content + footer */}
+    <ContactSection />
+    <div className="py-4 sm:py-6">
+      <Footer />
+    </div>
+  </div>
+</div>
       </div>
     </section>
   )

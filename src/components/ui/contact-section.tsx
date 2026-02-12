@@ -28,10 +28,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
   ]
 
   return (
-    <div
-      className={`${className} w-full flex flex-col px-3 sm:px-0 pb-[calc(env(safe-area-inset-bottom)+96px)]`}
-      style={{ backgroundColor: 'transparent' }}
-    >
+    <div className={`${className} w-full flex flex-col px-3 sm:px-0 pb-8`} style={{ backgroundColor: 'transparent' }}>
       
       {/* Social Links Section - Compact Padding */}
       <section className="py-2 min-[400px]:py-4 sm:py-6 flex items-center justify-center">
@@ -151,7 +148,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                   id="message"
                   name="message"
                   required
-                  className="w-full h-[88px] min-[400px]:h-[104px] sm:h-32 px-2 py-2 resize-none bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
+                  className="w-full h-[88px] min-[400px]:h-[104px] sm:h-32 px-2 py-2 resize-none bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm overscroll-contain"
                   placeholder="How can we help?"
                 ></textarea>
               </div>
