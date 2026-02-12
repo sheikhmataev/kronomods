@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react'
+import { useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -146,12 +146,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   const contactRef = useRef<HTMLDivElement | null>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const videoPlayAttemptedRef = useRef(false)
-
-  const [portalReady, setPortalReady] = useState(false)
-
-  useEffect(() => {
-    setPortalReady(true)
-  }, [])
 
   // Setup user interaction tracking on mount
   useGSAP(() => {
@@ -791,6 +785,12 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               y: 0,
               ease: 'linear',
               duration: 1.5,
+              onStart: () => {
+                contactTarget.style.pointerEvents = 'auto'
+              },
+              onReverseComplete: () => {
+                contactTarget.style.pointerEvents = 'none'
+              },
             },
             contactStart,
           )
@@ -1206,6 +1206,12 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               y: 0,
               duration: 1.0,
               ease: 'power1.out',
+              onStart: () => {
+                contactTarget.style.pointerEvents = 'auto'
+              },
+              onReverseComplete: () => {
+                contactTarget.style.pointerEvents = 'none'
+              },
             },
             contactStart,
           )
@@ -1334,29 +1340,29 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         </div>
 
         {/* Contact Section - appears after image slider */}
-        {portalReady &&
+        {typeof document !== 'undefined' &&
           createPortal(
             <div
               ref={contactRef}
               className="fixed inset-0 z-50"
+              // IMPORTANT: start hidden so it doesn't cover the page before GSAP sets it
               style={{
-                // IMPORTANT: do NOT disable pointer events on parent on iOS
-                pointerEvents: 'auto',
+                opacity: 0,
+                visibility: 'hidden',
+                transform: 'translateY(50px)',
+                pointerEvents: 'none',
               }}
             >
               <div
-                className="w-full overflow-y-auto overscroll-contain"
+                className="w-full overflow-y-auto overscroll-contain [webkit-overflow-scrolling:touch]"
                 style={{
                   backgroundColor: '#5F5A56',
-                  // Use minHeight instead of height to avoid iOS scroll weirdness
                   minHeight: '100svh',
-                  WebkitOverflowScrolling: 'touch',
                   paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
                   paddingBottom: 'calc(env(safe-area-inset-bottom) + 48px)',
                   touchAction: 'pan-y',
                 }}
               >
-                {/* Add extra bottom spacing so footer is always reachable */}
                 <div className="pb-24">
                   <ContactSection className="pb-10" />
                   <Footer />
