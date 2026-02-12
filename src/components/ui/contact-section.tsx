@@ -28,7 +28,10 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
   ]
 
   return (
-    <div className={`${className} w-full flex flex-col`} style={{ backgroundColor: 'transparent' }}>
+    <div
+      className={`${className} w-full flex flex-col px-3 sm:px-0 pb-[calc(env(safe-area-inset-bottom)+96px)]`}
+      style={{ backgroundColor: 'transparent' }}
+    >
       
       {/* Social Links Section - Compact Padding */}
       <section className="py-2 min-[400px]:py-4 sm:py-6 flex items-center justify-center">
@@ -81,57 +84,74 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
           <div className="max-w-lg mx-auto">
             {/* Reduced space-y from 4 to 2 for tighter mobile layout */}
             <form onSubmit={(e) => e.preventDefault()} className="space-y-2 min-[400px]:space-y-3 sm:space-y-4">
-              <div className="grid grid-cols-2 gap-1.5 min-[400px]:gap-2 sm:gap-4">
+              <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-2 sm:gap-4">
                 <div>
-                  <label className="font-medium text-porcelain text-xs block mb-1 ml-1">First name</label>
+                  <label htmlFor="firstName" className="font-medium text-porcelain text-xs block mb-1 ml-1">
+                    First name
+                  </label>
                   <input
+                    id="firstName"
+                    name="firstName"
+                    autoComplete="given-name"
                     type="text"
                     required
-                    className="w-full px-2 py-1 min-[400px]:py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
+                    className="w-full px-2 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
                     placeholder="First"
                   />
                 </div>
                 <div>
-                  <label className="font-medium text-porcelain text-xs block mb-1 ml-1">Last name</label>
+                  <label htmlFor="lastName" className="font-medium text-porcelain text-xs block mb-1 ml-1">
+                    Last name
+                  </label>
                   <input
+                    id="lastName"
+                    name="lastName"
+                    autoComplete="family-name"
                     type="text"
                     required
-                    className="w-full px-2 py-1 min-[400px]:py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
+                    className="w-full px-2 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
                     placeholder="Last"
                   />
                 </div>
               </div>
               
               <div>
-                <label className="font-medium text-porcelain text-xs block mb-1 ml-1">Email</label>
+                <label htmlFor="email" className="font-medium text-porcelain text-xs block mb-1 ml-1">Email</label>
                 <input
+                  id="email"
+                  name="email"
+                  autoComplete="email"
                   type="email"
                   required
-                  className="w-full px-2 py-1 min-[400px]:py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
+                  className="w-full px-2 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
                   placeholder="name@example.com"
                 />
               </div>
               
               <div>
-                <label className="font-medium text-porcelain text-xs block mb-1 ml-1">Phone</label>
+                <label htmlFor="phone" className="font-medium text-porcelain text-xs block mb-1 ml-1">Phone</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-2 my-auto h-5 flex items-center border-r border-onyx/30 pr-2 z-10">
                     <span className="text-xs text-porcelain/60 mr-1">🇳🇴</span>
                   </div>
                   <input
+                    id="phone"
+                    name="phone"
+                    autoComplete="tel"
                     type="tel"
                     placeholder="912 34 567"
-                    className="w-full pl-9 pr-2 py-1 min-[400px]:py-2 bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
+                    className="w-full pl-9 pr-2 py-2 bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
                   />
                 </div>
               </div>
               
               <div>
-                <label className="font-medium text-porcelain text-xs block mb-1 ml-1">Message</label>
+                <label htmlFor="message" className="font-medium text-porcelain text-xs block mb-1 ml-1">Message</label>
                 <textarea
+                  id="message"
+                  name="message"
                   required
-                  // Reduced height from h-32 to h-24 to save space
-                  className="w-full h-14 min-[400px]:h-18 sm:h-32 px-2 py-1 min-[400px]:py-2 resize-none bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
+                  className="w-full h-[88px] min-[400px]:h-[104px] sm:h-32 px-2 py-2 resize-none bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
                   placeholder="How can we help?"
                 ></textarea>
               </div>
