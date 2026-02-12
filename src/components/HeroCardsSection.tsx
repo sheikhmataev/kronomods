@@ -1331,29 +1331,20 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           ref={contactRef}
           className="absolute inset-0 z-50 pointer-events-none"
         >
-          {/* SCROLL CONTAINER: 
-              1. h-full & overflow-y-auto: Allows scrolling on small phones.
-              2. pointer-events-auto: Re-enables touch.
-              3. bg-[#5F5A56]: Ensures it covers the layers behind it.
-          */}
-          <div 
-            className="h-full w-full overflow-hidden pointer-events-auto"
-            style={{ 
+          <div
+            className="w-full pointer-events-auto overflow-y-auto overscroll-contain"
+            style={{
               backgroundColor: '#5F5A56',
-              height: '100dvh', // Force dynamic viewport height
-              maxHeight: '100dvh' // Double enforcement
+              height: '100svh',      // stable viewport on iOS
+              maxHeight: '100svh',
+              WebkitOverflowScrolling: 'touch',
+              paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)',
             }}
           >
-            {/* Flex layout with guaranteed footer visibility */}
-            <div className="flex flex-col h-[100dvh]">
-              {/* Header clearance and main content - further reduced for ultra-wide phones */}
-              {/* Added overflow-y-auto here to make ONLY this section scrollable */}
-              <div className="pt-8 sm:pt-12 min-[400px]:pt-14 flex-1 min-h-0 overflow-y-auto overscroll-contain">
-                <ContactSection />
-              </div>
-              
-              {/* Footer - always visible at bottom, outside the scroll area */}
-              <div className="flex-shrink-0 py-2 sm:py-4 md:py-6 bg-[#5F5A56] z-10 relative">
+            {/* Top spacing so content doesn't sit under the notch/status bar */}
+            <div style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}>
+              <ContactSection />
+              <div className="py-4 sm:py-6">
                 <Footer />
               </div>
             </div>
