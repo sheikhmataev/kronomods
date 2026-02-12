@@ -144,6 +144,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const imageSliderRef = useRef<HTMLDivElement | null>(null)
   const contactRef = useRef<HTMLDivElement | null>(null)
+  const contactInnerRef = useRef<HTMLDivElement | null>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const videoPlayAttemptedRef = useRef(false)
 
@@ -250,7 +251,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           gsap.set(imageSlider, { willChange: 'transform, opacity', zIndex: 45, force3D: true })
         }
         if (contact) {
-          gsap.set(contact, { willChange: 'transform, opacity', zIndex: 50, force3D: true })
+          gsap.set(contact, { willChange: 'opacity', zIndex: 50 })
         }
       }
 
@@ -759,9 +760,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             // autoAlpha toggles both opacity + visibility.
             // visibility:hidden prevents the hidden absolute layer from capturing clicks.
             autoAlpha: 0,
-            y: 50,
-            force3D: true,
           })
+          
+          if (contactInnerRef.current) {
+            gsap.set(contactInnerRef.current, { y: 50, force3D: true })
+          }
 
           const contactStart = imageSliderTarget ? 10.2 : 8.0
 
@@ -782,9 +785,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             contactTarget,
             {
               autoAlpha: 1,
-              y: 0,
-              ease: 'linear',
-              duration: 1.5,
+              duration: 1.0,
+              ease: 'power1.out',
               onStart: () => {
                 contactTarget.style.pointerEvents = 'auto'
               },
@@ -794,6 +796,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             },
             contactStart,
           )
+
+          if (contactInnerRef.current) {
+            timeline.to(
+              contactInnerRef.current,
+              { y: 0, duration: 1.0, ease: 'power1.out' },
+              contactStart,
+            )
+          }
         }
 
         timelineRef.current = timeline
@@ -1182,7 +1192,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
 
         const contactTarget = contactRef.current
         if (contactTarget) {
-  gsap.set(contactTarget, { autoAlpha: 0, y: 40, force3D: true })
+          gsap.set(contactTarget, { autoAlpha: 0 })
+          
+          if (contactInnerRef.current) {
+            gsap.set(contactInnerRef.current, { y: 40, force3D: true })
+          }
 
           const contactStart = imageSliderTarget ? 9.2 : 7.8
 
@@ -1203,7 +1217,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             contactTarget,
             {
               autoAlpha: 1,
-              y: 0,
               duration: 1.0,
               ease: 'power1.out',
               onStart: () => {
@@ -1215,6 +1228,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             },
             contactStart,
           )
+
+          if (contactInnerRef.current) {
+            timeline.to(
+              contactInnerRef.current,
+              { y: 0, duration: 1.0, ease: 'power1.out' },
+              contactStart,
+            )
+          }
         }
 
         timelineRef.current = timeline
@@ -1344,25 +1365,23 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           createPortal(
             <div
               ref={contactRef}
-              className="fixed inset-0 z-50 overflow-y-auto"
+              className="fixed inset-0 z-50 overflow-y-scroll"
               style={{
                 backgroundColor: '#5F5A56',
                 WebkitOverflowScrolling: 'touch',
                 minHeight: '100svh',
-                
-                // start hidden so it doesn't cover your site before GSAP reveals it
+
+                // start hidden (but DO NOT transform this element)
                 opacity: 0,
                 visibility: 'hidden',
-                transform: 'translateY(50px)',
                 pointerEvents: 'none',
 
                 paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
-                // more bottom padding so footer + send button are reachable on iOS
                 paddingBottom: 'calc(env(safe-area-inset-bottom) + 160px)',
                 touchAction: 'pan-y',
               }}
             >
-              <div className="pb-24">
+              <div ref={contactInnerRef} className="pb-24">
                 <ContactSection className="pb-10" />
                 <Footer />
               </div>
