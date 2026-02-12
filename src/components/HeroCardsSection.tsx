@@ -797,33 +797,60 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       mm.add('(max-width: 1023px)', () => {
         killTimeline()
 
-        const stackCards = cardsRef.current.filter(Boolean)
+        const centerCard = getCardByRole('center')
+        const leftCard = getCardByRole('left')
+        const rightCard = getCardByRole('right')
 
-        if (!heading || !macbook || !container) {
-          return
-        }
+        if (!centerCard || !leftCard || !rightCard) return
+        if (!heading || !macbook || !container) return
 
         const viewportWidth = window.innerWidth
         const viewportHeight = window.innerHeight
         const isUltraWide = viewportWidth / viewportHeight > 2.1
 
-        if (background) {
-          gsap.set(background, { backgroundColor: '#05060A', force3D: true })
-        }
+        if (background) gsap.set(background, { backgroundColor: '#05060A', force3D: true })
 
-        if (stackCards.length) {
-          gsap.set(stackCards, {
-            xPercent: 0,
-            y: 0,
-            scale: 1,
-            opacity: 1,
-            rotationY: 0,
-            rotationX: 0,
-            z: 0,
-            force3D: true,
-          })
-        }
+        // ✅ Initial state: ONLY center visible & big (no scroll required)
+        gsap.set(centerCard, {
+          transformOrigin: 'center center',
+          y: 0,
+          scale: 1.25,
+          opacity: 1,
+          rotationY: 0,
+          rotationX: 0,
+          z: 10,
+          force3D: true,
+          transformStyle: 'preserve-3d',
+          willChange: 'transform, opacity',
+        })
 
+        gsap.set(leftCard, {
+          transformOrigin: 'center center',
+          xPercent: -140,
+          y: 0,
+          scale: 0.82,
+          opacity: 0,
+          rotationY: -22,
+          rotationX: 4,
+          z: -40,
+          force3D: true,
+          transformStyle: 'preserve-3d',
+          willChange: 'transform, opacity',
+        })
+
+        gsap.set(rightCard, {
+          transformOrigin: 'center center',
+          xPercent: 140,
+          y: 0,
+          scale: 0.82,
+          opacity: 0,
+          rotationY: 22,
+          rotationX: 4,
+          z: -40,
+          force3D: true,
+          transformStyle: 'preserve-3d',
+          willChange: 'transform, opacity',
+        })
 
         gsap.set(heading, {
           opacity: 1,
@@ -851,12 +878,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         })
 
         const video = macbook.querySelector('video') as HTMLVideoElement
-        if (video) {
-          gsap.set(video, { opacity: 0, scale: 1.04, force3D: true })
-        }
+        if (video) gsap.set(video, { opacity: 0, scale: 1.04, force3D: true })
 
         const timeline = gsap.timeline({
-          defaults: { ease: 'power2.out' },
+          defaults: { ease: 'power3.out' },
           scrollTrigger: {
             trigger: section,
             start: 'top top',
@@ -869,65 +894,90 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           },
         })
 
-        timeline.to(
-          heading,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.35,
-          },
-          0,
-        )
-
-        if (stackCards.length) {
-          timeline.to(
-            stackCards,
+        // ✅ Phase 1 (like desktop)
+        timeline
+          .to(
+            centerCard,
             {
-              opacity: 1,
-              y: -8,
-              duration: 0.25,
-              stagger: 0.06,
-              ease: 'power1.out'
+              scale: 1.0,
+              y: 0,
+              z: 20,
+              duration: 0.55,
+              ease: 'power3.out',
+            },
+            0,
+          )
+          .to(
+            heading,
+            {
+              y: 90,
+              opacity: 0,
+              duration: 0.45,
+              ease: 'power2.in',
             },
             0.1,
           )
-
-          if (stackCards.length > 1) {
-            timeline.to(
-              stackCards.slice(1),
-              {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                duration: 0.5,
-                stagger: 0.12,
-                ease: 'power2.out',
-              },
-              0.15,
-            )
-          }
-
-          timeline.to(
-            stackCards,
+          .to(
+            leftCard,
             {
-              y: -30,
-              opacity: 0,
-              duration: 0.5,
-              stagger: 0.12,
+              xPercent: 0,
+              opacity: 1,
+              rotationY: -10,
+              rotationX: 0,
+              scale: 0.92,
+              z: -20,
+              duration: 0.55,
+              ease: 'power3.out',
+            },
+            0,
+          )
+          .to(
+            rightCard,
+            {
+              xPercent: 0,
+              opacity: 1,
+              rotationY: 10,
+              rotationX: 0,
+              scale: 0.92,
+              z: -20,
+              duration: 0.55,
+              ease: 'power3.out',
+            },
+            0,
+          )
+          .to(
+            [leftCard, rightCard],
+            {
+              scale: 0.88,
+              rotationY: (_i, target) => (target === leftCard ? -15 : 15),
+              z: -35,
+              duration: 0.25,
               ease: 'power2.inOut',
             },
-            1.1,
+            0.55,
           )
-        }
 
-        if (background) {
-          timeline.to(
-            background,
-            { backgroundColor: '#0B0D12', duration: 0.6, ease: 'power2.inOut' },
-            0.3,
-          )
-        }
+        // ✅ Phase 2: fade cards out to continue the rest of your sequence
+        const fadeTargets = [centerCard, leftCard, rightCard]
+        timeline.to(
+          fadeTargets,
+          { y: -30, duration: 0.35, ease: 'power2.out' },
+          0.85,
+        )
+        timeline.to(
+          fadeTargets,
+          { autoAlpha: 0, duration: 0.4, ease: 'power2.inOut' },
+          1.25,
+        )
 
+        // Background color transition
+        timeline.to(
+          background,
+          { backgroundColor: '#0B0D12', duration: 0.6, ease: 'power2.inOut' },
+          1.4,
+        )
+
+        // MacBook appearance
         timeline.to(
           macbook,
           {
@@ -938,9 +988,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             duration: 0.9,
             ease: 'power3.out',
           },
-          1.6,
+          1.8,
         )
 
+        // Video appearance with Safari handling
         if (video) {
           timeline.to(
             video,
@@ -969,7 +1020,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 }
               },
             },
-            2.2,
+            2.4,
           )
         }
 
