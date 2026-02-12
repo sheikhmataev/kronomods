@@ -1,5 +1,4 @@
 import { useRef } from 'react'
-import { createPortal } from 'react-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
@@ -1340,38 +1339,25 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         </div>
 
         {/* Contact Section - appears after image slider */}
-        {typeof document !== 'undefined' &&
-          createPortal(
-            <div
-              ref={contactRef}
-              className="fixed inset-0 z-50"
-              // IMPORTANT: start hidden so it doesn't cover the page before GSAP sets it
-              style={{
-                opacity: 0,
-                visibility: 'hidden',
-                transform: 'translateY(50px)',
-                pointerEvents: 'none',
-              }}
-            >
-              <div
-                className="w-full overflow-y-auto overscroll-contain [webkit-overflow-scrolling:touch]"
-                style={{
-                  backgroundColor: '#5F5A56',
-                  minHeight: '100svh',
-                  paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
-                  paddingBottom: 'calc(env(safe-area-inset-bottom) + 48px)',
-                  touchAction: 'pan-y',
-                }}
-              >
-                <div className="pb-24">
-                  <ContactSection className="pb-10" />
-                  <Footer />
-                </div>
-              </div>
-            </div>,
-            document.body,
-          )
-        }
+        <div
+          ref={contactRef}
+          className="fixed inset-0 z-50 overflow-y-auto"
+          style={{
+            backgroundColor: '#5F5A56',
+            WebkitOverflowScrolling: 'touch',
+            // use minHeight instead of height to avoid iOS keyboard/viewport bugs
+            minHeight: '100svh',
+            paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
+            // BIG bottom padding so you can scroll past the textarea and see footer
+            paddingBottom: 'calc(env(safe-area-inset-bottom) + 140px)',
+            touchAction: 'pan-y',
+          }}
+        >
+          <div className="pb-24">
+            <ContactSection className="pb-10" />
+            <Footer />
+          </div>
+        </div>
       </div>
     </section>
   )
