@@ -29,19 +29,19 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
 
   return (
     <div className={`${className} w-full flex flex-col px-3 sm:px-0 pb-8`} style={{ backgroundColor: 'transparent' }}>
-      
+
       {/* Social Links Section - Compact Padding */}
-      <section className="py-2 min-[400px]:py-4 sm:py-6 flex items-center justify-center">
+      <section className="py-2 min-[400px]:py-3 sm:py-6 flex items-center justify-center">
         <div className="max-w-screen-xl mx-auto px-3 w-full">
           <div className="text-center mb-2 min-[400px]:mb-3 sm:mb-4">
-            <h3 className="text-porcelain text-base min-[400px]:text-xl sm:text-2xl font-semibold font-display mb-1">
+            <h3 className="text-porcelain text-base min-[400px]:text-lg sm:text-2xl font-semibold font-display mb-1">
               Let's connect
             </h3>
             <p className="text-porcelain/60 text-xs sm:text-sm max-w-md mx-auto hidden sm:block">
               We're here to help and answer any question you might have.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 min-[400px]:gap-3 sm:gap-4 max-w-3xl mx-auto">
             {contactMethods.map((item, idx) => (
               <a
@@ -52,15 +52,15 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                 className="group block p-2 min-[400px]:p-3 sm:p-4 border border-onyx/30 rounded-md hover:border-champagne/50 transition-all duration-300 hover:shadow-md bg-onyx/10"
               >
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded border border-onyx/30 flex items-center justify-center text-champagne transition-colors duration-300 group-hover:border-champagne group-hover:text-auric group-hover:bg-champagne/10 shrink-0">
-                      {item.icon}
-                    </div>
-                    <div className="text-left flex-1 flex items-center justify-between">
-                        <h4 className="text-porcelain text-sm sm:text-base font-medium font-display group-hover:text-champagne">
-                          {item.title}
-                        </h4>
-                        <span className="text-xs text-champagne group-hover:text-auric">Open &rarr;</span>
-                    </div>
+                  <div className="w-8 h-8 rounded border border-onyx/30 flex items-center justify-center text-champagne transition-colors duration-300 group-hover:border-champagne group-hover:text-auric group-hover:bg-champagne/10 shrink-0">
+                    {item.icon}
+                  </div>
+                  <div className="text-left flex-1 flex items-center justify-between">
+                    <h4 className="text-porcelain text-sm sm:text-base font-medium font-display group-hover:text-champagne">
+                      {item.title}
+                    </h4>
+                    <span className="text-xs text-champagne group-hover:text-auric">Open &rarr;</span>
+                  </div>
                 </div>
               </a>
             ))}
@@ -69,7 +69,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
       </section>
 
       {/* Form Section - Compact Layout for Mobile */}
-      <section className="py-3 min-[400px]:py-5 sm:py-6 flex items-start justify-center pb-2">
+      <section className="py-2 min-[400px]:py-4 sm:py-6 flex items-start justify-center pb-2">
         <div className="max-w-screen-xl mx-auto px-3 w-full">
           <div className="text-center mb-2 min-[400px]:mb-3 sm:mb-4">
             <h3 className="text-champagne text-xs min-[400px]:text-sm sm:text-sm font-semibold font-display mb-1">Contact</h3>
@@ -77,7 +77,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
               Get in touch
             </p>
           </div>
-          
+
           <div className="max-w-lg mx-auto">
             {/* Reduced space-y from 4 to 2 for tighter mobile layout */}
             <form onSubmit={(e) => e.preventDefault()} className="space-y-2 min-[400px]:space-y-3 sm:space-y-4">
@@ -111,7 +111,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label htmlFor="email" className="font-medium text-porcelain text-xs block mb-1 ml-1">Email</label>
                 <input
@@ -124,7 +124,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                   placeholder="name@example.com"
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="phone" className="font-medium text-porcelain text-xs block mb-1 ml-1">Phone</label>
                 <div className="relative">
@@ -141,18 +141,18 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label htmlFor="message" className="font-medium text-porcelain text-xs block mb-1 ml-1">Message</label>
                 <textarea
                   id="message"
                   name="message"
                   required
-                  className="w-full min-h-[140px] px-2 py-2 resize-y bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
+                  className="w-full min-h-[100px] px-2 py-2 resize-y bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
                   placeholder="How can we help?"
                 ></textarea>
               </div>
-              
+
               <button
                 type="submit"
                 className="w-full px-4 py-2 min-[400px]:py-2.5 text-night font-bold bg-champagne hover:bg-auric active:bg-champagne rounded-md transition-colors text-sm mt-1"

@@ -1365,11 +1365,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           createPortal(
             <div
               ref={contactRef}
-              className="fixed inset-0 z-50 overflow-y-scroll"
+              className="fixed inset-0 z-[100] overflow-y-auto bg-onyx/95 backdrop-blur-sm"
               style={{
                 backgroundColor: '#5F5A56',
                 WebkitOverflowScrolling: 'touch',
-                minHeight: '100svh',
+                height: '100dvh',
 
                 // start hidden (but DO NOT transform this element)
                 opacity: 0,
@@ -1377,12 +1377,12 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 pointerEvents: 'none',
 
                 paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
-                paddingBottom: 'calc(env(safe-area-inset-bottom) + 160px)',
+                paddingBottom: 'calc(env(safe-area-inset-bottom) + 40px)',
                 touchAction: 'pan-y',
               }}
             >
-              <div ref={contactInnerRef} className="pb-24">
-                <ContactSection className="pb-10" />
+              <div ref={contactInnerRef} className="pb-12 min-h-full flex flex-col justify-center">
+                <ContactSection className="pb-4" />
                 <Footer />
               </div>
             </div>,
