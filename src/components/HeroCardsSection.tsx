@@ -812,21 +812,16 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         }
 
         if (stackCards.length) {
-          // Show first card immediately. Others are hidden until a little scroll.
-          gsap.set(stackCards, (i: number) => ({
+          gsap.set(stackCards, {
             xPercent: 0,
-            y: i === 0 ? 0 : 40,
-            scale: i === 0 ? 1 : 0.96,
-            opacity: i === 0 ? 1 : 0,
+            y: 0,
+            scale: 1,
+            opacity: 1,
             rotationY: 0,
             rotationX: 0,
             z: 0,
-            zIndex: 20 - i,
             force3D: true,
-            transformOrigin: 'center center',
-            transformStyle: 'preserve-3d',
-            willChange: 'transform, opacity',
-          }))
+          })
         }
 
 
@@ -1192,11 +1187,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         ref={containerRef}
         className="sticky top-0 flex h-screen flex-col items-center justify-start overflow-hidden px-2 sm:px-6 lg:px-8 pt-24 pb-8 sm:pt-12 sm:pb-12 lg:pt-16 lg:pb-16"
       >
-        <div className="relative grid w-full grid-cols-1 lg:grid-cols-3 content-center items-center gap-2 sm:gap-6 md:max-w-6xl md:gap-8 lg:gap-10 grow md:grow-0">
+        <div className="relative grid w-full grid-cols-3 lg:grid-cols-3 content-center items-center gap-2 sm:gap-6 md:max-w-6xl md:gap-8 lg:gap-10 grow md:grow-0">
           {cards.map((card, index) => {
             // Enhanced CSS classes with 3D transform hints
             const baseClasses =
-              'glass-card will-change-transform will-change-opacity flex h-[200px] min-[400px]:h-[240px] sm:h-[320px] md:h-[380px] lg:h-[420px] w-full overflow-hidden transition-transform duration-300'
+              'glass-card will-change-transform will-change-opacity flex h-[150px] min-[400px]:h-[170px] sm:h-[320px] md:h-[380px] lg:h-[420px] w-full overflow-hidden transition-transform duration-300'
             
             // Preserve 3D transforms for enhanced depth
             const transformStyle = {
@@ -1206,9 +1201,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             }
 
             const roleClasses: Record<CardRole, string> = {
-              center: 'col-span-1 lg:col-start-2 lg:col-end-3 row-start-1 self-start z-10',
-              left: 'col-span-1 lg:col-start-1 lg:col-end-2 row-start-1 lg:justify-self-end lg:opacity-0',
-              right: 'col-span-1 lg:col-start-3 lg:col-end-4 row-start-1 lg:justify-self-start lg:opacity-0',
+              // Mobile: explicitly place in columns 1/2/3
+              // Desktop: keep your existing LG placement
+              left:   'col-span-1 col-start-1 row-start-1 lg:col-start-1 lg:col-end-2 lg:justify-self-end lg:opacity-0',
+              center: 'col-span-1 col-start-2 row-start-1 lg:col-start-2 lg:col-end-3 self-start z-10',
+              right:  'col-span-1 col-start-3 row-start-1 lg:col-start-3 lg:col-end-4 lg:justify-self-start lg:opacity-0',
             }
 
             // Remove parallax from cards as it conflicts with ScrollTrigger animations
