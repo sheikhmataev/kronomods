@@ -1357,7 +1357,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 pointerEvents: 'none',
 
                 paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
-                paddingBottom: 'calc(env(safe-area-inset-bottom) + 140px)',
+                // more bottom padding so footer + send button are reachable on iOS
+                paddingBottom: 'calc(env(safe-area-inset-bottom) + 160px)',
                 touchAction: 'pan-y',
               }}
             >
