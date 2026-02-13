@@ -809,37 +809,34 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           opacity: 1,
           rotationY: 0,
           rotationX: 0,
-          z: 10,
+          z: 0,
           force3D: true,
-          transformStyle: 'preserve-3d',
           willChange: 'transform, opacity',
         })
 
         gsap.set(leftCard, {
           transformOrigin: 'center center',
-          xPercent: -140,
+          xPercent: -120,
           y: 0,
-          scale: 0.82,
+          scale: 0.85,
           opacity: 0,
-          rotationY: -22,
-          rotationX: 4,
-          z: -40,
+          rotationY: 0,
+          rotationX: 0,
+          z: 0,
           force3D: true,
-          transformStyle: 'preserve-3d',
           willChange: 'transform, opacity',
         })
 
         gsap.set(rightCard, {
           transformOrigin: 'center center',
-          xPercent: 140,
+          xPercent: 120,
           y: 0,
-          scale: 0.82,
+          scale: 0.85,
           opacity: 0,
-          rotationY: 22,
-          rotationX: 4,
-          z: -40,
+          rotationY: 0,
+          rotationX: 0,
+          z: 0,
           force3D: true,
-          transformStyle: 'preserve-3d',
           willChange: 'transform, opacity',
         })
 
@@ -892,7 +889,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             {
               scale: 1.0,
               y: 0,
-              z: 20,
               duration: 0.6,
               ease: 'power2.inOut',
             },
@@ -913,10 +909,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             {
               xPercent: 0,
               opacity: 1,
-              rotationY: -15,
-              rotationX: 0,
               scale: 0.88,
-              z: -35,
               duration: 0.9,
               ease: 'power2.inOut',
             },
@@ -927,10 +920,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             {
               xPercent: 0,
               opacity: 1,
-              rotationY: 15,
-              rotationX: 0,
               scale: 0.88,
-              z: -35,
               duration: 0.9,
               ease: 'power2.inOut',
             },
