@@ -13,9 +13,9 @@ const App = () => {
     // Note: ScrollSmoother is a Club GreenSock plugin that requires a license
     // It will work in development, but you'll need a Club membership for production
     ScrollSmoother.create({
-      smooth: 1.2, // Reduced from 1.5 for smoother feel (less lag)
+      smooth: 1.5, // Slightly higher for premium silky feel
       effects: false, // Disable data-speed effects to prevent conflicts with ScrollTrigger
-      smoothTouch: 0.05, // Reduced for better mobile performance
+      smoothTouch: 0.1, // Smooth touch scrolling on mobile
       normalizeScroll: true, // Normalize scroll across devices
       ignoreMobileResize: true, // Prevent recalculations on mobile resize
     })

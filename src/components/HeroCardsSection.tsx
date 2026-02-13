@@ -370,14 +370,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         }
 
         const timeline = gsap.timeline({
-          defaults: { ease: 'power3.out' },
+          defaults: { ease: 'power2.inOut' },
           scrollTrigger: {
             trigger: section,
             start: 'top top',
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            scrub: 1,
+            scrub: 2,
             invalidateOnRefresh: true,
             refreshPriority: -1,
           },
@@ -388,23 +388,15 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             centerCard,
             {
               y: getResponsiveY(180, 230, 280),
-              scale: getResponsiveScale(1.1, 1.15, 1.08),
+              scale: getResponsiveScale(1.0, 1.0, 1.0),
               rotationY: 0,
               rotationX: 0,
               z: 20,
               filter: 'blur(0px)',
-              ease: 'power3.out',
+              ease: 'power2.inOut',
+              duration: 0.6,
             },
             0,
-          )
-          .to(
-            centerCard,
-            {
-              y: getResponsiveY(180, 230, 280),
-              scale: getResponsiveScale(1.0, 1.0, 1.0),
-              ease: 'power2.inOut',
-            },
-            0.4,
           )
 
         timeline.to(
@@ -418,8 +410,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             rotationX: 0,
             z: -20,
             filter: 'blur(0px)',
-            ease: 'power3.out',
-            duration: 0.5,
+            ease: 'power2.inOut',
+            duration: 0.6,
           },
           0,
         )
@@ -435,8 +427,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             rotationX: 0,
             z: -20,
             filter: 'blur(0px)',
-            ease: 'power3.out',
-            duration: 0.5,
+            ease: 'power2.inOut',
+            duration: 0.6,
           },
           0,
         )
@@ -449,9 +441,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             z: -40,
             filter: 'blur(0px)',
             ease: 'power2.inOut',
-            duration: 0.2,
+            duration: 0.4,
           },
-          0.5,
+          0.6,
         )
 
         timeline.to(
@@ -459,7 +451,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           {
             y: getResponsiveY(180, 230, 280),
             opacity: 0,
-            ease: 'power2.in',
+            ease: 'power2.inOut',
+            duration: 0.5,
           },
           0.15,
         )
@@ -470,10 +463,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           fadeTargets,
           {
             y: getResponsiveY(80, 120, 160),
-            ease: 'power2.out',
-            duration: 0.4,
+            ease: 'power2.inOut',
+            duration: 0.6,
           },
-          0.7,
+          0.8,
         )
 
         timeline.to(
@@ -481,7 +474,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           {
             autoAlpha: 0,
             ease: 'power2.inOut',
-            duration: 0.4,
+            duration: 0.5,
           },
           1.2,
         )
@@ -511,8 +504,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               rotationX: 0,
               z: 0,
               filter: 'blur(0px)',
-              ease: 'power3.out',
-              duration: 1.2,
+              ease: 'power2.out',
+              duration: 1.4,
             },
             1.6,
           )
@@ -630,43 +623,30 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             force3D: true,
           })
 
-          const scale4 = isMobile ? (isUltraWide ? 2.5 : 3) : isTablet ? 4 : 4
+          const scaleMid = isMobile ? (isUltraWide ? 3 : 4) : isTablet ? 5 : 5
           timeline.to(
             container,
             {
-              scale: scale4,
-              x: -screenXFromCenter * scale4,
-              y: -screenYFromCenter * scale4,
-              ease: 'power1.inOut',
-              duration: 1.4,
+              scale: scaleMid,
+              x: -screenXFromCenter * scaleMid,
+              y: -screenYFromCenter * scaleMid,
+              ease: 'none',
+              duration: 2.0,
             },
             2.5,
           )
 
-          const scale6 = isMobile ? (isUltraWide ? 4 : 5) : isTablet ? 6 : 6
+          const scaleDeep = isMobile ? (isUltraWide ? 6 : 8) : isTablet ? 10 : 10
           timeline.to(
             container,
             {
-              scale: scale6,
-              x: -screenXFromCenter * scale6,
-              y: -screenYFromCenter * scale6,
-              ease: 'power1.inOut',
-              duration: 1.2,
+              scale: scaleDeep,
+              x: -screenXFromCenter * scaleDeep,
+              y: -screenYFromCenter * scaleDeep,
+              ease: 'power1.in',
+              duration: 1.6,
             },
-            3.8,
-          )
-
-          const scale10 = isMobile ? (isUltraWide ? 6 : 8) : isTablet ? 10 : 10
-          timeline.to(
-            container,
-            {
-              scale: scale10,
-              x: -screenXFromCenter * scale10,
-              y: -screenYFromCenter * scale10,
-              ease: 'power1.inOut',
-              duration: 1.0,
-            },
-            5.1,
+            4.5,
           )
 
           timeline.to(
@@ -682,21 +662,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           timeline.to(
             macbook,
             {
-              opacity: 0.3,
-              ease: 'power1.inOut',
-              duration: 1.2,
+              opacity: 0,
+              ease: 'power2.inOut',
+              duration: 2.0,
             },
             4.3,
-          )
-
-          timeline.to(
-            macbook,
-            {
-              opacity: 0,
-              ease: 'power1.inOut',
-              duration: 1.0,
-            },
-            5.3,
           )
 
           timeline.to(
@@ -715,8 +685,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               scale: 1,
               x: 0,
               y: 0,
-              ease: 'power2.out',
-              duration: 1.5,
+              ease: 'power2.inOut',
+              duration: 1.8,
             },
             6.1,
           )
@@ -725,8 +695,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             video,
             {
               scale: 1,
-              ease: 'power2.out',
-              duration: 1.5,
+              ease: 'power2.inOut',
+              duration: 1.8,
             },
             6.1,
           )
@@ -747,7 +717,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               opacity: 1,
               y: 0,
               scale: 1,
-              ease: 'power2.out',
+              ease: 'power2.inOut',
               duration: 1.5,
             },
             7.5,
@@ -774,8 +744,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               {
                 opacity: 0,
                 y: -50,
-                ease: 'power2.in',
-                duration: 1.0,
+                ease: 'power2.inOut',
+                duration: 1.2,
               },
               10.0,
             )
@@ -785,8 +755,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             contactTarget,
             {
               autoAlpha: 1,
-              duration: 1.0,
-              ease: 'power1.out',
+              duration: 1.4,
+              ease: 'power2.inOut',
               onStart: () => {
                 contactTarget.style.pointerEvents = 'auto'
                 // Disable normalizeScroll so the fixed overlay can receive touch/scroll events
@@ -804,7 +774,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           if (contactInnerRef.current) {
             timeline.to(
               contactInnerRef.current,
-              { y: 0, duration: 1.0, ease: 'power1.out' },
+              { y: 0, duration: 1.4, ease: 'power2.out' },
               contactStart,
             )
           }
@@ -902,14 +872,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         if (video) gsap.set(video, { opacity: 0, scale: 1.04, force3D: true })
 
         const timeline = gsap.timeline({
-          defaults: { ease: 'power3.out' },
+          defaults: { ease: 'power2.inOut' },
           scrollTrigger: {
             trigger: section,
             start: 'top top',
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            scrub: 1,
+            scrub: 2,
             invalidateOnRefresh: true,
             refreshPriority: -1,
           },
@@ -923,8 +893,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               scale: 1.0,
               y: 0,
               z: 20,
-              duration: 0.55,
-              ease: 'power3.out',
+              duration: 0.6,
+              ease: 'power2.inOut',
             },
             0,
           )
@@ -933,8 +903,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             {
               y: 90,
               opacity: 0,
-              duration: 0.45,
-              ease: 'power2.in',
+              duration: 0.5,
+              ease: 'power2.inOut',
             },
             0.1,
           )
@@ -947,8 +917,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               rotationX: 0,
               scale: 0.92,
               z: -20,
-              duration: 0.55,
-              ease: 'power3.out',
+              duration: 0.6,
+              ease: 'power2.inOut',
             },
             0,
           )
@@ -961,8 +931,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               rotationX: 0,
               scale: 0.92,
               z: -20,
-              duration: 0.55,
-              ease: 'power3.out',
+              duration: 0.6,
+              ease: 'power2.inOut',
             },
             0,
           )
@@ -972,29 +942,29 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               scale: 0.88,
               rotationY: (_i, target) => (target === leftCard ? -15 : 15),
               z: -35,
-              duration: 0.25,
+              duration: 0.4,
               ease: 'power2.inOut',
             },
-            0.55,
+            0.6,
           )
 
-        // ✅ Phase 2: fade cards out to continue the rest of your sequence
+        // ✅ Phase 2: fade cards out smoothly
         const fadeTargets = [centerCard, leftCard, rightCard]
         timeline.to(
           fadeTargets,
-          { y: -30, duration: 0.35, ease: 'power2.out' },
-          0.85,
+          { y: -30, duration: 0.5, ease: 'power2.inOut' },
+          0.9,
         )
         timeline.to(
           fadeTargets,
-          { autoAlpha: 0, duration: 0.4, ease: 'power2.inOut' },
+          { autoAlpha: 0, duration: 0.5, ease: 'power2.inOut' },
           1.25,
         )
 
         // Background color transition
         timeline.to(
           background,
-          { backgroundColor: '#0B0D12', duration: 0.6, ease: 'power2.inOut' },
+          { backgroundColor: '#0B0D12', duration: 0.7, ease: 'power2.inOut' },
           1.4,
         )
 
@@ -1006,8 +976,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             scale: 1,
             y: 0,
             filter: 'blur(0px)',
-            duration: 0.9,
-            ease: 'power3.out',
+            duration: 1.2,
+            ease: 'power2.out',
           },
           1.8,
         )
@@ -1070,8 +1040,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         const screenYFromCenter = screenFocusYInContainer - containerCenterY
 
         const midZoom = Math.min(5.2, Math.max(3.6, viewportHeight / (macbookRect.height * 0.45)))
-        const deepZoom = midZoom + 0.9
-        const finalZoom = deepZoom + 0.7
+        const deepZoom = midZoom + 1.6
 
         timeline.to(
           container,
@@ -1079,8 +1048,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             scale: midZoom,
             x: -screenXFromCenter * midZoom,
             y: -screenYFromCenter * midZoom,
-            ease: 'power1.inOut',
-            duration: 1.1,
+            ease: 'none',
+            duration: 1.8,
           },
           2.6,
         )
@@ -1091,22 +1060,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             scale: deepZoom,
             x: -screenXFromCenter * deepZoom,
             y: -screenYFromCenter * deepZoom,
-            ease: 'power1.inOut',
-            duration: 1.1,
+            ease: 'power1.in',
+            duration: 1.6,
           },
-          3.8,
-        )
-
-        timeline.to(
-          container,
-          {
-            scale: finalZoom,
-            x: -screenXFromCenter * finalZoom,
-            y: -screenYFromCenter * finalZoom,
-            ease: 'power1.inOut',
-            duration: 1.0,
-          },
-          4.9,
+          4.4,
         )
 
         if (video) {
@@ -1136,21 +1093,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         timeline.to(
           macbook,
           {
-            opacity: 0.35,
-            duration: 1.0,
-            ease: 'power1.inOut',
+            opacity: 0,
+            duration: 1.8,
+            ease: 'power2.inOut',
           },
           4.2,
-        )
-
-        timeline.to(
-          macbook,
-          {
-            opacity: 0,
-            duration: 0.9,
-            ease: 'power1.inOut',
-          },
-          5.1,
         )
 
         timeline.to(
@@ -1159,8 +1106,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             scale: 1,
             x: 0,
             y: 0,
-            ease: 'power2.out',
-            duration: 1.2,
+            ease: 'power2.inOut',
+            duration: 1.5,
           },
           5.9,
         )
@@ -1170,8 +1117,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             video,
             {
               scale: 1,
-              ease: 'power2.out',
-              duration: 1.0,
+              ease: 'power2.inOut',
+              duration: 1.5,
             },
             5.9,
           )
@@ -1187,8 +1134,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               opacity: 1,
               y: 0,
               scale: 1,
-              duration: 1.2,
-              ease: 'power2.out',
+              duration: 1.4,
+              ease: 'power2.inOut',
             },
             7.0,
           )
@@ -1210,8 +1157,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               {
                 opacity: 0,
                 y: -40,
-                ease: 'power2.in',
-                duration: 0.8,
+                ease: 'power2.inOut',
+                duration: 1.0,
               },
               9.0,
             )
@@ -1221,8 +1168,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             contactTarget,
             {
               autoAlpha: 1,
-              duration: 1.0,
-              ease: 'power1.out',
+              duration: 1.4,
+              ease: 'power2.inOut',
               onStart: () => {
                 contactTarget.style.pointerEvents = 'auto'
                 // Disable normalizeScroll so the fixed overlay can receive touch/scroll events
@@ -1240,7 +1187,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           if (contactInnerRef.current) {
             timeline.to(
               contactInnerRef.current,
-              { y: 0, duration: 1.0, ease: 'power1.out' },
+              { y: 0, duration: 1.4, ease: 'power2.out' },
               contactStart,
             )
           }
