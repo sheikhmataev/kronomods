@@ -877,6 +877,12 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             pin,
             anticipatePin: 1,
             scrub: 0.5,
+            snap: {
+              snapTo: [0, 0.28, 1], // Snap to: Start, MacBook visible, End
+              duration: { min: 0.2, max: 0.6 }, // Fast, responsive snap
+              delay: 0, // Snap immediately when scroll stops
+              ease: 'power1.inOut', // Smooth snap easing
+            },
             invalidateOnRefresh: true,
             refreshPriority: -1,
           },
