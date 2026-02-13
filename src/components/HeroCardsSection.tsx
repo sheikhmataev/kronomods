@@ -869,14 +869,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         if (video) gsap.set(video, { opacity: 0, scale: 1.04, force3D: true })
 
         const timeline = gsap.timeline({
-          defaults: { ease: 'power2.inOut' },
+          defaults: { ease: 'none' },
           scrollTrigger: {
             trigger: section,
             start: 'top top',
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            scrub: 2,
+            scrub: 0.5,
             invalidateOnRefresh: true,
             refreshPriority: -1,
           },
@@ -890,7 +890,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               scale: 1.0,
               y: 0,
               duration: 0.6,
-              ease: 'power2.inOut',
             },
             0,
           )
@@ -900,7 +899,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               y: 90,
               opacity: 0,
               duration: 0.5,
-              ease: 'power2.inOut',
+              // ease: 'none', // Inherited
             },
             0.1,
           )
@@ -911,7 +910,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               opacity: 1,
               scale: 0.88,
               duration: 0.9,
-              ease: 'power2.inOut',
+              // ease: 'none', // Inherited
             },
             0,
           )
@@ -922,7 +921,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               opacity: 1,
               scale: 0.88,
               duration: 0.9,
-              ease: 'power2.inOut',
             },
             0,
           )
@@ -931,19 +929,19 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         const fadeTargets = [centerCard, leftCard, rightCard]
         timeline.to(
           fadeTargets,
-          { y: -30, duration: 0.5, ease: 'power2.inOut' },
+          { y: -30, duration: 0.5 },
           0.9,
         )
         timeline.to(
           fadeTargets,
-          { autoAlpha: 0, duration: 0.5, ease: 'power2.inOut' },
+          { autoAlpha: 0, duration: 0.5 },
           1.25,
         )
 
         // Background color transition
         timeline.to(
           background,
-          { backgroundColor: '#0B0D12', duration: 0.7, ease: 'power2.inOut' },
+          { backgroundColor: '#0B0D12', duration: 0.7 },
           1.4,
         )
 
@@ -1027,7 +1025,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             scale: midZoom,
             x: -screenXFromCenter * midZoom,
             y: -screenYFromCenter * midZoom,
-            ease: 'none',
             duration: 1.8,
           },
           2.6,
@@ -1039,7 +1036,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             scale: deepZoom,
             x: -screenXFromCenter * deepZoom,
             y: -screenYFromCenter * deepZoom,
-            ease: 'power1.in',
+            // ease: 'power1.in', // Removed
             duration: 1.6,
           },
           4.4,
@@ -1050,7 +1047,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             video,
             {
               scale: 1.1,
-              ease: 'power1.inOut',
+              // ease: 'power1.inOut', // Removed
               duration: 1.6,
             },
             2.6,
@@ -1062,7 +1059,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             background,
             {
               backgroundColor: '#5F5A56',
-              ease: 'power1.inOut',
+              // ease: 'power1.inOut', // Removed
               duration: 1.6,
             },
             2.6,
@@ -1074,7 +1071,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           {
             opacity: 0,
             duration: 1.8,
-            ease: 'power2.inOut',
+            // ease: 'power2.inOut', // Removed
           },
           4.2,
         )
@@ -1085,7 +1082,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             scale: 1,
             x: 0,
             y: 0,
-            ease: 'power2.inOut',
+            // ease: 'power2.inOut', // Removed
             duration: 1.5,
           },
           5.9,
@@ -1096,7 +1093,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             video,
             {
               scale: 1,
-              ease: 'power2.inOut',
+              // ease: 'power2.inOut', // Removed
               duration: 1.5,
             },
             5.9,
@@ -1114,7 +1111,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               y: 0,
               scale: 1,
               duration: 1.4,
-              ease: 'power2.inOut',
+              // ease: 'power2.inOut', // Removed
             },
             7.0,
           )
@@ -1136,7 +1133,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               {
                 opacity: 0,
                 y: -40,
-                ease: 'power2.inOut',
+                // ease: 'power2.inOut', // Removed
                 duration: 1.0,
               },
               9.0,
@@ -1166,7 +1163,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           if (contactInnerRef.current) {
             timeline.to(
               contactInnerRef.current,
-              { y: 0, duration: 1.4, ease: 'power2.out' },
+              { y: 0, duration: 1.4 },
               contactStart,
             )
           }

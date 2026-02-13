@@ -11,4 +11,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    headers: {
+      'Permissions-Policy': 'interest-cohort=()',
+    },
+  },
 })
