@@ -44,8 +44,15 @@
 }
 
 /* Prevent text glitches during animations - only apply font smoothing */
-h1, h2, h3, h4, h5, h6,
-p, span, div {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;

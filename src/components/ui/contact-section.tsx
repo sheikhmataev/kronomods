@@ -33,8 +33,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
       {/* Social Links Section - Compact Padding */}
       <section className="py-2 min-[400px]:py-3 sm:py-6 flex items-center justify-center">
         <div className="max-w-screen-xl mx-auto px-3 w-full">
-          <div className="text-center mb-2 min-[400px]:mb-3 sm:mb-4">
-            <h3 className="text-porcelain text-base min-[400px]:text-lg sm:text-2xl font-semibold font-display mb-1">
+          <div className="text-center mb-1 min-[400px]:mb-3 sm:mb-4">
+            <h3 className="text-porcelain text-sm min-[400px]:text-lg sm:text-2xl font-semibold font-display mb-0">
               Let's connect
             </h3>
             <p className="text-porcelain/60 text-xs sm:text-sm max-w-md mx-auto hidden sm:block">
@@ -42,14 +42,14 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 min-[400px]:gap-3 sm:gap-4 max-w-3xl mx-auto">
+          <div className="grid grid-cols-2 gap-2 min-[400px]:gap-3 sm:gap-4 max-w-3xl mx-auto">
             {contactMethods.map((item, idx) => (
               <a
                 key={idx}
                 href={item.link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group block p-2 min-[400px]:p-3 sm:p-4 border border-onyx/30 rounded-md hover:border-champagne/50 transition-all duration-300 hover:shadow-md bg-onyx/10"
+                className="group block p-1.5 min-[400px]:p-3 sm:p-4 border border-onyx/30 rounded-md hover:border-champagne/50 transition-all duration-300 hover:shadow-md bg-onyx/10 backdrop-blur-md active:scale-[0.98]"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded border border-onyx/30 flex items-center justify-center text-champagne transition-colors duration-300 group-hover:border-champagne group-hover:text-auric group-hover:bg-champagne/10 shrink-0">
@@ -59,7 +59,12 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                     <h4 className="text-porcelain text-sm sm:text-base font-medium font-display group-hover:text-champagne">
                       {item.title}
                     </h4>
-                    <span className="text-xs text-champagne group-hover:text-auric">Open &rarr;</span>
+                    <span className="text-champagne/70 group-hover:text-auric transition-colors duration-300 transform group-hover:translate-x-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                        <path d="M5 12h14" />
+                        <path d="M12 5l7 7-7 7" />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </a>
@@ -92,7 +97,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                     autoComplete="given-name"
                     type="text"
                     required
-                    className="w-full px-2 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
+                    className="w-full px-2 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne/80 focus:ring-1 focus:ring-champagne/20 rounded-md text-base sm:text-sm transition-all duration-300"
                     placeholder="First"
                   />
                 </div>
@@ -106,7 +111,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                     autoComplete="family-name"
                     type="text"
                     required
-                    className="w-full px-2 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
+                    className="w-full px-2 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne/80 focus:ring-1 focus:ring-champagne/20 rounded-md text-base sm:text-sm transition-all duration-300"
                     placeholder="Last"
                   />
                 </div>
@@ -120,7 +125,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                   autoComplete="email"
                   type="email"
                   required
-                  className="w-full px-2 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
+                  className="w-full px-2 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne/80 focus:ring-1 focus:ring-champagne/20 rounded-md text-base sm:text-sm transition-all duration-300"
                   placeholder="name@example.com"
                 />
               </div>
@@ -137,7 +142,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                     autoComplete="tel"
                     type="tel"
                     placeholder="912 34 567"
-                    className="w-full pl-9 pr-2 py-2 bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
+                    className="w-full pl-9 pr-2 py-2 bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne/80 focus:ring-1 focus:ring-champagne/20 rounded-md text-porcelain text-base sm:text-sm transition-all duration-300"
                   />
                 </div>
               </div>
@@ -148,14 +153,14 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                   id="message"
                   name="message"
                   required
-                  className="w-full min-h-[100px] px-2 py-2 resize-y bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
+                  className="w-full min-h-[100px] px-2 py-2 resize-y bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne/80 focus:ring-1 focus:ring-champagne/20 rounded-md text-porcelain text-base sm:text-sm transition-all duration-300"
                   placeholder="How can we help?"
                 ></textarea>
               </div>
 
               <button
                 type="submit"
-                className="w-full px-4 py-2 min-[400px]:py-2.5 text-night font-bold bg-champagne hover:bg-auric active:bg-champagne rounded-md transition-colors text-sm mt-1"
+                className="w-full px-4 py-2 min-[400px]:py-2.5 text-night font-bold bg-champagne hover:bg-auric active:bg-champagne active:scale-[0.98] rounded-md transition-all duration-200 text-sm mt-1"
               >
                 Send Message
               </button>

@@ -59,11 +59,11 @@ const prefersReducedMotion = () =>
 // Safari-specific video autoplay helper with user interaction detection
 const attemptVideoPlay = async (video: HTMLVideoElement): Promise<boolean> => {
   if (!video) return false
-  
+
   try {
     // Ensure video is muted (required for autoplay in Safari)
     video.muted = true
-    
+
     // Ensure video is loaded and ready
     if (video.readyState < 2) {
       await new Promise((resolve, reject) => {
@@ -72,7 +72,7 @@ const attemptVideoPlay = async (video: HTMLVideoElement): Promise<boolean> => {
           video.removeEventListener('error', handleError)
           reject(new Error('Video load timeout'))
         }, 5000) // 5 second timeout
-        
+
         const handleCanPlay = () => {
           clearTimeout(timeout)
           video.removeEventListener('canplay', handleCanPlay)
@@ -87,14 +87,14 @@ const attemptVideoPlay = async (video: HTMLVideoElement): Promise<boolean> => {
         }
         video.addEventListener('canplay', handleCanPlay)
         video.addEventListener('error', handleError)
-        
+
         // Start loading if not already
         if (video.readyState < 1) {
           video.load()
         }
       })
     }
-    
+
     // Attempt to play with user interaction context
     const playPromise = video.play()
     if (playPromise !== undefined) {
@@ -114,16 +114,16 @@ let hasUserInteracted = false
 // Setup user interaction listeners
 const setupUserInteractionTracking = () => {
   if (typeof window === 'undefined' || hasUserInteracted) return
-  
+
   const interactionEvents = ['click', 'touch', 'keydown', 'mousedown', 'pointerdown']
-  
+
   const handleInteraction = () => {
     hasUserInteracted = true
     interactionEvents.forEach(event => {
       document.removeEventListener(event, handleInteraction)
     })
   }
-  
+
   interactionEvents.forEach(event => {
     document.addEventListener(event, handleInteraction, { once: true, passive: true })
   })
@@ -131,7 +131,7 @@ const setupUserInteractionTracking = () => {
 
 // Detect Safari browser
 const isSafari = () => {
-  return typeof window !== 'undefined' && 
+  return typeof window !== 'undefined' &&
     /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
 }
 
@@ -522,7 +522,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               () => {
                 if (video && !videoPlayAttemptedRef.current) {
                   videoPlayAttemptedRef.current = true
-                  
+
                   // Use enhanced video play helper for Safari compatibility
                   if (isSafari() && !hasUserInteracted) {
                     // For Safari without user interaction, add click handler
@@ -540,10 +540,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                       // Remove listener after successful play
                       video.removeEventListener('click', handleClick)
                     }
-                    
+
                     video.addEventListener('click', handleClick)
                     video.style.cursor = 'pointer'
-                    
+
                     // Show video with reduced opacity as cue
                     gsap.to(video, {
                       opacity: 0.5,
@@ -761,7 +761,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             // visibility:hidden prevents the hidden absolute layer from capturing clicks.
             autoAlpha: 0,
           })
-          
+
           if (contactInnerRef.current) {
             gsap.set(contactInnerRef.current, { y: 50, force3D: true })
           }
@@ -789,9 +789,13 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               ease: 'power1.out',
               onStart: () => {
                 contactTarget.style.pointerEvents = 'auto'
+                // Disable normalizeScroll so the fixed overlay can receive touch/scroll events
+                ScrollTrigger.normalizeScroll(false)
               },
               onReverseComplete: () => {
                 contactTarget.style.pointerEvents = 'none'
+                // Re-enable normalizeScroll when contact is hidden
+                ScrollTrigger.normalizeScroll(true)
               },
             },
             contactStart,
@@ -1193,7 +1197,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         const contactTarget = contactRef.current
         if (contactTarget) {
           gsap.set(contactTarget, { autoAlpha: 0 })
-          
+
           if (contactInnerRef.current) {
             gsap.set(contactInnerRef.current, { y: 40, force3D: true })
           }
@@ -1221,9 +1225,13 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               ease: 'power1.out',
               onStart: () => {
                 contactTarget.style.pointerEvents = 'auto'
+                // Disable normalizeScroll so the fixed overlay can receive touch/scroll events
+                ScrollTrigger.normalizeScroll(false)
               },
               onReverseComplete: () => {
                 contactTarget.style.pointerEvents = 'none'
+                // Re-enable normalizeScroll when contact is hidden
+                ScrollTrigger.normalizeScroll(true)
               },
             },
             contactStart,
@@ -1268,7 +1276,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         className="pointer-events-none absolute inset-0 z-[1] bg-grain opacity-[0.06]"
         aria-hidden="true"
       />
-      <div 
+      <div
         ref={containerRef}
         className="sticky top-0 flex h-screen flex-col items-center justify-start overflow-hidden px-2 sm:px-6 lg:px-8 pt-24 pb-8 sm:pt-12 sm:pb-12 lg:pt-16 lg:pb-16"
       >
@@ -1277,7 +1285,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             // Enhanced CSS classes with 3D transform hints
             const baseClasses =
               'glass-card will-change-transform will-change-opacity flex h-[150px] min-[400px]:h-[170px] sm:h-[320px] md:h-[380px] lg:h-[420px] w-full overflow-hidden transition-transform duration-300'
-            
+
             // Preserve 3D transforms for enhanced depth
             const transformStyle = {
               transformStyle: 'preserve-3d' as const,
@@ -1288,14 +1296,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             const roleClasses: Record<CardRole, string> = {
               // Mobile: explicitly place in columns 1/2/3
               // Desktop: keep your existing LG placement
-              left:   'col-span-1 col-start-1 row-start-1 lg:col-start-1 lg:col-end-2 lg:justify-self-end lg:opacity-0',
+              left: 'col-span-1 col-start-1 row-start-1 lg:col-start-1 lg:col-end-2 lg:justify-self-end lg:opacity-0',
               center: 'col-span-1 col-start-2 row-start-1 lg:col-start-2 lg:col-end-3 self-start z-10',
-              right:  'col-span-1 col-start-3 row-start-1 lg:col-start-3 lg:col-end-4 lg:justify-self-start lg:opacity-0',
+              right: 'col-span-1 col-start-3 row-start-1 lg:col-start-3 lg:col-end-4 lg:justify-self-start lg:opacity-0',
             }
 
             // Remove parallax from cards as it conflicts with ScrollTrigger animations
             // Parallax is handled by GSAP animations, not data-speed attributes
-            
+
             return (
               <div
                 key={card.role}
@@ -1307,10 +1315,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 style={
                   card.role === 'center'
                     ? {
-                        boxShadow:
-                          '0 42px 120px rgba(206, 168, 116, 0.32), 0 18px 40px rgba(255, 214, 170, 0.24)',
-                        ...transformStyle,
-                      }
+                      boxShadow:
+                        '0 42px 120px rgba(206, 168, 116, 0.32), 0 18px 40px rgba(255, 214, 170, 0.24)',
+                      ...transformStyle,
+                    }
                     : transformStyle
                 }
               >
@@ -1365,25 +1373,24 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           createPortal(
             <div
               ref={contactRef}
-              className="fixed inset-0 z-[100] overflow-y-auto bg-onyx/95 backdrop-blur-sm"
+              className="fixed top-0 left-0 right-0 bottom-0 z-[9999] overflow-y-auto bg-onyx/95 backdrop-blur-sm"
               style={{
                 backgroundColor: '#5F5A56',
-                WebkitOverflowScrolling: 'touch',
-                height: '100dvh',
+                WebkitOverflowScrolling: 'touch', // Critical for iOS momentum
 
                 // start hidden (but DO NOT transform this element)
                 opacity: 0,
                 visibility: 'hidden',
                 pointerEvents: 'none',
 
-                paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
-                paddingBottom: 'calc(env(safe-area-inset-bottom) + 40px)',
-                touchAction: 'pan-y',
+                paddingTop: 'calc(env(safe-area-inset-top, 0px) + 24px)',
+                touchAction: 'pan-y', // Critical for allowing vertical scroll when body is locked
               }}
             >
-              <div ref={contactInnerRef} className="pb-12 min-h-full flex flex-col justify-center">
+              <div ref={contactInnerRef} className="block sm:flex sm:flex-col sm:min-h-full sm:justify-center pt-4 sm:pt-0 pb-2">
                 <ContactSection className="pb-4" />
                 <Footer />
+                <div className="h-4 shrink-0 sm:hidden" />
               </div>
             </div>,
             document.body,
