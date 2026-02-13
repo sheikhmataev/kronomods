@@ -913,11 +913,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             {
               xPercent: 0,
               opacity: 1,
-              rotationY: -10,
+              rotationY: -15,
               rotationX: 0,
-              scale: 0.92,
-              z: -20,
-              duration: 0.6,
+              scale: 0.88,
+              z: -35,
+              duration: 0.9,
               ease: 'power2.inOut',
             },
             0,
@@ -927,25 +927,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             {
               xPercent: 0,
               opacity: 1,
-              rotationY: 10,
+              rotationY: 15,
               rotationX: 0,
-              scale: 0.92,
-              z: -20,
-              duration: 0.6,
+              scale: 0.88,
+              z: -35,
+              duration: 0.9,
               ease: 'power2.inOut',
             },
             0,
-          )
-          .to(
-            [leftCard, rightCard],
-            {
-              scale: 0.88,
-              rotationY: (_i, target) => (target === leftCard ? -15 : 15),
-              z: -35,
-              duration: 0.4,
-              ease: 'power2.inOut',
-            },
-            0.6,
           )
 
         // ✅ Phase 2: fade cards out smoothly
