@@ -370,14 +370,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         }
 
         const timeline = gsap.timeline({
-          defaults: { ease: 'power2.inOut' },
+          defaults: { ease: 'none' }, // Step 2: Linear easing for direct 1:1 scroll mapping
           scrollTrigger: {
             trigger: section,
             start: 'top top',
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            scrub: 2,
+            scrub: 2, // Step 1: Desktop scrub for momentum
             invalidateOnRefresh: true,
             refreshPriority: -1,
           },
@@ -393,7 +393,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               rotationX: 0,
               z: 20,
               filter: 'blur(0px)',
-              ease: 'power2.inOut',
               duration: 0.6,
             },
             0,
@@ -410,7 +409,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             rotationX: 0,
             z: -20,
             filter: 'blur(0px)',
-            ease: 'power2.inOut',
             duration: 0.6,
           },
           0,
@@ -427,10 +425,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             rotationX: 0,
             z: -20,
             filter: 'blur(0px)',
-            ease: 'power2.inOut',
             duration: 0.6,
           },
-          0,
+          0.05, // Step 6: Micro-lag for organic feel
         )
 
         timeline.to(
@@ -504,7 +501,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               rotationX: 0,
               z: 0,
               filter: 'blur(0px)',
-              ease: 'power2.out',
               duration: 1.4,
             },
             1.6,
@@ -643,7 +639,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               scale: scaleDeep,
               x: -screenXFromCenter * scaleDeep,
               y: -screenYFromCenter * scaleDeep,
-              ease: 'power1.in',
               duration: 1.6,
             },
             4.5,
@@ -653,7 +648,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             background,
             {
               backgroundColor: '#5F5A56',
-              ease: 'power1.inOut',
               duration: 2.0,
             },
             2.5,
@@ -663,7 +657,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             macbook,
             {
               opacity: 0,
-              ease: 'power2.inOut',
               duration: 2.0,
             },
             4.3,
@@ -673,7 +666,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             video,
             {
               scale: 1.2,
-              ease: 'power1.inOut',
               duration: 2.0,
             },
             2.5,
@@ -685,7 +677,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               scale: 1,
               x: 0,
               y: 0,
-              ease: 'power2.inOut',
               duration: 1.8,
             },
             6.1,
@@ -695,7 +686,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             video,
             {
               scale: 1,
-              ease: 'power2.inOut',
               duration: 1.8,
             },
             6.1,
@@ -774,7 +764,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           if (contactInnerRef.current) {
             timeline.to(
               contactInnerRef.current,
-              { y: 0, duration: 1.4, ease: 'power2.out' },
+              { y: 0, duration: 1.4 },
               contactStart,
             )
           }
@@ -869,14 +859,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         if (video) gsap.set(video, { opacity: 0, scale: 1.04, force3D: true })
 
         const timeline = gsap.timeline({
-          defaults: { ease: 'none' },
+          defaults: { ease: 'none' }, // Step 2: Linear easing for indirect scroll mapping
           scrollTrigger: {
             trigger: section,
             start: 'top top',
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            scrub: 0.5,
+            scrub: 1.2, // Step 1: Mobile scrub for smooth "catch-up" momentum
             snap: {
               snapTo: [0, 0.28, 1], // Snap to: Start, MacBook visible, End
               duration: { min: 0.2, max: 0.6 }, // Fast, responsive snap
@@ -928,7 +918,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               scale: 0.88,
               duration: 0.9,
             },
-            0,
+            0.05, // Step 6: Micro-lag for organic feel
           )
 
         // ✅ Phase 2: fade cards out smoothly
@@ -960,7 +950,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             y: 0,
             filter: 'blur(0px)',
             duration: 1.2,
-            ease: 'power2.out',
           },
           1.8,
         )
@@ -1219,7 +1208,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             const transformStyle = {
               transformStyle: 'preserve-3d' as const,
               backfaceVisibility: 'hidden' as const,
+              WebkitBackfaceVisibility: 'hidden' as const,
               perspective: 1000,
+              transform: 'translate3d(0,0,0)', // Step 4: Force GPU
             }
 
             const roleClasses: Record<CardRole, string> = {
