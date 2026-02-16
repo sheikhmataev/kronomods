@@ -864,8 +864,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             trigger: section,
             start: 'top top',
             end: 'bottom bottom',
-            pin,
-            anticipatePin: 1,
+            pin: false, // Remove pin to prevent auto-scroll glitching on mobile
             scrub: true, // Use true instead of number for better mobile performance
             snap: {
               snapTo: [0, 0.28, 1], // Snap to: Start, MacBook visible, End
