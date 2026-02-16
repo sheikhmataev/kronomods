@@ -859,14 +859,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         if (video) gsap.set(video, { opacity: 0, scale: 1.04, force3D: true })
 
         const timeline = gsap.timeline({
-          defaults: { ease: 'none' }, // Step 2: Linear easing for indirect scroll mapping
+          defaults: { ease: 'power2.inOut' }, // Smooth easing for mobile
           scrollTrigger: {
             trigger: section,
             start: 'top top',
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            scrub: 1.2, // Step 1: Mobile scrub for smooth "catch-up" momentum
+            scrub: 0.3, // Reduced scrub for smoother mobile animations
             snap: {
               snapTo: [0, 0.28, 1], // Snap to: Start, MacBook visible, End
               duration: { min: 0.2, max: 0.6 }, // Fast, responsive snap
@@ -905,8 +905,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               xPercent: 0,
               opacity: 1,
               scale: 0.88,
-              duration: 0.9,
-              // ease: 'none', // Inherited
+              duration: 0.6,
+              ease: 'power2.out',
             },
             0,
           )
@@ -916,7 +916,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               xPercent: 0,
               opacity: 1,
               scale: 0.88,
-              duration: 0.9,
+              duration: 0.6,
+              ease: 'power2.out',
             },
             0.05, // Step 6: Micro-lag for organic feel
           )
@@ -925,12 +926,12 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         const fadeTargets = [centerCard, leftCard, rightCard]
         timeline.to(
           fadeTargets,
-          { y: 0, duration: 0.5 },
+          { y: 0, duration: 0.3, ease: 'power2.inOut' },
           0.9,
         )
         timeline.to(
           fadeTargets,
-          { autoAlpha: 0, duration: 0.5 },
+          { autoAlpha: 0, duration: 0.4, ease: 'power2.inOut' },
           1.25,
         )
 
