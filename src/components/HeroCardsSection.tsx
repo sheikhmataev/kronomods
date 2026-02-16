@@ -866,13 +866,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            scrub: 0.1, // Near-zero scrub for instant response on slow scrolls
-            snap: {
-              snapTo: [0, 0.28, 1], // Snap to: Start, MacBook visible, End
-              duration: { min: 0.2, max: 0.6 }, // Fast, responsive snap
-              delay: 0, // Snap immediately when scroll stops
-              ease: 'power1.inOut', // Smooth snap easing
-            },
+            scrub: 0.05, // Ultra-low scrub for instant mobile response
+            // Remove snap completely on mobile for natural scrolling
             invalidateOnRefresh: true,
             refreshPriority: -1,
           },
