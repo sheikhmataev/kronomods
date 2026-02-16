@@ -859,14 +859,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         if (video) gsap.set(video, { opacity: 0, scale: 1.04, force3D: true })
 
         const timeline = gsap.timeline({
-          defaults: { ease: 'power2.inOut' }, // Smooth easing for mobile
+          defaults: { ease: 'none' }, // Remove complex easing for mobile performance
           scrollTrigger: {
             trigger: section,
             start: 'top top',
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            scrub: 0.05, // Ultra-low scrub for instant mobile response
+            scrub: true, // Use true instead of number for better mobile performance
             snap: {
               snapTo: [0, 0.28, 1], // Snap to: Start, MacBook visible, End
               duration: { min: 0.1, max: 0.3 }, // Faster snap for mobile
@@ -906,7 +906,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               opacity: 1,
               scale: 0.88,
               duration: 0.4,
-              ease: 'power2.out',
             },
             0,
           )
@@ -917,7 +916,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               opacity: 1,
               scale: 0.88,
               duration: 0.4,
-              ease: 'power2.out',
             },
             0.05, // Step 6: Micro-lag for organic feel
           )
@@ -926,12 +924,12 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         const fadeTargets = [centerCard, leftCard, rightCard]
         timeline.to(
           fadeTargets,
-          { y: 0, duration: 0.2, ease: 'power2.inOut' },
+          { y: 0, duration: 0.2 },
           0.9,
         )
         timeline.to(
           fadeTargets,
-          { autoAlpha: 0, duration: 0.3, ease: 'power2.inOut' },
+          { autoAlpha: 0, duration: 0.3 },
           1.25,
         )
 
