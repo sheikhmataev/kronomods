@@ -925,7 +925,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         const fadeTargets = [centerCard, leftCard, rightCard]
         timeline.to(
           fadeTargets,
-          { y: -30, duration: 0.5 },
+          { y: 0, duration: 0.5 },
           0.9,
         )
         timeline.to(
