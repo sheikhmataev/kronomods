@@ -866,7 +866,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            scrub: 0.3, // Reduced scrub for smoother mobile animations
+            scrub: 0.1, // Near-zero scrub for instant response on slow scrolls
             snap: {
               snapTo: [0, 0.28, 1], // Snap to: Start, MacBook visible, End
               duration: { min: 0.2, max: 0.6 }, // Fast, responsive snap
@@ -905,7 +905,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               xPercent: 0,
               opacity: 1,
               scale: 0.88,
-              duration: 0.6,
+              duration: 0.4,
               ease: 'power2.out',
             },
             0,
@@ -916,7 +916,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               xPercent: 0,
               opacity: 1,
               scale: 0.88,
-              duration: 0.6,
+              duration: 0.4,
               ease: 'power2.out',
             },
             0.05, // Step 6: Micro-lag for organic feel
@@ -926,12 +926,12 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         const fadeTargets = [centerCard, leftCard, rightCard]
         timeline.to(
           fadeTargets,
-          { y: 0, duration: 0.3, ease: 'power2.inOut' },
+          { y: 0, duration: 0.2, ease: 'power2.inOut' },
           0.9,
         )
         timeline.to(
           fadeTargets,
-          { autoAlpha: 0, duration: 0.4, ease: 'power2.inOut' },
+          { autoAlpha: 0, duration: 0.3, ease: 'power2.inOut' },
           1.25,
         )
 
