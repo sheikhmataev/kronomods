@@ -787,9 +787,12 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               duration: 1.5,
               onStart: () => {
                 contactTarget.style.pointerEvents = 'auto'
+                document.body.style.overflow = 'hidden'
               },
               onReverseComplete: () => {
                 contactTarget.style.pointerEvents = 'none'
+                document.body.style.overflow = ''
+                contactTarget.scrollTop = 0
               },
             },
             contactStart,
@@ -1208,9 +1211,12 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               ease: 'power1.out',
               onStart: () => {
                 contactTarget.style.pointerEvents = 'auto'
+                document.body.style.overflow = 'hidden'
               },
               onReverseComplete: () => {
                 contactTarget.style.pointerEvents = 'none'
+                document.body.style.overflow = ''
+                contactTarget.scrollTop = 0
               },
             },
             contactStart,
@@ -1344,11 +1350,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           createPortal(
             <div
               ref={contactRef}
-              className="fixed inset-0 z-50 overflow-y-auto"
+              className="contact-portal-container mobile-scroll-container fixed inset-0 z-50 overflow-y-auto overflow-x-hidden"
               style={{
                 backgroundColor: '#5F5A56',
                 WebkitOverflowScrolling: 'touch',
-                minHeight: '100svh',
                 
                 // start hidden so it doesn't cover your site before GSAP reveals it
                 opacity: 0,
@@ -1357,12 +1362,15 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 pointerEvents: 'none',
 
                 paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
-                paddingBottom: 'calc(env(safe-area-inset-bottom) + 140px)',
+                // Increased bottom padding for better mobile scrollability
+                paddingBottom: 'calc(env(safe-area-inset-bottom) + 200px)',
                 touchAction: 'pan-y',
+                // prevent scroll chaining to the body (which drives GSAP)
+                overscrollBehavior: 'contain',
               }}
             >
-              <div className="pb-24">
-                <ContactSection className="pb-10" />
+              <div className="pb-32 min-h-fit">
+                <ContactSection className="pb-16" />
                 <Footer />
               </div>
             </div>,

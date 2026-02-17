@@ -50,3 +50,35 @@ p, span, div {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
+
+/* Enhanced mobile scrolling for contact section */
+@layer utilities {
+  .mobile-scroll-container {
+    /* Ensure smooth scrolling on all devices */
+    scroll-behavior: smooth;
+    /* Optimize touch scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* Prevent momentum scrolling from interfering with GSAP */
+    overscroll-behavior-y: contain;
+    /* Better touch targets on mobile */
+    touch-action: manipulation;
+  }
+
+  /* Improve form inputs for mobile touch */
+  .mobile-touch-input {
+    /* Prevent zoom on focus for iOS */
+    font-size: 16px;
+    /* Better touch target size */
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Ensure contact section is fully accessible on small screens */
+  .contact-portal-container {
+    height: 100vh; /* Fallback for older browsers */
+    height: 100dvh; /* Dynamic viewport height for modern mobile browsers */
+    max-height: 100vh;
+    max-height: 100dvh;
+  }
+}

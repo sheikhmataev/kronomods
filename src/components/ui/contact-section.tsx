@@ -29,6 +29,18 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
 
   return (
     <div className={`${className} w-full flex flex-col px-3 sm:px-0 pb-8`} style={{ backgroundColor: 'transparent' }}>
+      {/* Scroll indicator for mobile users */}
+      <div className="block sm:hidden text-center pt-4 pb-2">
+        <div className="inline-flex items-center gap-2 text-porcelain/40 text-xs">
+          <svg className="w-3 h-3 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+          Scroll to view all options
+          <svg className="w-3 h-3 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </div>
+      </div>
       
       {/* Social Links Section - Compact Padding */}
       <section className="py-2 min-[400px]:py-4 sm:py-6 flex items-center justify-center">
@@ -68,22 +80,22 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
         </div>
       </section>
 
-      {/* Form Section - Compact Layout for Mobile */}
-      <section className="py-3 min-[400px]:py-5 sm:py-6 flex items-start justify-center pb-2">
+      {/* Form Section - Mobile Scrollable Layout */}
+      <section className="py-4 min-[400px]:py-6 sm:py-8 flex items-start justify-center min-h-fit">
         <div className="max-w-screen-xl mx-auto px-3 w-full">
-          <div className="text-center mb-2 min-[400px]:mb-3 sm:mb-4">
-            <h3 className="text-champagne text-xs min-[400px]:text-sm sm:text-sm font-semibold font-display mb-1">Contact</h3>
-            <p className="text-porcelain text-base min-[400px]:text-xl sm:text-3xl font-semibold font-display mb-1">
+          <div className="text-center mb-4 min-[400px]:mb-6 sm:mb-8">
+            <h3 className="text-champagne text-sm min-[400px]:text-base sm:text-lg font-semibold font-display mb-2">Contact</h3>
+            <p className="text-porcelain text-lg min-[400px]:text-2xl sm:text-3xl font-semibold font-display mb-2">
               Get in touch
             </p>
           </div>
           
           <div className="max-w-lg mx-auto">
-            {/* Reduced space-y from 4 to 2 for tighter mobile layout */}
-            <form onSubmit={(e) => e.preventDefault()} className="space-y-2 min-[400px]:space-y-3 sm:space-y-4">
-              <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-2 sm:gap-4">
+            {/* Improved spacing for mobile scrollability */}
+            <form onSubmit={(e) => e.preventDefault()} className="space-y-4 min-[400px]:space-y-5 sm:space-y-6">
+              <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-4 sm:gap-4">
                 <div>
-                  <label htmlFor="firstName" className="font-medium text-porcelain text-xs block mb-1 ml-1">
+                  <label htmlFor="firstName" className="font-medium text-porcelain text-sm block mb-2 ml-1">
                     First name
                   </label>
                   <input
@@ -92,12 +104,12 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                     autoComplete="given-name"
                     type="text"
                     required
-                    className="w-full px-2 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
+                    className="mobile-touch-input w-full px-3 py-3 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm transition-colors"
                     placeholder="First"
                   />
                 </div>
                 <div>
-                  <label htmlFor="lastName" className="font-medium text-porcelain text-xs block mb-1 ml-1">
+                  <label htmlFor="lastName" className="font-medium text-porcelain text-sm block mb-2 ml-1">
                     Last name
                   </label>
                   <input
@@ -106,30 +118,30 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                     autoComplete="family-name"
                     type="text"
                     required
-                    className="w-full px-2 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
+                    className="mobile-touch-input w-full px-3 py-3 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm transition-colors"
                     placeholder="Last"
                   />
                 </div>
               </div>
               
               <div>
-                <label htmlFor="email" className="font-medium text-porcelain text-xs block mb-1 ml-1">Email</label>
+                <label htmlFor="email" className="font-medium text-porcelain text-sm block mb-2 ml-1">Email</label>
                 <input
                   id="email"
                   name="email"
                   autoComplete="email"
                   type="email"
                   required
-                  className="w-full px-2 py-2 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm"
+                  className="mobile-touch-input w-full px-3 py-3 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm transition-colors"
                   placeholder="name@example.com"
                 />
               </div>
               
               <div>
-                <label htmlFor="phone" className="font-medium text-porcelain text-xs block mb-1 ml-1">Phone</label>
+                <label htmlFor="phone" className="font-medium text-porcelain text-sm block mb-2 ml-1">Phone</label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-2 my-auto h-5 flex items-center border-r border-onyx/30 pr-2 z-10">
-                    <span className="text-xs text-porcelain/60 mr-1">🇳🇴</span>
+                  <div className="absolute inset-y-0 left-3 my-auto h-5 flex items-center border-r border-onyx/30 pr-3 z-10">
+                    <span className="text-sm text-porcelain/60 mr-1">🇳🇴</span>
                   </div>
                   <input
                     id="phone"
@@ -137,28 +149,30 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                     autoComplete="tel"
                     type="tel"
                     placeholder="912 34 567"
-                    className="w-full pl-9 pr-2 py-2 bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
+                    className="mobile-touch-input w-full pl-12 pr-3 py-3 bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm transition-colors"
                   />
                 </div>
               </div>
               
               <div>
-                <label htmlFor="message" className="font-medium text-porcelain text-xs block mb-1 ml-1">Message</label>
+                <label htmlFor="message" className="font-medium text-porcelain text-sm block mb-2 ml-1">Message</label>
                 <textarea
                   id="message"
                   name="message"
                   required
-                  className="w-full min-h-[140px] px-2 py-2 resize-y bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm"
+                  className="mobile-touch-input w-full min-h-[160px] px-3 py-3 resize-y bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm transition-colors"
                   placeholder="How can we help?"
                 ></textarea>
               </div>
               
-              <button
-                type="submit"
-                className="w-full px-4 py-2 min-[400px]:py-2.5 text-night font-bold bg-champagne hover:bg-auric active:bg-champagne rounded-md transition-colors text-sm mt-1"
-              >
-                Send Message
-              </button>
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  className="w-full px-4 py-3 min-[400px]:py-4 text-night font-bold bg-champagne hover:bg-auric active:bg-champagne rounded-md transition-colors text-base font-display touch-manipulation"
+                >
+                  Send Message
+                </button>
+              </div>
             </form>
           </div>
         </div>
