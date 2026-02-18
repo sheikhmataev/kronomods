@@ -71,6 +71,22 @@ p, span, div {
     /* Better touch target size */
     min-height: 44px;
   }
+
+  /* iOS Safari specific fixes */
+  .ios-scroll-fix {
+    /* Force hardware acceleration */
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+    /* Enable momentum scrolling on iOS */
+    -webkit-overflow-scrolling: touch;
+    /* Prevent rubber band effect from interfering */
+    overscroll-behavior: contain;
+    /* Ensure touch events work properly */
+    touch-action: pan-y;
+    /* Fix iOS scroll issues */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
 }
 
 @media (max-width: 640px) {

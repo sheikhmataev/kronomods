@@ -56,6 +56,13 @@ const cards: CardConfig[] = [
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+// iOS detection for scroll fixes
+const isIOS = () => {
+  if (typeof window === 'undefined') return false
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+}
+
 // Safari-specific video autoplay helper with user interaction detection
 const attemptVideoPlay = async (video: HTMLVideoElement): Promise<boolean> => {
   if (!video) return false
@@ -787,12 +794,30 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               duration: 1.5,
               onStart: () => {
                 contactTarget.style.pointerEvents = 'auto'
+                // Enable scrolling on the inner scroll container for iOS
+                const scrollContainer = contactTarget.querySelector('div')
+                if (scrollContainer) {
+                  scrollContainer.style.pointerEvents = 'auto'
+                  // iOS specific fixes
+                  if (isIOS()) {
+                    // Use array notation for webkit properties
+                    ;(scrollContainer.style as any).WebkitOverflowScrolling = 'touch'
+                    scrollContainer.style.touchAction = 'pan-y'
+                    // Force a reflow to ensure iOS recognizes the scrollable area
+                    scrollContainer.scrollTop = 0
+                    scrollContainer.focus()
+                  }
+                }
                 document.body.style.overflow = 'hidden'
               },
               onReverseComplete: () => {
                 contactTarget.style.pointerEvents = 'none'
+                const scrollContainer = contactTarget.querySelector('div')
+                if (scrollContainer) {
+                  scrollContainer.style.pointerEvents = 'none'
+                  scrollContainer.scrollTop = 0
+                }
                 document.body.style.overflow = ''
-                contactTarget.scrollTop = 0
               },
             },
             contactStart,
@@ -1211,12 +1236,30 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               ease: 'power1.out',
               onStart: () => {
                 contactTarget.style.pointerEvents = 'auto'
+                // Enable scrolling on the inner scroll container for iOS
+                const scrollContainer = contactTarget.querySelector('div')
+                if (scrollContainer) {
+                  scrollContainer.style.pointerEvents = 'auto'
+                  // iOS specific fixes
+                  if (isIOS()) {
+                    // Use array notation for webkit properties
+                    ;(scrollContainer.style as any).WebkitOverflowScrolling = 'touch'
+                    scrollContainer.style.touchAction = 'pan-y'
+                    // Force a reflow to ensure iOS recognizes the scrollable area
+                    scrollContainer.scrollTop = 0
+                    scrollContainer.focus()
+                  }
+                }
                 document.body.style.overflow = 'hidden'
               },
               onReverseComplete: () => {
                 contactTarget.style.pointerEvents = 'none'
+                const scrollContainer = contactTarget.querySelector('div')
+                if (scrollContainer) {
+                  scrollContainer.style.pointerEvents = 'none'
+                  scrollContainer.scrollTop = 0
+                }
                 document.body.style.overflow = ''
-                contactTarget.scrollTop = 0
               },
             },
             contactStart,
@@ -1350,10 +1393,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           createPortal(
             <div
               ref={contactRef}
-              className="contact-portal-container mobile-scroll-container fixed inset-0 z-50 overflow-y-auto overflow-x-hidden"
+              className="contact-portal-container mobile-scroll-container fixed inset-0 z-50"
               style={{
                 backgroundColor: '#5F5A56',
-                WebkitOverflowScrolling: 'touch',
                 
                 // start hidden so it doesn't cover your site before GSAP reveals it
                 opacity: 0,
@@ -1361,17 +1403,39 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 transform: 'translateY(50px)',
                 pointerEvents: 'none',
 
-                paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
-                // Increased bottom padding for better mobile scrollability
-                paddingBottom: 'calc(env(safe-area-inset-bottom) + 200px)',
-                touchAction: 'pan-y',
-                // prevent scroll chaining to the body (which drives GSAP)
-                overscrollBehavior: 'contain',
+                // iOS Safari specific fixes
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 50,
               }}
             >
-              <div className="pb-32 min-h-fit">
-                <ContactSection className="pb-16" />
-                <Footer />
+              <div
+                className="h-full w-full overflow-y-auto overflow-x-hidden ios-scroll-fix"
+                tabIndex={0}
+                style={{
+                  WebkitOverflowScrolling: 'touch',
+                  paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
+                  paddingBottom: 'calc(env(safe-area-inset-bottom) + 200px)',
+                  touchAction: 'pan-y',
+                  overscrollBehavior: 'contain',
+                  // Force hardware acceleration for better iOS performance
+                  transform: 'translate3d(0,0,0)',
+                  // Additional iOS Safari fixes
+                  WebkitBackfaceVisibility: 'hidden',
+                  backfaceVisibility: 'hidden',
+                  // Ensure minimum height for proper scrolling
+                  minHeight: '100%',
+                  // Remove focus outline since this is for touch scrolling
+                  outline: 'none',
+                }}
+              >
+                <div className="pb-32 min-h-fit">
+                  <ContactSection className="pb-16" />
+                  <Footer />
+                </div>
               </div>
             </div>,
             document.body,
