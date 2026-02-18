@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ScrollSmoother } from 'gsap/ScrollSmoother'
 import { useGSAP } from '@gsap/react'
 import { MacbookPro } from '@/components/ui/macbook-pro'
 import { ImageAutoSlider } from '@/components/ui/image-auto-slider'
@@ -12,7 +13,7 @@ import watch1Image from '@/assets/watch1/watch1.png'
 import watch2Image from '@/assets/watch2/watch2.jpg'
 import watch3Image from '@/assets/watch3/watch3.jpg'
 
-gsap.registerPlugin(ScrollTrigger, useGSAP)
+gsap.registerPlugin(ScrollTrigger, ScrollSmoother, useGSAP)
 
 export type HeroCardsSectionProps = {
   /** Enable or disable ScrollTrigger pinning. Defaults to true. */
@@ -808,6 +809,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                     scrollContainer.focus()
                   }
                 }
+                // CRITICAL: Disable ScrollSmoother to prevent touch event interference
+                const smoother = ScrollSmoother.get()
+                if (smoother) {
+                  smoother.kill()
+                }
                 document.body.style.overflow = 'hidden'
               },
               onReverseComplete: () => {
@@ -816,6 +822,18 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 if (scrollContainer) {
                   scrollContainer.style.pointerEvents = 'none'
                   scrollContainer.scrollTop = 0
+                }
+                // Re-enable ScrollSmoother when contact section closes
+                const smoother = ScrollSmoother.get()
+                if (!smoother) {
+                  // Recreate ScrollSmoother with same settings as App.tsx
+                  ScrollSmoother.create({
+                    smooth: 1.2,
+                    effects: false,
+                    smoothTouch: 0.05,
+                    normalizeScroll: true,
+                    ignoreMobileResize: true,
+                  })
                 }
                 document.body.style.overflow = ''
               },
@@ -1250,6 +1268,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                     scrollContainer.focus()
                   }
                 }
+                // CRITICAL: Disable ScrollSmoother to prevent touch event interference
+                const smoother = ScrollSmoother.get()
+                if (smoother) {
+                  smoother.kill()
+                }
                 document.body.style.overflow = 'hidden'
               },
               onReverseComplete: () => {
@@ -1258,6 +1281,18 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 if (scrollContainer) {
                   scrollContainer.style.pointerEvents = 'none'
                   scrollContainer.scrollTop = 0
+                }
+                // Re-enable ScrollSmoother when contact section closes
+                const smoother = ScrollSmoother.get()
+                if (!smoother) {
+                  // Recreate ScrollSmoother with same settings as App.tsx
+                  ScrollSmoother.create({
+                    smooth: 1.2,
+                    effects: false,
+                    smoothTouch: 0.05,
+                    normalizeScroll: true,
+                    ignoreMobileResize: true,
+                  })
                 }
                 document.body.style.overflow = ''
               },
@@ -1438,7 +1473,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 </div>
               </div>
             </div>,
-            document.body,
+            document.documentElement, // Render outside ScrollSmoother wrapper
           )
         }
       </div>
