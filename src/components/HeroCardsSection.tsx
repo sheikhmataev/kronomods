@@ -799,7 +799,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 if (scrollContainer) {
                   scrollContainer.style.pointerEvents = 'auto'
                 }
-                // Hide the header logo so it doesn't show over contact section
+                document.body.style.overflow = 'hidden'
                 const header = document.querySelector('header')
                 if (header) (header as HTMLElement).style.display = 'none'
               },
@@ -810,7 +810,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                   scrollContainer.style.pointerEvents = 'none'
                   scrollContainer.scrollTop = 0
                 }
-                // Show the header logo again
+                document.body.style.overflow = ''
                 const header = document.querySelector('header')
                 if (header) (header as HTMLElement).style.display = ''
               },
@@ -1215,7 +1215,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 if (scrollContainer) {
                   scrollContainer.style.pointerEvents = 'auto'
                 }
-                // Hide the header logo so it doesn't show over contact section
+                document.body.style.overflow = 'hidden'
                 const header = document.querySelector('header')
                 if (header) (header as HTMLElement).style.display = 'none'
               },
@@ -1226,7 +1226,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                   scrollContainer.style.pointerEvents = 'none'
                   scrollContainer.scrollTop = 0
                 }
-                // Show the header logo again
+                document.body.style.overflow = ''
                 const header = document.querySelector('header')
                 if (header) (header as HTMLElement).style.display = ''
               },
@@ -1375,6 +1375,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 right: 0,
                 bottom: 0,
                 zIndex: 9999,
+                overscrollBehavior: 'contain',
               }}
             >
               <div
@@ -1382,7 +1383,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 style={{
                   WebkitOverflowScrolling: 'touch',
                   paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
-                  paddingBottom: 'calc(env(safe-area-inset-bottom) + 40px)',
+                  paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
                   touchAction: 'pan-y',
                   overscrollBehavior: 'contain',
                   transform: 'translate3d(0,0,0)',
