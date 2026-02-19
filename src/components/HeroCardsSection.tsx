@@ -799,6 +799,15 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 if (scrollContainer) {
                   scrollContainer.style.pointerEvents = 'auto'
                 }
+                // ⚠️ CRITICAL iOS FIX — DO NOT REMOVE ⚠️
+                // normalizeScroll attaches a non-passive touchmove listener on
+                // <document> that calls preventDefault() on EVERY touch event.
+                // This kills native overflow-y scrolling inside our fixed portal
+                // on real iPhones/iPads (desktop simulation does NOT reproduce this).
+                // Disabling it here is the ONLY way to allow touch-scrolling the
+                // contact form on iOS Safari, Samsung Internet, and all mobile browsers.
+                // It is re-enabled in onReverseComplete below.
+                ScrollTrigger.normalizeScroll(false)
                 document.body.style.overflow = 'hidden'
                 const header = document.querySelector('header')
                 if (header) (header as HTMLElement).style.display = 'none'
@@ -810,6 +819,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                   scrollContainer.style.pointerEvents = 'none'
                   scrollContainer.scrollTop = 0
                 }
+                // ⚠️ CRITICAL iOS FIX — DO NOT REMOVE — re-enable normalizeScroll
+                // that was disabled in onStart above (see comment there).
+                ScrollTrigger.normalizeScroll(true)
                 document.body.style.overflow = ''
                 const header = document.querySelector('header')
                 if (header) (header as HTMLElement).style.display = ''
@@ -1215,6 +1227,15 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 if (scrollContainer) {
                   scrollContainer.style.pointerEvents = 'auto'
                 }
+                // ⚠️ CRITICAL iOS FIX — DO NOT REMOVE ⚠️
+                // normalizeScroll attaches a non-passive touchmove listener on
+                // <document> that calls preventDefault() on EVERY touch event.
+                // This kills native overflow-y scrolling inside our fixed portal
+                // on real iPhones/iPads (desktop simulation does NOT reproduce this).
+                // Disabling it here is the ONLY way to allow touch-scrolling the
+                // contact form on iOS Safari, Samsung Internet, and all mobile browsers.
+                // It is re-enabled in onReverseComplete below.
+                ScrollTrigger.normalizeScroll(false)
                 document.body.style.overflow = 'hidden'
                 const header = document.querySelector('header')
                 if (header) (header as HTMLElement).style.display = 'none'
@@ -1226,6 +1247,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                   scrollContainer.style.pointerEvents = 'none'
                   scrollContainer.scrollTop = 0
                 }
+                // ⚠️ CRITICAL iOS FIX — DO NOT REMOVE — re-enable normalizeScroll
+                // that was disabled in onStart above (see comment there).
+                ScrollTrigger.normalizeScroll(true)
                 document.body.style.overflow = ''
                 const header = document.querySelector('header')
                 if (header) (header as HTMLElement).style.display = ''
