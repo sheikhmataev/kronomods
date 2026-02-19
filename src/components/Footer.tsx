@@ -3,7 +3,7 @@ import React from 'react'
 export const Footer: React.FC = () => {
   return (
     <footer
-      className="relative z-10 px-6 pt-8 pb-[calc(env(safe-area-inset-bottom)+24px)] sm:px-10 lg:px-16"
+      className="relative z-10 px-6 pt-4 pb-[calc(env(safe-area-inset-bottom)+12px)] sm:px-10 lg:px-16"
       style={{ backgroundColor: '#5F5A56' }}
     >
       <div className="mx-auto max-w-7xl">

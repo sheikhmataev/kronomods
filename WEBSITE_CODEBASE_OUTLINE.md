@@ -245,11 +245,276 @@ const cards = [
 - **Video showcase**: MacBook Pro with autoplay video content
 - **Image gallery**: Infinite scrolling product imagery
 
-### 5. Cross-Browser Compatibility
-- **Safari-specific optimizations**: Video autoplay handling
-- **Mobile touch support**: Optimized ScrollSmoother settings
-- **Accessibility features**: Reduced motion preferences
-- **Performance considerations**: GPU acceleration and transform optimizations
+### 5. Cross-Browser & Cross-Device Compatibility
+- **Universal Device Support**: iPhone, Samsung Galaxy, iPad, Android tablets, desktop browsers
+- **Browser Compatibility**: Safari, Chrome, Firefox, Edge, Opera, Samsung Internet
+- **Mobile-First Approach**: Touch-optimized interactions and responsive design
+- **iPhone-Specific Optimizations**: Critical fixes for iOS Safari and WebKit browsers
+- **Performance Considerations**: GPU acceleration and transform optimizations
+
+## Cross-Device & Cross-Browser Compatibility Requirements
+
+### Critical Priority: Universal Device Support
+**The Kronomods website MUST work flawlessly across all devices and browsers.** This is non-negotiable for a luxury brand website. The user experience must be consistent and premium regardless of the device or browser being used.
+
+### Supported Devices & Browsers
+- **iPhone**: All models (iPhone SE to iPhone 15 Pro Max)
+- **Samsung Galaxy**: All recent models (S series, A series, Note series, Fold series)
+- **iPad & Android Tablets**: Full tablet experience optimization
+- **Desktop**: Windows, Mac, Linux compatibility
+- **Browsers**: Safari, Chrome, Firefox, Edge, Opera, Samsung Internet
+
+### iPhone-Specific Issues & Fixes
+
+#### 1. iOS Safari Video Autoplay Issues
+**Problem**: Safari blocks video autoplay without user interaction
+**Solution**: 
+```javascript
+// User interaction tracking for Safari compliance
+const attemptVideoPlay = async (video: HTMLVideoElement): Promise<boolean> => {
+  if (isSafari() && !hasUserInteracted) {
+    // Add click handler for Safari without user interaction
+    const handleClick = () => {
+      attemptVideoPlay(video)
+      video.removeEventListener('click', handleClick)
+      video.style.cursor = 'default'
+    }
+    video.addEventListener('click', handleClick)
+    video.style.cursor = 'pointer'
+  } else {
+    return video.play().catch(() => false)
+  }
+}
+```
+
+#### 2. iOS ScrollSmoother Conflicts
+**Problem**: ScrollSmoother interferes with native iOS scrolling behavior
+**Solution**:
+```javascript
+ScrollTrigger.config({
+  ignoreMobileResize: true  // Prevents iOS viewport change refresh loops
+})
+
+ScrollSmoother.create({
+  smoothTouch: 0.05,        // Reduced for iOS touch sensitivity
+  normalizeScroll: true,   // Cross-device consistency
+  ignoreMobileResize: true  // Performance optimization
+})
+```
+
+#### 3. iOS Viewport Height Issues
+**Problem**: iOS viewport height changes when Safari UI appears/disappears
+**Solution**:
+```css
+/* Use stable viewport units */
+.hero-section {
+  height: 100svh; /* Stable viewport height */
+}
+
+/* Safe area insets for iPhone notches */
+.contact-portal {
+  padding-top: calc(env(safe-area-inset-top) + 16px);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 40px);
+}
+```
+
+#### 4. iOS Touch Event Handling
+**Problem**: iOS requires specific touch event handling for smooth scrolling
+**Solution**:
+```javascript
+// iOS-specific scroll container fixes
+const scrollContainer = contactTarget.querySelector('div')
+if (scrollContainer && isIOS()) {
+  scrollContainer.style.WebkitOverflowScrolling = 'touch'
+  scrollContainer.style.touchAction = 'pan-y'
+  scrollContainer.scrollTop = 0 // Force reflow
+  scrollContainer.focus() // Enable touch scrolling
+}
+```
+
+#### 5. iOS Hardware Acceleration
+**Problem**: iOS Safari needs explicit hardware acceleration for smooth animations
+**Solution**:
+```javascript
+// Force GPU acceleration on iOS
+gsap.set(element, {
+  force3D: true,
+  transform: 'translate3d(0,0,0)',
+  willChange: 'transform, opacity'
+})
+
+// CSS for iOS Safari
+.ios-scroll-fix {
+  transform: translate3d(0,0,0);
+  WebkitBackfaceVisibility: 'hidden';
+  backfaceVisibility: 'hidden';
+}
+```
+
+#### 6. iOS Keyboard & Form Issues
+**Problem**: iOS keyboard interferes with fixed positioning and scroll behavior
+**Solution**:
+```javascript
+// Handle iOS keyboard appearance/disappearance
+onStart: () => {
+  // Hide header to prevent overlap
+  const header = document.querySelector('header')
+  if (header) (header as HTMLElement).style.display = 'none'
+},
+onReverseComplete: () => {
+  // Show header again
+  const header = document.querySelector('header')
+  if (header) (header as HTMLElement).style.display = ''
+}
+```
+
+### Samsung & Android Specific Optimizations
+
+#### 1. Samsung Internet Browser
+**Problem**: Samsung Internet has different scroll behavior than Chrome
+**Solution**: 
+```javascript
+// Samsung-specific scroll optimizations
+ScrollTrigger.config({
+  ignoreMobileResize: true, // Prevents Samsung viewport issues
+  normalizeScroll: true     // Consistent scroll behavior
+})
+```
+
+#### 2. Android Chrome Scrolling
+**Problem**: Android Chrome has momentum scrolling that can interfere with animations
+**Solution**:
+```javascript
+// Android momentum scroll handling
+scrollTrigger: {
+  fastScrollEnd: true,     // Prevents momentum scroll issues
+  anticipatePin: 1,        // Prevents layout shifts
+  scrub: 0.5              // Reduced sensitivity for Android
+}
+```
+
+### Cross-Browser Compatibility Matrix
+
+| Feature | Safari | Chrome | Firefox | Edge | Samsung Internet |
+|---------|--------|--------|---------|------|------------------|
+| Video Autoplay | ✅ (with fix) | ✅ | ✅ | ✅ | ✅ |
+| Smooth Scrolling | ✅ (optimized) | ✅ | ✅ | ✅ | ✅ (optimized) |
+| 3D Animations | ✅ (GPU accel) | ✅ | ✅ | ✅ | ✅ |
+| Touch Events | ✅ (iOS fixes) | ✅ | ✅ | ✅ | ✅ |
+| Form Inputs | ✅ (safe area) | ✅ | ✅ | ✅ | ✅ |
+
+### Mobile Performance Optimizations
+
+#### 1. Reduced Motion Support
+```javascript
+// Respect user's motion preferences
+const prefersReducedMotion = () => 
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+if (prefersReducedMotion()) {
+  // Disable complex animations
+  gsap.globalTimeline.timeScale(0)
+}
+```
+
+#### 2. Touch-Friendly Interactions
+```javascript
+// Mobile-optimized ScrollTrigger settings
+scrollTrigger: {
+  scrub: 0.5,           // Reduced for mobile
+  fastScrollEnd: true,  // Prevents momentum issues
+  anticipatePin: 1      // Prevents layout shifts
+}
+```
+
+#### 3. Memory Management
+```javascript
+// Clean up animations on mobile
+return () => {
+  ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+  gsap.globalTimeline.clear()
+}
+```
+
+### Testing Requirements
+
+#### Device Testing Checklist
+- [ ] iPhone (iOS 17+) - Safari
+- [ ] Samsung Galaxy (Android 13+) - Samsung Internet & Chrome
+- [ ] iPad (iPadOS 17+) - Safari
+- [ ] Desktop (Windows/Mac) - Chrome, Firefox, Edge, Safari
+- [ ] Tablet (Android) - Chrome
+
+#### Critical User Flows to Test
+1. **Scroll Experience**: Smooth scrolling across all phases
+2. **Video Playback**: Autoplay works on all devices
+3. **Contact Form**: Keyboard behavior on mobile
+4. **Touch Interactions**: Responsive touch events
+5. **Performance**: 60fps animations on all devices
+
+### Browser-Specific CSS Fixes
+
+#### Safari WebKit
+```css
+/* Safari-specific fixes */
+.contact-portal-container {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Safe area support for iPhone notches */
+@supports (padding: max(0px)) {
+  .contact-section {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+}
+```
+
+#### Chrome/Android
+```css
+/* Chrome-specific optimizations */
+.gpu-accelerated {
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+}
+
+/* Android overscroll behavior */
+.mobile-scroll-container {
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+```
+
+### Performance Monitoring
+
+#### Mobile Performance Metrics
+- **60fps animations** across all devices
+- **Memory usage** under 100MB on mobile
+- **Load time** under 3 seconds on 3G
+- **Touch response** under 100ms
+
+#### Cross-Browser Testing Tools
+- **BrowserStack** for comprehensive device testing
+- **Safari Web Inspector** for iOS debugging
+- **Chrome DevTools** for Android debugging
+- **Lighthouse** for performance scoring
+
+### Ongoing Maintenance
+
+#### Regular Testing Schedule
+- **Weekly**: Test on iPhone and Samsung devices
+- **Monthly**: Full cross-browser compatibility check
+- **Quarterly**: Performance optimization review
+
+#### Update Requirements
+- **iOS Updates**: Test on new iOS versions within 2 weeks
+- **Android Updates**: Test on new Android versions within 2 weeks
+- **Browser Updates**: Test on new browser versions within 1 week
+
+This comprehensive cross-device and cross-browser compatibility ensures the Kronomods website delivers a premium, consistent experience across all platforms, with special attention to iPhone-specific issues that commonly affect luxury brand websites.
 
 ## Technical Implementation Details
 

@@ -28,19 +28,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
   ]
 
   return (
-    <div className={`${className} w-full flex flex-col px-3 sm:px-0 pb-8`} style={{ backgroundColor: 'transparent' }}>
-      {/* Scroll indicator for mobile users */}
-      <div className="block sm:hidden text-center pt-4 pb-2">
-        <div className="inline-flex items-center gap-2 text-porcelain/40 text-xs">
-          <svg className="w-3 h-3 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-          Scroll to view all options
-          <svg className="w-3 h-3 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </div>
-      </div>
+    <div className={`${className} w-full flex flex-col px-3 sm:px-0`} style={{ backgroundColor: 'transparent' }}>
       
       {/* Social Links Section - Compact Padding */}
       <section className="py-2 min-[400px]:py-4 sm:py-6 flex items-center justify-center">

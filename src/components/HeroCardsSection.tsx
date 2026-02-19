@@ -2,7 +2,6 @@ import { useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ScrollSmoother } from 'gsap/ScrollSmoother'
 import { useGSAP } from '@gsap/react'
 import { MacbookPro } from '@/components/ui/macbook-pro'
 import { ImageAutoSlider } from '@/components/ui/image-auto-slider'
@@ -13,7 +12,13 @@ import watch1Image from '@/assets/watch1/watch1.png'
 import watch2Image from '@/assets/watch2/watch2.jpg'
 import watch3Image from '@/assets/watch3/watch3.jpg'
 
-gsap.registerPlugin(ScrollTrigger, ScrollSmoother, useGSAP)
+gsap.registerPlugin(ScrollTrigger, useGSAP)
+
+// Disable lag compensation — prevents GSAP from trying to "catch up" after
+// a missed frame, which is the primary cause of visible animation jumps.
+gsap.ticker.lagSmoothing(0)
+// Force GPU compositing layer on every animated element globally.
+gsap.config({ force3D: true })
 
 export type HeroCardsSectionProps = {
   /** Enable or disable ScrollTrigger pinning. Defaults to true. */
@@ -57,12 +62,6 @@ const cards: CardConfig[] = [
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-// iOS detection for scroll fixes
-const isIOS = () => {
-  if (typeof window === 'undefined') return false
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-}
 
 // Safari-specific video autoplay helper with user interaction detection
 const attemptVideoPlay = async (video: HTMLVideoElement): Promise<boolean> => {
@@ -240,12 +239,15 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
 
       const primeLayersForSafari = () => {
         const cardTargets = cardsRef.current.filter(Boolean)
+        // Only use preserve-3d on desktop — on mobile it forces expensive
+        // 3D compositing layers that cause jitter and frame drops.
+        const isDesktop = window.innerWidth >= 1024
         if (cardTargets.length) {
           gsap.set(cardTargets, {
             willChange: 'transform, opacity',
             zIndex: (index) => 30 - index,
             force3D: true,
-            transformStyle: 'preserve-3d',
+            ...(isDesktop ? { transformStyle: 'preserve-3d' } : {}),
           })
         }
         if (heading) {
@@ -384,7 +386,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            scrub: 1,
+            // 1.5 gives a buttery trailing feel; 1 is too twitchy on desktop.
+            scrub: 1.5,
+            // Snap the animation to its final state after a fast flick —
+            // prevents the timeline from hanging mid-tween on fast scrolls.
+            fastScrollEnd: true,
             invalidateOnRefresh: true,
             refreshPriority: -1,
           },
@@ -473,24 +479,18 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
 
         const fadeTargets = [centerCard, leftCard, rightCard]
 
+        // Exit: cards move UP and fade simultaneously.
+        // When scrubbing backward (scroll up), the reverse plays — cards
+        // descend back into position from above, which feels natural.
         timeline.to(
           fadeTargets,
           {
-            y: getResponsiveY(80, 120, 160),
-            ease: 'power2.out',
-            duration: 0.4,
-          },
-          0.7,
-        )
-
-        timeline.to(
-          fadeTargets,
-          {
+            y: getResponsiveY(-60, -80, -100),
             autoAlpha: 0,
             ease: 'power2.inOut',
-            duration: 0.4,
+            duration: 0.55,
           },
-          1.2,
+          0.85,
         )
 
         if (background) {
@@ -795,26 +795,13 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               duration: 1.5,
               onStart: () => {
                 contactTarget.style.pointerEvents = 'auto'
-                // Enable scrolling on the inner scroll container for iOS
                 const scrollContainer = contactTarget.querySelector('div')
                 if (scrollContainer) {
                   scrollContainer.style.pointerEvents = 'auto'
-                  // iOS specific fixes
-                  if (isIOS()) {
-                    // Use array notation for webkit properties
-                    ;(scrollContainer.style as any).WebkitOverflowScrolling = 'touch'
-                    scrollContainer.style.touchAction = 'pan-y'
-                    // Force a reflow to ensure iOS recognizes the scrollable area
-                    scrollContainer.scrollTop = 0
-                    scrollContainer.focus()
-                  }
                 }
-                // CRITICAL: Disable ScrollSmoother to prevent touch event interference
-                const smoother = ScrollSmoother.get()
-                if (smoother) {
-                  smoother.kill()
-                }
-                document.body.style.overflow = 'hidden'
+                // Hide the header logo so it doesn't show over contact section
+                const header = document.querySelector('header')
+                if (header) (header as HTMLElement).style.display = 'none'
               },
               onReverseComplete: () => {
                 contactTarget.style.pointerEvents = 'none'
@@ -823,19 +810,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                   scrollContainer.style.pointerEvents = 'none'
                   scrollContainer.scrollTop = 0
                 }
-                // Re-enable ScrollSmoother when contact section closes
-                const smoother = ScrollSmoother.get()
-                if (!smoother) {
-                  // Recreate ScrollSmoother with same settings as App.tsx
-                  ScrollSmoother.create({
-                    smooth: 1.2,
-                    effects: false,
-                    smoothTouch: 0.05,
-                    normalizeScroll: true,
-                    ignoreMobileResize: true,
-                  })
-                }
-                document.body.style.overflow = ''
+                // Show the header logo again
+                const header = document.querySelector('header')
+                if (header) (header as HTMLElement).style.display = ''
               },
             },
             contactStart,
@@ -864,16 +841,14 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         if (background) gsap.set(background, { backgroundColor: '#05060A', force3D: true })
 
         // ✅ Initial state: ONLY center visible & big (no scroll required)
+        // Mobile: pure 2D transforms only — rotationX/Y/z and preserve-3d
+        // force full 3D compositing layers which cause GPU jitter on phones.
         gsap.set(centerCard, {
           transformOrigin: 'center center',
           y: 0,
           scale: 1.25,
           opacity: 1,
-          rotationY: 0,
-          rotationX: 0,
-          z: 10,
           force3D: true,
-          transformStyle: 'preserve-3d',
           willChange: 'transform, opacity',
         })
 
@@ -883,11 +858,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           y: 0,
           scale: 0.82,
           opacity: 0,
-          rotationY: -22,
-          rotationX: 4,
-          z: -40,
           force3D: true,
-          transformStyle: 'preserve-3d',
           willChange: 'transform, opacity',
         })
 
@@ -897,11 +868,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           y: 0,
           scale: 0.82,
           opacity: 0,
-          rotationY: 22,
-          rotationX: 4,
-          z: -40,
           force3D: true,
-          transformStyle: 'preserve-3d',
           willChange: 'transform, opacity',
         })
 
@@ -924,10 +891,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           opacity: 0,
           scale: 0.9,
           y: 80,
-          filter: 'blur(10px)',
+          // No blur on mobile — filter animations are extremely expensive
+          // on mobile GPUs and are the primary cause of frame drops.
           force3D: true,
-          transformStyle: 'preserve-3d',
-          willChange: 'transform, opacity, filter',
+          willChange: 'transform, opacity',
         })
 
         const video = macbook.querySelector('video') as HTMLVideoElement
@@ -941,20 +908,23 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            scrub: 1,
+            // 0.8 on mobile: tighter than desktop so touch scrolling feels
+            // responsive, but enough damping to kill jitter from scroll events.
+            scrub: 0.8,
+            // Snaps to final state after fast swipe — prevents mid-tween hangs.
+            fastScrollEnd: true,
             invalidateOnRefresh: true,
             refreshPriority: -1,
           },
         })
 
-        // ✅ Phase 1 (like desktop)
+        // ✅ Phase 1 — pure 2D on mobile, no rotationX/Y/z
         timeline
           .to(
             centerCard,
             {
               scale: 1.0,
               y: 0,
-              z: 20,
               duration: 0.55,
               ease: 'power3.out',
             },
@@ -975,10 +945,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             {
               xPercent: 0,
               opacity: 1,
-              rotationY: -10,
-              rotationX: 0,
               scale: 0.92,
-              z: -20,
               duration: 0.55,
               ease: 'power3.out',
             },
@@ -989,10 +956,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             {
               xPercent: 0,
               opacity: 1,
-              rotationY: 10,
-              rotationX: 0,
               scale: 0.92,
-              z: -20,
               duration: 0.55,
               ease: 'power3.out',
             },
@@ -1002,25 +966,19 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             [leftCard, rightCard],
             {
               scale: 0.88,
-              rotationY: (_i, target) => (target === leftCard ? -15 : 15),
-              z: -35,
               duration: 0.25,
               ease: 'power2.inOut',
             },
             0.55,
           )
 
-        // ✅ Phase 2: fade cards out to continue the rest of your sequence
+        // ✅ Phase 2: cards move UP and fade simultaneously.
+        // Reversing this (scroll up) makes cards descend back in from above.
         const fadeTargets = [centerCard, leftCard, rightCard]
         timeline.to(
           fadeTargets,
-          { y: -30, duration: 0.35, ease: 'power2.out' },
-          0.85,
-        )
-        timeline.to(
-          fadeTargets,
-          { autoAlpha: 0, duration: 0.4, ease: 'power2.inOut' },
-          1.25,
+          { y: -80, autoAlpha: 0, duration: 0.45, ease: 'power2.inOut' },
+          0.9,
         )
 
         // Background color transition
@@ -1030,14 +988,13 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           1.4,
         )
 
-        // MacBook appearance
+        // MacBook appearance — no blur animation on mobile
         timeline.to(
           macbook,
           {
             opacity: 1,
             scale: 1,
             y: 0,
-            filter: 'blur(0px)',
             duration: 0.9,
             ease: 'power3.out',
           },
@@ -1254,26 +1211,13 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               ease: 'power1.out',
               onStart: () => {
                 contactTarget.style.pointerEvents = 'auto'
-                // Enable scrolling on the inner scroll container for iOS
                 const scrollContainer = contactTarget.querySelector('div')
                 if (scrollContainer) {
                   scrollContainer.style.pointerEvents = 'auto'
-                  // iOS specific fixes
-                  if (isIOS()) {
-                    // Use array notation for webkit properties
-                    ;(scrollContainer.style as any).WebkitOverflowScrolling = 'touch'
-                    scrollContainer.style.touchAction = 'pan-y'
-                    // Force a reflow to ensure iOS recognizes the scrollable area
-                    scrollContainer.scrollTop = 0
-                    scrollContainer.focus()
-                  }
                 }
-                // CRITICAL: Disable ScrollSmoother to prevent touch event interference
-                const smoother = ScrollSmoother.get()
-                if (smoother) {
-                  smoother.kill()
-                }
-                document.body.style.overflow = 'hidden'
+                // Hide the header logo so it doesn't show over contact section
+                const header = document.querySelector('header')
+                if (header) (header as HTMLElement).style.display = 'none'
               },
               onReverseComplete: () => {
                 contactTarget.style.pointerEvents = 'none'
@@ -1282,19 +1226,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                   scrollContainer.style.pointerEvents = 'none'
                   scrollContainer.scrollTop = 0
                 }
-                // Re-enable ScrollSmoother when contact section closes
-                const smoother = ScrollSmoother.get()
-                if (!smoother) {
-                  // Recreate ScrollSmoother with same settings as App.tsx
-                  ScrollSmoother.create({
-                    smooth: 1.2,
-                    effects: false,
-                    smoothTouch: 0.05,
-                    normalizeScroll: true,
-                    ignoreMobileResize: true,
-                  })
-                }
-                document.body.style.overflow = ''
+                // Show the header logo again
+                const header = document.querySelector('header')
+                if (header) (header as HTMLElement).style.display = ''
               },
             },
             contactStart,
@@ -1428,52 +1362,39 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           createPortal(
             <div
               ref={contactRef}
-              className="contact-portal-container mobile-scroll-container fixed inset-0 z-50"
+              className="contact-portal-container"
               style={{
                 backgroundColor: '#5F5A56',
-                
-                // start hidden so it doesn't cover your site before GSAP reveals it
                 opacity: 0,
                 visibility: 'hidden',
                 transform: 'translateY(50px)',
                 pointerEvents: 'none',
-
-                // iOS Safari specific fixes
                 position: 'fixed',
                 top: 0,
                 left: 0,
                 right: 0,
                 bottom: 0,
-                zIndex: 50,
+                zIndex: 9999,
               }}
             >
               <div
-                className="h-full w-full overflow-y-auto overflow-x-hidden ios-scroll-fix"
-                tabIndex={0}
+                className="h-full w-full overflow-y-auto overflow-x-hidden"
                 style={{
                   WebkitOverflowScrolling: 'touch',
                   paddingTop: 'calc(env(safe-area-inset-top) + 16px)',
-                  paddingBottom: 'calc(env(safe-area-inset-bottom) + 200px)',
+                  paddingBottom: 'calc(env(safe-area-inset-bottom) + 40px)',
                   touchAction: 'pan-y',
                   overscrollBehavior: 'contain',
-                  // Force hardware acceleration for better iOS performance
                   transform: 'translate3d(0,0,0)',
-                  // Additional iOS Safari fixes
-                  WebkitBackfaceVisibility: 'hidden',
-                  backfaceVisibility: 'hidden',
-                  // Ensure minimum height for proper scrolling
-                  minHeight: '100%',
-                  // Remove focus outline since this is for touch scrolling
                   outline: 'none',
                 }}
               >
-                <div className="pb-32 min-h-fit">
-                  <ContactSection className="pb-16" />
-                  <Footer />
-                </div>
+                <ContactSection className="pb-2" />
+                <div className="h-4 sm:hidden" />
+                <Footer />
               </div>
             </div>,
-            document.documentElement, // Render outside ScrollSmoother wrapper
+            document.documentElement,
           )
         }
       </div>
