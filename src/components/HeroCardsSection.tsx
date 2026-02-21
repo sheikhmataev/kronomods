@@ -151,6 +151,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const imageSliderRef = useRef<HTMLDivElement | null>(null)
   const contactRef = useRef<HTMLDivElement | null>(null)
+  const scrollBackCleanupRef = useRef<(() => void) | null>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const videoPlayAttemptedRef = useRef(false)
 
@@ -811,8 +812,74 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 document.body.style.overflow = 'hidden'
                 const header = document.querySelector('header')
                 if (header) (header as HTMLElement).style.display = 'none'
+
+                // "Scroll-back" feature: when user is at the top of the
+                // contact overlay and scrolls/swipes up again, hand control
+                // back to the GSAP timeline so they can return to earlier sections.
+                if (scrollContainer) {
+                  const dismissContact = () => {
+                    contactTarget.style.pointerEvents = 'none'
+                    scrollContainer.style.pointerEvents = 'none'
+                    scrollContainer.scrollTop = 0
+                    // ⚠️ CRITICAL iOS FIX — DO NOT REMOVE
+                    ScrollTrigger.normalizeScroll(true)
+                    document.body.style.overflow = ''
+                    if (header) (header as HTMLElement).style.display = ''
+                    // Jump back half a viewport so GSAP's scrub timeline
+                    // starts reversing. We use the ScrollTrigger instance
+                    // attached to our own timeline (accessible via timelineRef)
+                    // so GSAP recalculates immediately on the same frame.
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const st = (timelineRef.current as any)?.scrollTrigger
+                    const currentPos: number = st ? st.scroll() : window.scrollY
+                    const target = Math.max(0, currentPos - Math.round(window.innerHeight * 0.5))
+                    if (st) {
+                      st.scroll(target)
+                    } else {
+                      window.scrollTo({ top: target, behavior: 'instant' as ScrollBehavior })
+                    }
+                    cleanup()
+                  }
+
+                  let touchStartY = 0
+
+                  const onTouchStart = (e: TouchEvent) => {
+                    touchStartY = e.touches[0].clientY
+                  }
+
+                  const onTouchMove = (e: TouchEvent) => {
+                    // scrollTop can be a sub-pixel float on some browsers
+                    if (scrollContainer.scrollTop < 1) {
+                      const deltaY = e.touches[0].clientY - touchStartY
+                      // Finger moves DOWN (positive deltaY) = swiping up = go back
+                      if (deltaY > 20) {
+                        dismissContact()
+                      }
+                    }
+                  }
+
+                  const onWheel = (e: WheelEvent) => {
+                    if (scrollContainer.scrollTop < 1 && e.deltaY < 0) {
+                      dismissContact()
+                    }
+                  }
+
+                  scrollContainer.addEventListener('touchstart', onTouchStart, { passive: true })
+                  scrollContainer.addEventListener('touchmove', onTouchMove, { passive: true })
+                  scrollContainer.addEventListener('wheel', onWheel, { passive: true })
+
+                  const cleanup = () => {
+                    scrollContainer.removeEventListener('touchstart', onTouchStart)
+                    scrollContainer.removeEventListener('touchmove', onTouchMove)
+                    scrollContainer.removeEventListener('wheel', onWheel)
+                    scrollBackCleanupRef.current = null
+                  }
+                  scrollBackCleanupRef.current = cleanup
+                }
               },
               onReverseComplete: () => {
+                // Clean up scroll-back listeners if still attached
+                if (scrollBackCleanupRef.current) scrollBackCleanupRef.current()
                 contactTarget.style.pointerEvents = 'none'
                 const scrollContainer = contactTarget.querySelector('div')
                 if (scrollContainer) {
@@ -1239,8 +1306,73 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 document.body.style.overflow = 'hidden'
                 const header = document.querySelector('header')
                 if (header) (header as HTMLElement).style.display = 'none'
+
+                // "Scroll-back" feature: when user is at the top of the
+                // contact overlay and scrolls/swipes up again, hand control
+                // back to the GSAP timeline so they can return to earlier sections.
+                if (scrollContainer) {
+                  const dismissContact = () => {
+                    contactTarget.style.pointerEvents = 'none'
+                    scrollContainer.style.pointerEvents = 'none'
+                    scrollContainer.scrollTop = 0
+                    // ⚠️ CRITICAL iOS FIX — DO NOT REMOVE
+                    ScrollTrigger.normalizeScroll(true)
+                    document.body.style.overflow = ''
+                    if (header) (header as HTMLElement).style.display = ''
+                    // Jump back half a viewport so GSAP's scrub timeline
+                    // starts reversing. We use the ScrollTrigger instance
+                    // attached to our own timeline (accessible via timelineRef)
+                    // so GSAP recalculates immediately on the same frame.
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const st = (timelineRef.current as any)?.scrollTrigger
+                    const currentPos: number = st ? st.scroll() : window.scrollY
+                    const target = Math.max(0, currentPos - Math.round(window.innerHeight * 0.5))
+                    if (st) {
+                      st.scroll(target)
+                    } else {
+                      window.scrollTo({ top: target, behavior: 'instant' as ScrollBehavior })
+                    }
+                    cleanup()
+                  }
+
+                  let touchStartY = 0
+
+                  const onTouchStart = (e: TouchEvent) => {
+                    touchStartY = e.touches[0].clientY
+                  }
+
+                  const onTouchMove = (e: TouchEvent) => {
+                    // scrollTop can be a sub-pixel float on some browsers
+                    if (scrollContainer.scrollTop < 1) {
+                      const deltaY = e.touches[0].clientY - touchStartY
+                      // Finger moves DOWN (positive deltaY) = swiping up = go back
+                      if (deltaY > 20) {
+                        dismissContact()
+                      }
+                    }
+                  }
+
+                  const onWheel = (e: WheelEvent) => {
+                    if (scrollContainer.scrollTop < 1 && e.deltaY < 0) {
+                      dismissContact()
+                    }
+                  }
+
+                  scrollContainer.addEventListener('touchstart', onTouchStart, { passive: true })
+                  scrollContainer.addEventListener('touchmove', onTouchMove, { passive: true })
+                  scrollContainer.addEventListener('wheel', onWheel, { passive: true })
+
+                  const cleanup = () => {
+                    scrollContainer.removeEventListener('touchstart', onTouchStart)
+                    scrollContainer.removeEventListener('touchmove', onTouchMove)
+                    scrollContainer.removeEventListener('wheel', onWheel)
+                    scrollBackCleanupRef.current = null
+                  }
+                  scrollBackCleanupRef.current = cleanup
+                }
               },
               onReverseComplete: () => {
+                if (scrollBackCleanupRef.current) scrollBackCleanupRef.current()
                 contactTarget.style.pointerEvents = 'none'
                 const scrollContainer = contactTarget.querySelector('div')
                 if (scrollContainer) {
