@@ -543,11 +543,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
 
           const getResponsiveFocusY = () => {
             if (isMobile) {
-              if (isUltraWide) return 0.43
-              return 0.48
+              if (isUltraWide) return 0.38
+              return 0.42
             }
-            if (isTablet) return 0.53
-            return 0.55
+            if (isTablet) return 0.46
+            return 0.48
           }
 
           const focusX = getResponsiveFocusX()
@@ -854,7 +854,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            scrub: 1.2,
+            scrub: 1.8,
             fastScrollEnd: true,
             invalidateOnRefresh: true,
             refreshPriority: -1,
@@ -926,7 +926,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         const macbookRect = macbook.getBoundingClientRect()
 
         const getResponsiveFocusX = () => 0.36
-        const getResponsiveFocusY = () => (isUltraWide ? 0.43 : 0.48)
+        const getResponsiveFocusY = () => (isUltraWide ? 0.38 : 0.42)
 
         const focusX = getResponsiveFocusX()
         const focusY = getResponsiveFocusY()
@@ -948,9 +948,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         const screenXFromCenter = screenFocusXInContainer - containerCenterX
         const screenYFromCenter = screenFocusYInContainer - containerCenterY
 
-        const midZoom = Math.min(4.0, Math.max(2.8, viewportHeight / (macbookRect.height * 0.45)))
-        const deepZoom = midZoom + 0.6
-        const finalZoom = deepZoom + 0.5
+        const midZoom = Math.min(6.0, Math.max(4.5, viewportHeight / (macbookRect.height * 0.35)))
+        const deepZoom = midZoom + 1.0
+        const finalZoom = deepZoom + 0.8
 
         timeline.to(
           container,
@@ -958,8 +958,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             scale: midZoom,
             x: -screenXFromCenter * midZoom,
             y: -screenYFromCenter * midZoom,
-            ease: 'power1.inOut',
-            duration: 1.1,
+            ease: 'sine.inOut',
+            duration: 1.6,
           },
           1.7,
         )
@@ -970,10 +970,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             scale: deepZoom,
             x: -screenXFromCenter * deepZoom,
             y: -screenYFromCenter * deepZoom,
-            ease: 'power1.inOut',
-            duration: 1.1,
+            ease: 'sine.inOut',
+            duration: 1.6,
           },
-          2.9,
+          3.0,
         )
 
         timeline.to(
@@ -982,8 +982,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             scale: finalZoom,
             x: -screenXFromCenter * finalZoom,
             y: -screenYFromCenter * finalZoom,
-            ease: 'power1.inOut',
-            duration: 1.0,
+            ease: 'sine.inOut',
+            duration: 1.4,
           },
           4.0,
         )
