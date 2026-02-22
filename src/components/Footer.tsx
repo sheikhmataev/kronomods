@@ -9,9 +9,14 @@ export const Footer: React.FC = () => {
       <div className="mx-auto max-w-7xl">
         <p className="text-center text-sm text-porcelain/60 font-sans">
           Designet for Kronomods - laget av{' '}
-          <span className="text-champagne/80 hover:text-champagne transition-colors">
+          <a
+            href="http://sheikhmataev.github.io/mash/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-champagne/80 hover:text-champagne transition-colors"
+          >
             MASH Partners AS
-          </span>{' '}
+          </a>{' '}
           - © 2025
         </p>
       </div>

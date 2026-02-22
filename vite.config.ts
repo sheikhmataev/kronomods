@@ -4,11 +4,21 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/kronomods/', // GitHub Pages base path - change to '/' if deploying to root domain
+  base: '/kronomods/',
   plugins: [react()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+    },
+  },
+  build: {
+    target: 'es2020',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          gsap: ['gsap', '@gsap/react'],
+        },
+      },
     },
   },
 })

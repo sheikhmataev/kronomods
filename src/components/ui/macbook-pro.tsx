@@ -1,5 +1,5 @@
 import type { CSSProperties, SVGProps } from "react";
-import { useId } from "react";
+import { useId, useState, useEffect } from "react";
 
 export interface MacbookProProps extends SVGProps<SVGSVGElement> {
   width?: number;
@@ -18,6 +18,15 @@ export function MacbookPro({
   ...props
 }: MacbookProProps) {
   const clipPathId = useId();
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth >= 1024 : true
+  );
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 1024px)");
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
   const { className, style, ...svgProps } = props;
   const screen = { x: 74.52, y: 21.32, width: 501.22, height: 323.85, radius: 5 };
   const wrapperStyle: CSSProperties = {
@@ -149,10 +158,8 @@ export function MacbookPro({
       </svg>
       {videoSrc && (
         <div style={screenStyle}>
-          {/* Video renders at 2x the container size and is scaled down.
-              The browser allocates 2x the pixels for compositing, so when
-              GSAP zooms into the MacBook the extra resolution prevents
-              pixelation. The parent overflow:hidden clips it to fit. */}
+          {/* Desktop: 2x render + scale(0.5) for sharper zoom.
+              Mobile: 1x to save GPU memory. */}
           <video
             src={videoSrc}
             poster={videoPoster}
@@ -165,16 +172,14 @@ export function MacbookPro({
             x-webkit-airplay="deny"
             data-keepplaying
             style={{
-              width: "200%",
-              height: "200%",
+              width: isDesktop ? "200%" : "100%",
+              height: isDesktop ? "200%" : "100%",
               objectFit: "cover",
               display: "block",
               opacity: 0,
-              transform: "scale(0.5)",
-              transformOrigin: "top left",
+              ...(isDesktop ? { transform: "scale(0.5)", transformOrigin: "top left" } : {}),
               clipPath: "inset(0px round 5px)",
               WebkitClipPath: "inset(0px round 5px)",
-              imageRendering: "auto",
             }}
             onError={(e) => {
               console.warn('Video error:', e)

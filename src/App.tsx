@@ -31,6 +31,8 @@ const App = () => {
             <div className="pointer-events-auto relative p-0 m-0 -top-4 sm:-top-8 lg:-top-20">
               <img
                 src={logo}
+                width={320}
+                height={320}
                 className="h-auto w-[200px] object-contain sm:w-[260px] lg:w-[320px]"
                 alt="Kronomods"
               />

@@ -31,54 +31,6 @@ export const ImageAutoSlider: React.FC<ImageAutoSliderProps> = ({
 
   return (
     <>
-      <style>{`
-        html, body {
-          margin: 0;
-          padding: 0;
-          overflow-x: hidden;
-          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-
-        @keyframes scroll-right {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-
-        .infinite-scroll {
-          animation: scroll-right 20s linear infinite;
-        }
-
-        .scroll-container {
-          mask: linear-gradient(
-            90deg,
-            transparent 0%,
-            black 10%,
-            black 90%,
-            transparent 100%
-          );
-          -webkit-mask: linear-gradient(
-            90deg,
-            transparent 0%,
-            black 10%,
-            black 90%,
-            transparent 100%
-          );
-        }
-
-        .image-item {
-          transition: transform 0.3s ease, filter 0.3s ease;
-        }
-
-        .image-item:hover {
-          transform: scale(1.05);
-          filter: brightness(1.1);
-        }
-      `}</style>
-
       <div 
         className={`w-full min-h-screen relative overflow-hidden flex items-center justify-center ${className}`}
         style={{ backgroundColor: '#5F5A56' }}
@@ -103,6 +55,8 @@ export const ImageAutoSlider: React.FC<ImageAutoSliderProps> = ({
                   <img
                     src={image}
                     alt={`Gallery image ${(index % images.length) + 1}`}
+                    width={320}
+                    height={320}
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />

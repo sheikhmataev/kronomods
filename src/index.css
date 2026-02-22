@@ -23,7 +23,7 @@
 
 @layer components {
   .glass-card {
-    @apply rounded-3xl bg-onyx/70 backdrop-blur-xl border border-white/5 shadow-card-glow;
+    @apply rounded-3xl bg-onyx/70 border border-white/5 shadow-card-glow;
     transform-style: preserve-3d;
     backface-visibility: hidden;
     perspective: 1000px;
@@ -43,12 +43,28 @@
   will-change: transform;
 }
 
-/* Prevent text glitches during animations - only apply font smoothing */
-h1, h2, h3, h4, h5, h6,
-p, span, div {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+/* Image auto-slider keyframes + classes (moved from inline <style>) */
+@keyframes scroll-right {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.infinite-scroll {
+  animation: scroll-right 20s linear infinite;
+}
+
+.scroll-container {
+  mask: linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask: linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+
+.image-item {
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.image-item:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
 }
 
 /* Enhanced mobile scrolling for contact section */

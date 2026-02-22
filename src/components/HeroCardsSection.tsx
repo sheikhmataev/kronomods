@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -154,34 +154,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   const scrollBackCleanupRef = useRef<(() => void) | null>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const videoPlayAttemptedRef = useRef(false)
-  const videoPreloadRef = useRef<HTMLVideoElement | null>(null)
-
-  // Preload + decode video immediately on mount so it's fully buffered
-  // before the user scrolls to the MacBook section.
-  useEffect(() => {
-    const v = document.createElement('video')
-    v.src = watchVideo
-    v.muted = true
-    v.playsInline = true
-    v.preload = 'auto'
-    v.setAttribute('playsinline', '')
-    v.load()
-    videoPreloadRef.current = v
-
-    const link = document.createElement('link')
-    link.rel = 'preload'
-    link.as = 'fetch'
-    link.href = watchVideo
-    link.crossOrigin = 'anonymous'
-    document.head.appendChild(link)
-
-    return () => {
-      v.src = ''
-      v.load()
-      videoPreloadRef.current = null
-      if (link.parentNode) link.parentNode.removeChild(link)
-    }
-  }, [])
+  // The DOM <video preload="auto"> in macbook-pro.tsx handles buffering.
 
   // Setup user interaction tracking on mount
   useGSAP(() => {
@@ -217,7 +190,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           if (!card) return
           card.style.opacity = '1'
           card.style.transform = 'none'
-          card.style.willChange = 'auto'
         })
         if (heading) {
           heading.style.opacity = '0'
@@ -226,12 +198,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           const isTablet = viewportWidth >= 640 && viewportWidth < 1024
           const headingY = isMobile ? 80 : isTablet ? 120 : 160
           heading.style.transform = `translate3d(0, ${headingY}px, 0)`
-          heading.style.willChange = 'auto'
         }
         if (macbook) {
           macbook.style.opacity = '1'
           macbook.style.transform = 'none'
-          macbook.style.willChange = 'auto'
           const video = macbook.querySelector('video') as HTMLVideoElement
           if (video) {
             video.style.opacity = '1'
@@ -266,34 +236,23 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       const getCardByRole = (role: CardRole) =>
         cardsRef.current.find((card) => card?.dataset.role === role) ?? null
 
-      const primeLayersForSafari = () => {
+      const primeLayers = () => {
         const cardTargets = cardsRef.current.filter(Boolean)
-        // Only use preserve-3d on desktop — on mobile it forces expensive
-        // 3D compositing layers that cause jitter and frame drops.
         const isDesktop = window.innerWidth >= 1024
         if (cardTargets.length) {
           gsap.set(cardTargets, {
-            willChange: 'transform, opacity',
             zIndex: (index) => 30 - index,
             force3D: true,
             ...(isDesktop ? { transformStyle: 'preserve-3d' } : {}),
           })
         }
-        if (heading) {
-          gsap.set(heading, { willChange: 'transform, opacity', zIndex: 40, force3D: true })
-        }
-        if (macbook) {
-          gsap.set(macbook, { willChange: 'transform, opacity, filter', zIndex: 35, force3D: true })
-        }
-        if (imageSlider) {
-          gsap.set(imageSlider, { willChange: 'transform, opacity', zIndex: 45, force3D: true })
-        }
-        if (contact) {
-          gsap.set(contact, { willChange: 'transform, opacity', zIndex: 50, force3D: true })
-        }
+        if (heading) gsap.set(heading, { zIndex: 40, force3D: true })
+        if (macbook) gsap.set(macbook, { zIndex: 35, force3D: true })
+        if (imageSlider) gsap.set(imageSlider, { zIndex: 45, force3D: true })
+        if (contact) gsap.set(contact, { zIndex: 50, force3D: true })
       }
 
-      primeLayersForSafari()
+      primeLayers()
 
       mm.add('(min-width: 1024px)', () => {
         killTimeline()
@@ -342,7 +301,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           filter: 'blur(0px)',
           force3D: true,
           transformStyle: 'preserve-3d',
-          willChange: 'transform, opacity',
         })
 
         gsap.set(leftCard, {
@@ -357,7 +315,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           filter: 'blur(0px)',
           force3D: true,
           transformStyle: 'preserve-3d',
-          willChange: 'transform, opacity',
         })
 
         gsap.set(rightCard, {
@@ -372,14 +329,12 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           filter: 'blur(0px)',
           force3D: true,
           transformStyle: 'preserve-3d',
-          willChange: 'transform, opacity',
         })
 
         gsap.set(heading, {
           y: 0,
           opacity: 1,
           force3D: true,
-          willChange: 'transform, opacity',
         })
 
         if (background) {
@@ -397,7 +352,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             filter: 'blur(8px)',
             force3D: true,
             transformStyle: 'preserve-3d',
-            willChange: 'transform, opacity, filter',
           })
           const video = macbook.querySelector('video') as HTMLVideoElement
           if (video) {
@@ -406,12 +360,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         }
 
         // ── AUTO-PLAY INTRO ──────────────────────────────────────────────────
-        // immediateRender: false prevents .from() from snapping the elements to
-        // their off-screen "from" state at creation time. Without this, GSAP
-        // immediately applies xPercent:±120 / opacity:0 on creation, which the
-        // scroll timeline then captures as its "from" snapshot — keeping the
-        // side cards invisible even at scroll 0.
-        const intro = gsap.timeline({ defaults: { ease: 'power2.out', duration: 0.85 } })
+        // Paused on creation — only plays once the page is fully loaded
+        // (fonts, images, layout stable) to avoid a glitchy first frame.
+        // immediateRender: false prevents .from() from snapping elements to
+        // their off-screen state before the animation actually starts.
+        const intro = gsap.timeline({ defaults: { ease: 'power2.out', duration: 0.85 }, paused: true })
         intro.from(centerCard, { scale: getResponsiveScale(1.1, 1.12, 1.15), immediateRender: false }, 0)
         intro.from(
           leftCard,
@@ -423,6 +376,15 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           { xPercent: 120, scale: 0.8, opacity: 0, rotationY: 25, rotationX: 5, z: -50, immediateRender: false },
           0.05,
         )
+
+        const playWhenReady = () => {
+          requestAnimationFrame(() => requestAnimationFrame(() => intro.play()))
+        }
+        if (document.readyState === 'complete') {
+          playWhenReady()
+        } else {
+          window.addEventListener('load', playWhenReady, { once: true })
+        }
 
         // ── SCROLL-DRIVEN TIMELINE ───────────────────────────────────────────
         // Starts from the settled 3-card state; first scroll exits the cards.
@@ -521,7 +483,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 }
               },
               [],
-              1.95,
+              0.8,
             )
           }
         }
@@ -801,7 +763,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           scale: 1.0,
           opacity: 1,
           force3D: true,
-          willChange: 'transform, opacity',
         })
 
         gsap.set(leftCard, {
@@ -811,7 +772,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           scale: 0.88,
           opacity: 1,
           force3D: true,
-          willChange: 'transform, opacity',
         })
 
         gsap.set(rightCard, {
@@ -821,29 +781,35 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           scale: 0.88,
           opacity: 1,
           force3D: true,
-          willChange: 'transform, opacity',
         })
 
-        gsap.set(heading, { opacity: 1, y: 0, force3D: true, willChange: 'transform, opacity' })
+        gsap.set(heading, { opacity: 1, y: 0, force3D: true })
         gsap.set(container, { transformOrigin: 'center center', x: 0, y: 0, scale: 1, force3D: true })
         gsap.set(macbook, {
           opacity: 0,
           scale: 0.9,
           y: 80,
           force3D: true,
-          willChange: 'transform, opacity',
         })
 
         const video = macbook.querySelector('video') as HTMLVideoElement
         if (video) gsap.set(video, { opacity: 0, scale: 1.04, force3D: true })
 
         // ── AUTO-PLAY INTRO ──────────────────────────────────────────────────
-        // immediateRender: false prevents GSAP from snapping cards to their
-        // off-screen "from" state at tween creation — same reasoning as desktop.
-        const intro = gsap.timeline({ defaults: { ease: 'power2.out', duration: 0.75 } })
+        // Paused on creation — waits for full page load before playing.
+        const intro = gsap.timeline({ defaults: { ease: 'power2.out', duration: 0.75 }, paused: true })
         intro.from(centerCard, { scale: 1.1, immediateRender: false }, 0)
         intro.from(leftCard, { xPercent: -140, scale: 0.82, opacity: 0, immediateRender: false }, 0.05)
         intro.from(rightCard, { xPercent: 140, scale: 0.82, opacity: 0, immediateRender: false }, 0.05)
+
+        const playWhenReady = () => {
+          requestAnimationFrame(() => requestAnimationFrame(() => intro.play()))
+        }
+        if (document.readyState === 'complete') {
+          playWhenReady()
+        } else {
+          window.addEventListener('load', playWhenReady, { once: true })
+        }
 
         // ── SCROLL-DRIVEN TIMELINE ───────────────────────────────────────────
         const timeline = gsap.timeline({
@@ -918,7 +884,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 }
               },
             },
-            0.7,
+            0.4,
           )
         }
 
@@ -1170,8 +1136,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         className="pointer-events-none absolute inset-0 z-0"
         aria-hidden="true"
         style={{
-          backgroundColor: '#05060A', // Initial night color
-          transition: 'background-color 0.3s ease', // Fallback for reduced motion
+          backgroundColor: '#05060A',
         }}
       />
       {/* Background texture - removed parallax to prevent conflicts */}
@@ -1187,15 +1152,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           {cards.map((card, index) => {
             // Enhanced CSS classes with 3D transform hints
             const baseClasses =
-              'glass-card will-change-transform will-change-opacity flex h-[150px] min-[400px]:h-[170px] sm:h-[320px] md:h-[380px] lg:h-[420px] w-full overflow-hidden'
+              'glass-card flex h-[150px] min-[400px]:h-[170px] sm:h-[320px] md:h-[380px] lg:h-[420px] w-full overflow-hidden'
             
-            // Preserve 3D transforms for enhanced depth
-            const transformStyle = {
-              transformStyle: 'preserve-3d' as const,
-              backfaceVisibility: 'hidden' as const,
-              perspective: 1000,
-            }
-
             const roleClasses: Record<CardRole, string> = {
               // Mobile: explicitly place in columns 1/2/3
               // Desktop: keep your existing LG placement
@@ -1222,14 +1180,15 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                     ? {
                         boxShadow:
                           '0 42px 120px rgba(206, 168, 116, 0.32), 0 18px 40px rgba(255, 214, 170, 0.24)',
-                        ...transformStyle,
                       }
-                    : transformStyle
+                    : undefined
                 }
               >
                 <img
                   src={card.image}
                   alt={card.title}
+                  width={420}
+                  height={420}
                   className="w-full h-full object-cover"
                 />
               </div>

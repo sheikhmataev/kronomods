@@ -92,7 +92,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                     autoComplete="given-name"
                     type="text"
                     required
-                    className="mobile-touch-input w-full px-3 py-3 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm transition-colors"
+                    className="mobile-touch-input w-full px-3 py-3 text-porcelain bg-onyx/80 outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm transition-colors"
                     placeholder="First"
                   />
                 </div>
@@ -106,7 +106,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                     autoComplete="family-name"
                     type="text"
                     required
-                    className="mobile-touch-input w-full px-3 py-3 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm transition-colors"
+                    className="mobile-touch-input w-full px-3 py-3 text-porcelain bg-onyx/80 outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm transition-colors"
                     placeholder="Last"
                   />
                 </div>
@@ -120,7 +120,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                   autoComplete="email"
                   type="email"
                   required
-                  className="mobile-touch-input w-full px-3 py-3 text-porcelain bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm transition-colors"
+                  className="mobile-touch-input w-full px-3 py-3 text-porcelain bg-onyx/80 outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm transition-colors"
                   placeholder="name@example.com"
                 />
               </div>
@@ -137,7 +137,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                     autoComplete="tel"
                     type="tel"
                     placeholder="912 34 567"
-                    className="mobile-touch-input w-full pl-12 pr-3 py-3 bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm transition-colors"
+                    className="mobile-touch-input w-full pl-12 pr-3 py-3 bg-onyx/80 outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm transition-colors"
                   />
                 </div>
               </div>
@@ -148,7 +148,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                   id="message"
                   name="message"
                   required
-                  className="mobile-touch-input w-full min-h-[160px] px-3 py-3 resize-y bg-onyx/20 backdrop-blur-sm outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm transition-colors"
+                  className="mobile-touch-input w-full min-h-[160px] px-3 py-3 resize-y bg-onyx/80 outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm transition-colors"
                   placeholder="How can we help?"
                 ></textarea>
               </div>
