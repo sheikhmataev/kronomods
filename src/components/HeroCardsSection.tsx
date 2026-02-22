@@ -297,14 +297,20 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           return desktop
         }
 
+        // ── FINAL RESTING STATES ─────────────────────────────────────────────
+        // Cards are set to their FINAL visible positions. The auto-play intro
+        // uses .from() to animate FROM off-screen into these positions.
+        // This guarantees cards are always visible even if the intro is killed.
+        const cardY = getResponsiveY(180, 230, 280)
+
         gsap.set(centerCard, {
           transformOrigin: 'center center',
-          y: getResponsiveY(20, 160, 200),
-          scale: getResponsiveScale(1.2, 1.3, 1.45),
+          y: cardY,
+          scale: 1.0,
           opacity: 1,
           rotationY: 0,
           rotationX: 0,
-          z: 10,
+          z: 20,
           filter: 'blur(0px)',
           force3D: true,
           transformStyle: 'preserve-3d',
@@ -313,13 +319,13 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
 
         gsap.set(leftCard, {
           transformOrigin: 'center center',
-          xPercent: -120,
-          y: getResponsiveY(20, 160, 200),
-          scale: getResponsiveScale(0.7, 0.75, 0.8),
-          opacity: 0,
-          rotationY: -25,
-          rotationX: 5,
-          z: -50,
+          xPercent: 0,
+          y: cardY,
+          scale: 0.88,
+          opacity: 1,
+          rotationY: -15,
+          rotationX: 0,
+          z: -40,
           filter: 'blur(0px)',
           force3D: true,
           transformStyle: 'preserve-3d',
@@ -328,13 +334,13 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
 
         gsap.set(rightCard, {
           transformOrigin: 'center center',
-          xPercent: 120,
-          y: getResponsiveY(20, 160, 200),
-          scale: getResponsiveScale(0.7, 0.75, 0.8),
-          opacity: 0,
-          rotationY: 25,
-          rotationX: 5,
-          z: -50,
+          xPercent: 0,
+          y: cardY,
+          scale: 0.88,
+          opacity: 1,
+          rotationY: 15,
+          rotationX: 0,
+          z: -40,
           filter: 'blur(0px)',
           force3D: true,
           transformStyle: 'preserve-3d',
@@ -349,10 +355,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         })
 
         if (background) {
-          gsap.set(background, {
-            backgroundColor: '#05060A',
-            force3D: true,
-          })
+          gsap.set(background, { backgroundColor: '#05060A', force3D: true })
         }
 
         if (macbook) {
@@ -368,147 +371,82 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             transformStyle: 'preserve-3d',
             willChange: 'transform, opacity, filter',
           })
-
           const video = macbook.querySelector('video') as HTMLVideoElement
           if (video) {
-            gsap.set(video, {
-              opacity: 0,
-              scale: 1.05,
-              force3D: true,
-            })
+            gsap.set(video, { opacity: 0, scale: 1.05, force3D: true })
           }
         }
 
+        // ── AUTO-PLAY INTRO ──────────────────────────────────────────────────
+        // immediateRender: false prevents .from() from snapping the elements to
+        // their off-screen "from" state at creation time. Without this, GSAP
+        // immediately applies xPercent:±120 / opacity:0 on creation, which the
+        // scroll timeline then captures as its "from" snapshot — keeping the
+        // side cards invisible even at scroll 0.
+        const intro = gsap.timeline({ defaults: { ease: 'power2.out', duration: 0.85 } })
+        intro.from(centerCard, { scale: getResponsiveScale(1.1, 1.12, 1.15), immediateRender: false }, 0)
+        intro.from(
+          leftCard,
+          { xPercent: -120, scale: 0.8, opacity: 0, rotationY: -25, rotationX: 5, z: -50, immediateRender: false },
+          0.05,
+        )
+        intro.from(
+          rightCard,
+          { xPercent: 120, scale: 0.8, opacity: 0, rotationY: 25, rotationX: 5, z: -50, immediateRender: false },
+          0.05,
+        )
+
+        // ── SCROLL-DRIVEN TIMELINE ───────────────────────────────────────────
+        // Starts from the settled 3-card state; first scroll exits the cards.
+        // All positions are ~0.85 s earlier than the previous version because
+        // the card-entry phase (0 – 0.85) is now handled by the auto-play intro.
         const timeline = gsap.timeline({
-          defaults: { ease: 'power3.out' },
+          defaults: { ease: 'power2.out' },
           scrollTrigger: {
             trigger: section,
             start: 'top top',
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            // 1.5 gives a buttery trailing feel; 1 is too twitchy on desktop.
-            scrub: 1.5,
-            // Snap the animation to its final state after a fast flick —
-            // prevents the timeline from hanging mid-tween on fast scrolls.
+            scrub: 1.8,
             fastScrollEnd: true,
             invalidateOnRefresh: true,
             refreshPriority: -1,
           },
         })
 
-        timeline
-          .to(
-            centerCard,
-            {
-              y: getResponsiveY(180, 230, 280),
-              scale: getResponsiveScale(1.1, 1.15, 1.08),
-              rotationY: 0,
-              rotationX: 0,
-              z: 20,
-              filter: 'blur(0px)',
-              ease: 'power3.out',
-            },
-            0,
-          )
-          .to(
-            centerCard,
-            {
-              y: getResponsiveY(180, 230, 280),
-              scale: getResponsiveScale(1.0, 1.0, 1.0),
-              ease: 'power2.inOut',
-            },
-            0.4,
-          )
-
-        timeline.to(
-          leftCard,
-          {
-            xPercent: 0,
-            y: getResponsiveY(180, 230, 280),
-            scale: getResponsiveScale(0.9, 0.95, 1.02),
-            opacity: 1,
-            rotationY: -10,
-            rotationX: 0,
-            z: -20,
-            filter: 'blur(0px)',
-            ease: 'power3.out',
-            duration: 0.5,
-          },
-          0,
-        )
-
-        timeline.to(
-          rightCard,
-          {
-            xPercent: 0,
-            y: getResponsiveY(180, 230, 280),
-            scale: getResponsiveScale(0.9, 0.95, 1.02),
-            opacity: 1,
-            rotationY: 10,
-            rotationX: 0,
-            z: -20,
-            filter: 'blur(0px)',
-            ease: 'power3.out',
-            duration: 0.5,
-          },
-          0,
-        )
-
-        timeline.to(
-          [leftCard, rightCard],
-          {
-            scale: 0.88,
-            rotationY: (_index, target) => (target === leftCard ? -15 : 15),
-            z: -40,
-            filter: 'blur(0px)',
-            ease: 'power2.inOut',
-            duration: 0.2,
-          },
-          0.5,
-        )
-
-        timeline.to(
-          heading,
-          {
-            y: getResponsiveY(180, 230, 280),
-            opacity: 0,
-            ease: 'power2.in',
-          },
-          0.15,
-        )
-
         const fadeTargets = [centerCard, leftCard, rightCard]
 
-        // Exit: cards move UP and fade simultaneously.
-        // When scrubbing backward (scroll up), the reverse plays — cards
-        // descend back into position from above, which feels natural.
-        timeline.to(
+        // Phase 1 — cards + heading exit the instant the user scrolls.
+        // fromTo() with explicit visible "from" values guarantees the cards are
+        // rendered as fully visible at scroll 0. Cards move upward and fade
+        // simultaneously as soon as scrolling begins.
+        timeline.fromTo(
           fadeTargets,
-          {
-            y: getResponsiveY(-60, -80, -100),
-            autoAlpha: 0,
-            ease: 'power2.inOut',
-            duration: 0.55,
-          },
-          0.85,
+          { y: cardY, autoAlpha: 1 },
+          { y: getResponsiveY(-60, -80, -100), autoAlpha: 0, ease: 'power2.inOut', duration: 0.8 },
+          0,
+        )
+
+        timeline.fromTo(
+          heading,
+          { y: 0, opacity: 1 },
+          { y: getResponsiveY(180, 230, 280), opacity: 0, ease: 'power2.inOut', duration: 0.5 },
+          0,
         )
 
         if (background) {
           timeline.to(
             background,
-            {
-              backgroundColor: '#0B0D12',
-              ease: 'power2.inOut',
-              duration: 0.65,
-            },
-            0.3,
+            { backgroundColor: '#0B0D12', ease: 'power2.inOut', duration: 0.9 },
+            0,
           )
         }
 
         if (macbook) {
           const video = macbook.querySelector('video') as HTMLVideoElement
 
+          // MacBook enters overlapping with the card exit for a crossfade feel
           timeline.to(
             macbook,
             {
@@ -519,10 +457,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               rotationX: 0,
               z: 0,
               filter: 'blur(0px)',
-              ease: 'power3.out',
-              duration: 1.2,
+              ease: 'power2.out',
+              duration: 1.4,
             },
-            1.6,
+            0.6,
           )
 
           if (video) {
@@ -530,60 +468,32 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               () => {
                 if (video && !videoPlayAttemptedRef.current) {
                   videoPlayAttemptedRef.current = true
-                  
-                  // Use enhanced video play helper for Safari compatibility
+
                   if (isSafari() && !hasUserInteracted) {
-                    // For Safari without user interaction, add click handler
                     const handleClick = () => {
                       attemptVideoPlay(video).then((success) => {
                         if (success) {
-                          gsap.to(video, {
-                            opacity: 1,
-                            scale: 1,
-                            ease: 'power2.out',
-                            duration: 1.5,
-                          })
+                          gsap.to(video, { opacity: 1, scale: 1, ease: 'power2.out', duration: 1.5 })
                         }
                       })
-                      // Remove listener after successful play
                       video.removeEventListener('click', handleClick)
                     }
-                    
                     video.addEventListener('click', handleClick)
                     video.style.cursor = 'pointer'
-                    
-                    // Show video with reduced opacity as cue
-                    gsap.to(video, {
-                      opacity: 0.5,
-                      scale: 1,
-                      ease: 'power2.out',
-                      duration: 1.5,
-                    })
+                    gsap.to(video, { opacity: 0.5, scale: 1, ease: 'power2.out', duration: 1.5 })
                   } else {
-                    // Normal autoplay attempt
                     attemptVideoPlay(video).then((success) => {
                       if (success) {
-                        gsap.to(video, {
-                          opacity: 1,
-                          scale: 1,
-                          ease: 'power2.out',
-                          duration: 1.5,
-                        })
+                        gsap.to(video, { opacity: 1, scale: 1, ease: 'power2.out', duration: 1.5 })
                       } else {
-                        // Fallback: show video even if play failed
-                        gsap.to(video, {
-                          opacity: 0.7,
-                          scale: 1,
-                          ease: 'power2.out',
-                          duration: 1.5,
-                        })
+                        gsap.to(video, { opacity: 0.7, scale: 1, ease: 'power2.out', duration: 1.5 })
                       }
                     })
                   }
                 }
               },
               [],
-              2.8,
+              1.95,
             )
           }
         }
@@ -621,8 +531,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           const macbookXInContainer = macbookRect.left - containerRect.left
           const macbookYInContainer = macbookRect.top - containerRect.top
 
-          const screenFocusXInContainer = macbookXInContainer + macbookRect.width * screenFocusXInMacbook
-          const screenFocusYInContainer = macbookYInContainer + macbookRect.height * screenFocusYInMacbook
+          const screenFocusXInContainer =
+            macbookXInContainer + macbookRect.width * screenFocusXInMacbook
+          const screenFocusYInContainer =
+            macbookYInContainer + macbookRect.height * screenFocusYInMacbook
 
           const containerCenterX = containerRect.width / 2
           const containerCenterY = containerRect.height / 2
@@ -648,7 +560,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               ease: 'power1.inOut',
               duration: 1.4,
             },
-            2.5,
+            1.65,
           )
 
           const scale6 = isMobile ? (isUltraWide ? 4 : 5) : isTablet ? 6 : 6
@@ -661,7 +573,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               ease: 'power1.inOut',
               duration: 1.2,
             },
-            3.8,
+            2.95,
           )
 
           const scale10 = isMobile ? (isUltraWide ? 6 : 8) : isTablet ? 10 : 10
@@ -674,116 +586,49 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               ease: 'power1.inOut',
               duration: 1.0,
             },
-            5.1,
+            4.25,
           )
 
           timeline.to(
             background,
-            {
-              backgroundColor: '#5F5A56',
-              ease: 'power1.inOut',
-              duration: 2.0,
-            },
-            2.5,
+            { backgroundColor: '#5F5A56', ease: 'power1.inOut', duration: 2.0 },
+            1.65,
           )
 
-          timeline.to(
-            macbook,
-            {
-              opacity: 0.3,
-              ease: 'power1.inOut',
-              duration: 1.2,
-            },
-            4.3,
-          )
-
-          timeline.to(
-            macbook,
-            {
-              opacity: 0,
-              ease: 'power1.inOut',
-              duration: 1.0,
-            },
-            5.3,
-          )
-
-          timeline.to(
-            video,
-            {
-              scale: 1.2,
-              ease: 'power1.inOut',
-              duration: 2.0,
-            },
-            2.5,
-          )
+          timeline.to(macbook, { opacity: 0.3, ease: 'power1.inOut', duration: 1.2 }, 3.45)
+          timeline.to(macbook, { opacity: 0, ease: 'power1.inOut', duration: 1.0 }, 4.45)
+          timeline.to(video, { scale: 1.2, ease: 'power1.inOut', duration: 2.0 }, 1.65)
 
           timeline.to(
             container,
-            {
-              scale: 1,
-              x: 0,
-              y: 0,
-              ease: 'power2.out',
-              duration: 1.5,
-            },
-            6.1,
+            { scale: 1, x: 0, y: 0, ease: 'power2.out', duration: 1.5 },
+            5.25,
           )
-
-          timeline.to(
-            video,
-            {
-              scale: 1,
-              ease: 'power2.out',
-              duration: 1.5,
-            },
-            6.1,
-          )
+          timeline.to(video, { scale: 1, ease: 'power2.out', duration: 1.5 }, 5.25)
         }
 
         const imageSliderTarget = imageSliderRef.current
         if (imageSliderTarget) {
-          gsap.set(imageSliderTarget, {
-            opacity: 0,
-            y: 100,
-            scale: 0.95,
-            force3D: true,
-          })
+          gsap.set(imageSliderTarget, { opacity: 0, y: 100, scale: 0.95, force3D: true })
 
           timeline.to(
             imageSliderTarget,
-            {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              ease: 'power2.out',
-              duration: 1.5,
-            },
-            7.5,
+            { opacity: 1, y: 0, scale: 1, ease: 'power2.out', duration: 1.5 },
+            6.65,
           )
         }
 
         const contactTarget = contactRef.current
         if (contactTarget) {
-          gsap.set(contactTarget, {
-            // autoAlpha toggles both opacity + visibility.
-            // visibility:hidden prevents the hidden absolute layer from capturing clicks.
-            autoAlpha: 0,
-            y: 50,
-            force3D: true,
-          })
+          gsap.set(contactTarget, { autoAlpha: 0, y: 50, force3D: true })
 
-          const contactStart = imageSliderTarget ? 10.2 : 8.0
+          const contactStart = imageSliderTarget ? 9.35 : 8.0
 
           if (imageSliderTarget) {
             timeline.to(
               imageSliderTarget,
-              {
-                opacity: 0,
-                y: -50,
-                ease: 'power2.in',
-                duration: 1.0,
-              },
-              10.0,
+              { opacity: 0, y: -50, ease: 'power2.in', duration: 1.0 },
+              9.15,
             )
           }
 
@@ -813,9 +658,15 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 const header = document.querySelector('header')
                 if (header) (header as HTMLElement).style.display = 'none'
 
-                // "Scroll-back" feature: when user is at the top of the
-                // contact overlay and scrolls/swipes up again, hand control
-                // back to the GSAP timeline so they can return to earlier sections.
+                // ⚠️ CRITICAL SCROLL-BACK FEATURE — DO NOT REMOVE ⚠️
+                // This entire block (dismissContact, touch/wheel listeners, and
+                // the cleanup function) allows the user to scroll back UP from
+                // the contact section to previous sections. Without it the
+                // contact overlay is a dead-end with no way to return.
+                // It works by: detecting an upward swipe/scroll while at
+                // scrollTop === 0, then dismissing the overlay, re-enabling
+                // normalizeScroll + body overflow, and jumping the GSAP scrub
+                // timeline back by half a viewport so it starts reversing.
                 if (scrollContainer) {
                   const dismissContact = () => {
                     contactTarget.style.pointerEvents = 'none'
@@ -825,10 +676,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                     ScrollTrigger.normalizeScroll(true)
                     document.body.style.overflow = ''
                     if (header) (header as HTMLElement).style.display = ''
-                    // Jump back half a viewport so GSAP's scrub timeline
-                    // starts reversing. We use the ScrollTrigger instance
-                    // attached to our own timeline (accessible via timelineRef)
-                    // so GSAP recalculates immediately on the same frame.
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const st = (timelineRef.current as any)?.scrollTrigger
                     const currentPos: number = st ? st.scroll() : window.scrollY
@@ -848,10 +695,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                   }
 
                   const onTouchMove = (e: TouchEvent) => {
-                    // scrollTop can be a sub-pixel float on some browsers
                     if (scrollContainer.scrollTop < 1) {
                       const deltaY = e.touches[0].clientY - touchStartY
-                      // Finger moves DOWN (positive deltaY) = swiping up = go back
                       if (deltaY > 20) {
                         dismissContact()
                       }
@@ -876,9 +721,9 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                   }
                   scrollBackCleanupRef.current = cleanup
                 }
+                // ⚠️ END SCROLL-BACK FEATURE — DO NOT REMOVE ANYTHING ABOVE ⚠️
               },
               onReverseComplete: () => {
-                // Clean up scroll-back listeners if still attached
                 if (scrollBackCleanupRef.current) scrollBackCleanupRef.current()
                 contactTarget.style.pointerEvents = 'none'
                 const scrollContainer = contactTarget.querySelector('div')
@@ -919,13 +764,13 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
 
         if (background) gsap.set(background, { backgroundColor: '#05060A', force3D: true })
 
-        // ✅ Initial state: ONLY center visible & big (no scroll required)
-        // Mobile: pure 2D transforms only — rotationX/Y/z and preserve-3d
-        // force full 3D compositing layers which cause GPU jitter on phones.
+        // ── FINAL RESTING STATES ─────────────────────────────────────────────
+        // Cards set to FINAL visible positions. Auto-play .from() animates
+        // FROM off-screen. Pure 2D transforms on mobile to avoid GPU jitter.
         gsap.set(centerCard, {
           transformOrigin: 'center center',
           y: 0,
-          scale: 1.25,
+          scale: 1.0,
           opacity: 1,
           force3D: true,
           willChange: 'transform, opacity',
@@ -933,45 +778,30 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
 
         gsap.set(leftCard, {
           transformOrigin: 'center center',
-          xPercent: -140,
+          xPercent: 0,
           y: 0,
-          scale: 0.82,
-          opacity: 0,
+          scale: 0.88,
+          opacity: 1,
           force3D: true,
           willChange: 'transform, opacity',
         })
 
         gsap.set(rightCard, {
           transformOrigin: 'center center',
-          xPercent: 140,
+          xPercent: 0,
           y: 0,
-          scale: 0.82,
-          opacity: 0,
-          force3D: true,
-          willChange: 'transform, opacity',
-        })
-
-        gsap.set(heading, {
+          scale: 0.88,
           opacity: 1,
-          y: 0,
           force3D: true,
           willChange: 'transform, opacity',
         })
 
-        gsap.set(container, {
-          transformOrigin: 'center center',
-          x: 0,
-          y: 0,
-          scale: 1,
-          force3D: true,
-        })
-
+        gsap.set(heading, { opacity: 1, y: 0, force3D: true, willChange: 'transform, opacity' })
+        gsap.set(container, { transformOrigin: 'center center', x: 0, y: 0, scale: 1, force3D: true })
         gsap.set(macbook, {
           opacity: 0,
           scale: 0.9,
           y: 80,
-          // No blur on mobile — filter animations are extremely expensive
-          // on mobile GPUs and are the primary cause of frame drops.
           force3D: true,
           willChange: 'transform, opacity',
         })
@@ -979,108 +809,61 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         const video = macbook.querySelector('video') as HTMLVideoElement
         if (video) gsap.set(video, { opacity: 0, scale: 1.04, force3D: true })
 
+        // ── AUTO-PLAY INTRO ──────────────────────────────────────────────────
+        // immediateRender: false prevents GSAP from snapping cards to their
+        // off-screen "from" state at tween creation — same reasoning as desktop.
+        const intro = gsap.timeline({ defaults: { ease: 'power2.out', duration: 0.75 } })
+        intro.from(centerCard, { scale: 1.1, immediateRender: false }, 0)
+        intro.from(leftCard, { xPercent: -140, scale: 0.82, opacity: 0, immediateRender: false }, 0.05)
+        intro.from(rightCard, { xPercent: 140, scale: 0.82, opacity: 0, immediateRender: false }, 0.05)
+
+        // ── SCROLL-DRIVEN TIMELINE ───────────────────────────────────────────
         const timeline = gsap.timeline({
-          defaults: { ease: 'power3.out' },
+          defaults: { ease: 'power2.out' },
           scrollTrigger: {
             trigger: section,
             start: 'top top',
             end: 'bottom bottom',
             pin,
             anticipatePin: 1,
-            // 0.8 on mobile: tighter than desktop so touch scrolling feels
-            // responsive, but enough damping to kill jitter from scroll events.
-            scrub: 0.8,
-            // Snaps to final state after fast swipe — prevents mid-tween hangs.
+            scrub: 1.2,
             fastScrollEnd: true,
             invalidateOnRefresh: true,
             refreshPriority: -1,
           },
         })
 
-        // ✅ Phase 1 — pure 2D on mobile, no rotationX/Y/z
-        timeline
-          .to(
-            centerCard,
-            {
-              scale: 1.0,
-              y: 0,
-              duration: 0.55,
-              ease: 'power3.out',
-            },
-            0,
-          )
-          .to(
-            heading,
-            {
-              y: 90,
-              opacity: 0,
-              duration: 0.45,
-              ease: 'power2.in',
-            },
-            0.1,
-          )
-          .to(
-            leftCard,
-            {
-              xPercent: 0,
-              opacity: 1,
-              scale: 0.92,
-              duration: 0.55,
-              ease: 'power3.out',
-            },
-            0,
-          )
-          .to(
-            rightCard,
-            {
-              xPercent: 0,
-              opacity: 1,
-              scale: 0.92,
-              duration: 0.55,
-              ease: 'power3.out',
-            },
-            0,
-          )
-          .to(
-            [leftCard, rightCard],
-            {
-              scale: 0.88,
-              duration: 0.25,
-              ease: 'power2.inOut',
-            },
-            0.55,
-          )
-
-        // ✅ Phase 2: cards move UP and fade simultaneously.
-        // Reversing this (scroll up) makes cards descend back in from above.
         const fadeTargets = [centerCard, leftCard, rightCard]
-        timeline.to(
+
+        // Phase 1 — cards + heading exit the instant the user scrolls.
+        // fromTo() with explicit visible "from" ensures cards render as visible
+        // at scroll 0. Cards move upward and fade simultaneously immediately.
+        timeline.fromTo(
           fadeTargets,
-          { y: -80, autoAlpha: 0, duration: 0.45, ease: 'power2.inOut' },
-          0.9,
+          { y: 0, autoAlpha: 1 },
+          { y: -80, autoAlpha: 0, duration: 0.7, ease: 'power2.inOut' },
+          0,
+        )
+        timeline.fromTo(
+          heading,
+          { y: 0, opacity: 1 },
+          { y: 90, opacity: 0, duration: 0.5, ease: 'power2.inOut' },
+          0,
         )
 
-        // Background color transition
         timeline.to(
           background,
-          { backgroundColor: '#0B0D12', duration: 0.6, ease: 'power2.inOut' },
-          1.4,
+          { backgroundColor: '#0B0D12', duration: 0.8, ease: 'power2.inOut' },
+          0.3,
         )
 
-        // MacBook appearance — no blur animation on mobile
+        // MacBook enters overlapping with the card exit for a crossfade feel
         timeline.to(
           macbook,
-          {
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            duration: 0.9,
-            ease: 'power3.out',
-          },
-          1.8,
+          { opacity: 1, scale: 1, y: 0, duration: 1.1, ease: 'power2.out' },
+          0.7,
         )
 
-        // Video appearance with Safari handling
         if (video) {
           timeline.to(
             video,
@@ -1090,9 +873,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               duration: 1.2,
               ease: 'power2.out',
               onStart: () => {
-                // Enhanced video play for Safari compatibility
                 if (isSafari() && !hasUserInteracted) {
-                  // Add click handler for Safari without user interaction
                   const handleClick = () => {
                     attemptVideoPlay(video)
                     video.removeEventListener('click', handleClick)
@@ -1109,7 +890,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 }
               },
             },
-            2.4,
+            1.5,
           )
         }
 
@@ -1128,8 +909,10 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         const macbookXInContainer = macbookRect.left - containerRect.left
         const macbookYInContainer = macbookRect.top - containerRect.top
 
-        const screenFocusXInContainer = macbookXInContainer + macbookRect.width * screenFocusXInMacbook
-        const screenFocusYInContainer = macbookYInContainer + macbookRect.height * screenFocusYInMacbook
+        const screenFocusXInContainer =
+          macbookXInContainer + macbookRect.width * screenFocusXInMacbook
+        const screenFocusYInContainer =
+          macbookYInContainer + macbookRect.height * screenFocusYInMacbook
 
         const containerCenterX = containerRect.width / 2
         const containerCenterY = containerRect.height / 2
@@ -1150,7 +933,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             ease: 'power1.inOut',
             duration: 1.1,
           },
-          2.6,
+          1.7,
         )
 
         timeline.to(
@@ -1162,7 +945,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             ease: 'power1.inOut',
             duration: 1.1,
           },
-          3.8,
+          2.9,
         )
 
         timeline.to(
@@ -1174,75 +957,32 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             ease: 'power1.inOut',
             duration: 1.0,
           },
-          4.9,
+          4.0,
         )
 
         if (video) {
-          timeline.to(
-            video,
-            {
-              scale: 1.1,
-              ease: 'power1.inOut',
-              duration: 1.6,
-            },
-            2.6,
-          )
+          timeline.to(video, { scale: 1.1, ease: 'power1.inOut', duration: 1.6 }, 1.7)
         }
 
         if (background) {
           timeline.to(
             background,
-            {
-              backgroundColor: '#5F5A56',
-              ease: 'power1.inOut',
-              duration: 1.6,
-            },
-            2.6,
+            { backgroundColor: '#5F5A56', ease: 'power1.inOut', duration: 1.6 },
+            1.7,
           )
         }
 
-        timeline.to(
-          macbook,
-          {
-            opacity: 0.35,
-            duration: 1.0,
-            ease: 'power1.inOut',
-          },
-          4.2,
-        )
-
-        timeline.to(
-          macbook,
-          {
-            opacity: 0,
-            duration: 0.9,
-            ease: 'power1.inOut',
-          },
-          5.1,
-        )
+        timeline.to(macbook, { opacity: 0.35, duration: 1.0, ease: 'power1.inOut' }, 3.3)
+        timeline.to(macbook, { opacity: 0, duration: 0.9, ease: 'power1.inOut' }, 4.2)
 
         timeline.to(
           container,
-          {
-            scale: 1,
-            x: 0,
-            y: 0,
-            ease: 'power2.out',
-            duration: 1.2,
-          },
-          5.9,
+          { scale: 1, x: 0, y: 0, ease: 'power2.out', duration: 1.2 },
+          5.0,
         )
 
         if (video) {
-          timeline.to(
-            video,
-            {
-              scale: 1,
-              ease: 'power2.out',
-              duration: 1.0,
-            },
-            5.9,
-          )
+          timeline.to(video, { scale: 1, ease: 'power2.out', duration: 1.0 }, 5.0)
         }
 
         const imageSliderTarget = imageSliderRef.current
@@ -1251,33 +991,22 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
 
           timeline.to(
             imageSliderTarget,
-            {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              duration: 1.2,
-              ease: 'power2.out',
-            },
-            7.0,
+            { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'power2.out' },
+            6.1,
           )
         }
 
         const contactTarget = contactRef.current
         if (contactTarget) {
-  gsap.set(contactTarget, { autoAlpha: 0, y: 40, force3D: true })
+          gsap.set(contactTarget, { autoAlpha: 0, y: 40, force3D: true })
 
-          const contactStart = imageSliderTarget ? 9.2 : 7.8
+          const contactStart = imageSliderTarget ? 8.3 : 6.9
 
           if (imageSliderTarget) {
             timeline.to(
               imageSliderTarget,
-              {
-                opacity: 0,
-                y: -40,
-                ease: 'power2.in',
-                duration: 0.8,
-              },
-              9.0,
+              { opacity: 0, y: -40, ease: 'power2.in', duration: 0.8 },
+              8.1,
             )
           }
 
@@ -1307,9 +1036,15 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                 const header = document.querySelector('header')
                 if (header) (header as HTMLElement).style.display = 'none'
 
-                // "Scroll-back" feature: when user is at the top of the
-                // contact overlay and scrolls/swipes up again, hand control
-                // back to the GSAP timeline so they can return to earlier sections.
+                // ⚠️ CRITICAL SCROLL-BACK FEATURE — DO NOT REMOVE ⚠️
+                // This entire block (dismissContact, touch/wheel listeners, and
+                // the cleanup function) allows the user to scroll back UP from
+                // the contact section to previous sections. Without it the
+                // contact overlay is a dead-end with no way to return.
+                // It works by: detecting an upward swipe/scroll while at
+                // scrollTop === 0, then dismissing the overlay, re-enabling
+                // normalizeScroll + body overflow, and jumping the GSAP scrub
+                // timeline back by half a viewport so it starts reversing.
                 if (scrollContainer) {
                   const dismissContact = () => {
                     contactTarget.style.pointerEvents = 'none'
@@ -1319,10 +1054,6 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                     ScrollTrigger.normalizeScroll(true)
                     document.body.style.overflow = ''
                     if (header) (header as HTMLElement).style.display = ''
-                    // Jump back half a viewport so GSAP's scrub timeline
-                    // starts reversing. We use the ScrollTrigger instance
-                    // attached to our own timeline (accessible via timelineRef)
-                    // so GSAP recalculates immediately on the same frame.
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const st = (timelineRef.current as any)?.scrollTrigger
                     const currentPos: number = st ? st.scroll() : window.scrollY
@@ -1342,10 +1073,8 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                   }
 
                   const onTouchMove = (e: TouchEvent) => {
-                    // scrollTop can be a sub-pixel float on some browsers
                     if (scrollContainer.scrollTop < 1) {
                       const deltaY = e.touches[0].clientY - touchStartY
-                      // Finger moves DOWN (positive deltaY) = swiping up = go back
                       if (deltaY > 20) {
                         dismissContact()
                       }
@@ -1370,6 +1099,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                   }
                   scrollBackCleanupRef.current = cleanup
                 }
+                // ⚠️ END SCROLL-BACK FEATURE — DO NOT REMOVE ANYTHING ABOVE ⚠️
               },
               onReverseComplete: () => {
                 if (scrollBackCleanupRef.current) scrollBackCleanupRef.current()
@@ -1429,7 +1159,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           {cards.map((card, index) => {
             // Enhanced CSS classes with 3D transform hints
             const baseClasses =
-              'glass-card will-change-transform will-change-opacity flex h-[150px] min-[400px]:h-[170px] sm:h-[320px] md:h-[380px] lg:h-[420px] w-full overflow-hidden transition-transform duration-300'
+              'glass-card will-change-transform will-change-opacity flex h-[150px] min-[400px]:h-[170px] sm:h-[320px] md:h-[380px] lg:h-[420px] w-full overflow-hidden'
             
             // Preserve 3D transforms for enhanced depth
             const transformStyle = {
@@ -1441,9 +1171,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
             const roleClasses: Record<CardRole, string> = {
               // Mobile: explicitly place in columns 1/2/3
               // Desktop: keep your existing LG placement
-              left:   'col-span-1 col-start-1 row-start-1 lg:col-start-1 lg:col-end-2 lg:justify-self-end lg:opacity-0',
+              // Opacity is fully controlled by GSAP (gsap.set + auto-play intro),
+              // so no Tailwind opacity classes here — they would fight GSAP.
+              left:   'col-span-1 col-start-1 row-start-1 lg:col-start-1 lg:col-end-2 lg:justify-self-end',
               center: 'col-span-1 col-start-2 row-start-1 lg:col-start-2 lg:col-end-3 self-start z-10',
-              right:  'col-span-1 col-start-3 row-start-1 lg:col-start-3 lg:col-end-4 lg:justify-self-start lg:opacity-0',
+              right:  'col-span-1 col-start-3 row-start-1 lg:col-start-3 lg:col-end-4 lg:justify-self-start',
             }
 
             // Remove parallax from cards as it conflicts with ScrollTrigger animations
