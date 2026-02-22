@@ -149,6 +149,10 @@ export function MacbookPro({
       </svg>
       {videoSrc && (
         <div style={screenStyle}>
+          {/* Video renders at 2x the container size and is scaled down.
+              The browser allocates 2x the pixels for compositing, so when
+              GSAP zooms into the MacBook the extra resolution prevents
+              pixelation. The parent overflow:hidden clips it to fit. */}
           <video
             src={videoSrc}
             poster={videoPoster}
@@ -161,13 +165,16 @@ export function MacbookPro({
             x-webkit-airplay="deny"
             data-keepplaying
             style={{
-              width: "100%",
-              height: "100%",
+              width: "200%",
+              height: "200%",
               objectFit: "cover",
               display: "block",
               opacity: 0,
+              transform: "scale(0.5)",
+              transformOrigin: "top left",
               clipPath: "inset(0px round 5px)",
               WebkitClipPath: "inset(0px round 5px)",
+              imageRendering: "auto",
             }}
             onError={(e) => {
               console.warn('Video error:', e)

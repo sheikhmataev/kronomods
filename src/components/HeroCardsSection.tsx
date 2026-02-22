@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -154,6 +154,34 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   const scrollBackCleanupRef = useRef<(() => void) | null>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const videoPlayAttemptedRef = useRef(false)
+  const videoPreloadRef = useRef<HTMLVideoElement | null>(null)
+
+  // Preload + decode video immediately on mount so it's fully buffered
+  // before the user scrolls to the MacBook section.
+  useEffect(() => {
+    const v = document.createElement('video')
+    v.src = watchVideo
+    v.muted = true
+    v.playsInline = true
+    v.preload = 'auto'
+    v.setAttribute('playsinline', '')
+    v.load()
+    videoPreloadRef.current = v
+
+    const link = document.createElement('link')
+    link.rel = 'preload'
+    link.as = 'fetch'
+    link.href = watchVideo
+    link.crossOrigin = 'anonymous'
+    document.head.appendChild(link)
+
+    return () => {
+      v.src = ''
+      v.load()
+      videoPreloadRef.current = null
+      if (link.parentNode) link.parentNode.removeChild(link)
+    }
+  }, [])
 
   // Setup user interaction tracking on mount
   useGSAP(() => {
