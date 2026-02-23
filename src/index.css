@@ -67,6 +67,11 @@
   filter: brightness(1.1);
 }
 
+/* Pause the scroll animation when user hovers the container */
+.scroll-container:hover .infinite-scroll {
+  animation-play-state: paused;
+}
+
 /* Enhanced mobile scrolling for contact section */
 @layer utilities {
   .mobile-scroll-container {

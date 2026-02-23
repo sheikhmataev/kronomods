@@ -29,13 +29,20 @@ const App = () => {
           {/* Removed data-speed to prevent conflicts with smooth scrolling */}
           <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center p-0 m-0 px-6 sm:px-10 lg:px-16">
             <div className="pointer-events-auto relative p-0 m-0 -top-4 sm:-top-8 lg:-top-20">
-              <img
-                src={logo}
-                width={320}
-                height={320}
-                className="h-auto w-[200px] object-contain sm:w-[260px] lg:w-[320px]"
-                alt="Kronomods"
-              />
+              <a
+                href="#"
+                onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                aria-label="Kronomods — scroll to top"
+                className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne rounded block"
+              >
+                <img
+                  src={logo}
+                  width={320}
+                  height={320}
+                  className="h-auto w-[200px] object-contain sm:w-[260px] lg:w-[320px]"
+                  alt="Kronomods — Fine Timekeeping"
+                />
+              </a>
             </div>
           </header>
 

@@ -1,10 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 export interface ContactSectionProps {
   className?: string
 }
 
+type FormStatus = 'idle' | 'loading' | 'success' | 'error'
+
 export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }) => {
+  const [status, setStatus] = useState<FormStatus>('idle')
+
   const contactMethods = [
     {
       icon: (
@@ -27,17 +31,44 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
     },
   ]
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setStatus('loading')
+    const form = e.currentTarget
+    const data = new FormData(form)
+
+    try {
+      const res = await fetch('https://formspree.io/f/xeogaplb', {
+        method: 'POST',
+        body: data,
+        headers: { Accept: 'application/json' },
+      })
+      if (res.ok) {
+        setStatus('success')
+        form.reset()
+      } else {
+        setStatus('error')
+      }
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  const inputBase =
+    'mobile-touch-input w-full px-3 py-3 text-porcelain bg-onyx/80 outline-none border border-onyx/30 focus:border-champagne focus-visible:ring-2 focus-visible:ring-champagne/50 rounded-md text-base sm:text-sm transition-colors placeholder:text-porcelain/40'
+
   return (
     <div className={`${className} w-full flex flex-col px-3 sm:px-0`} style={{ backgroundColor: 'transparent' }}>
       
-      {/* Social Links Section - Compact Padding */}
+      {/* Social Links Section */}
       <section className="py-2 min-[400px]:py-4 sm:py-6 flex items-center justify-center">
         <div className="max-w-screen-xl mx-auto px-3 w-full">
           <div className="text-center mb-2 min-[400px]:mb-3 sm:mb-4">
-            <h3 className="text-porcelain text-base min-[400px]:text-xl sm:text-2xl font-semibold font-display mb-1">
+            <p className="text-champagne text-xs sm:text-sm font-semibold font-display tracking-widest uppercase mb-1">Connect</p>
+            <h3 className="text-porcelain text-xl min-[400px]:text-2xl sm:text-3xl font-semibold font-display mb-1">
               Let's connect
             </h3>
-            <p className="text-porcelain/60 text-xs sm:text-sm max-w-md mx-auto hidden sm:block">
+            <p className="text-porcelain/80 text-xs sm:text-sm max-w-md mx-auto hidden sm:block">
               We're here to help and answer any question you might have.
             </p>
           </div>
@@ -49,7 +80,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
                 href={item.link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group block p-2 min-[400px]:p-3 sm:p-4 border border-onyx/30 rounded-md hover:border-champagne/50 transition-all duration-300 hover:shadow-md bg-onyx/10"
+                className="group block p-2 min-[400px]:p-3 sm:p-4 border border-onyx/30 rounded-md hover:border-champagne/50 transition-all duration-300 hover:shadow-md bg-onyx/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne rounded-md"
               >
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded border border-onyx/30 flex items-center justify-center text-champagne transition-colors duration-300 group-hover:border-champagne group-hover:text-auric group-hover:bg-champagne/10 shrink-0">
@@ -68,100 +99,140 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ className = '' }
         </div>
       </section>
 
-      {/* Form Section - Mobile Scrollable Layout */}
+      {/* Form Section */}
       <section className="py-4 min-[400px]:py-6 sm:py-8 flex items-start justify-center min-h-fit">
         <div className="max-w-screen-xl mx-auto px-3 w-full">
           <div className="text-center mb-4 min-[400px]:mb-6 sm:mb-8">
-            <h3 className="text-champagne text-sm min-[400px]:text-base sm:text-lg font-semibold font-display mb-2">Contact</h3>
-            <p className="text-porcelain text-lg min-[400px]:text-2xl sm:text-3xl font-semibold font-display mb-2">
+            <p className="text-champagne text-xs sm:text-sm font-semibold font-display tracking-widest uppercase mb-2">Contact</p>
+            <h3 className="text-porcelain text-xl min-[400px]:text-2xl sm:text-3xl font-semibold font-display mb-2">
               Get in touch
-            </p>
+            </h3>
           </div>
           
           <div className="max-w-lg mx-auto">
-            {/* Improved spacing for mobile scrollability */}
-            <form onSubmit={(e) => e.preventDefault()} className="space-y-4 min-[400px]:space-y-5 sm:space-y-6">
-              <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-4 sm:gap-4">
-                <div>
-                  <label htmlFor="firstName" className="font-medium text-porcelain text-sm block mb-2 ml-1">
-                    First name
-                  </label>
-                  <input
-                    id="firstName"
-                    name="firstName"
-                    autoComplete="given-name"
-                    type="text"
-                    required
-                    className="mobile-touch-input w-full px-3 py-3 text-porcelain bg-onyx/80 outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm transition-colors"
-                    placeholder="First"
-                  />
+            {/* Success state */}
+            {status === 'success' ? (
+              <div
+                role="status"
+                aria-live="polite"
+                className="text-center py-12 px-6 border border-champagne/30 rounded-lg bg-champagne/5"
+              >
+                <div className="w-12 h-12 rounded-full border-2 border-champagne flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-6 h-6 text-champagne" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
                 </div>
-                <div>
-                  <label htmlFor="lastName" className="font-medium text-porcelain text-sm block mb-2 ml-1">
-                    Last name
-                  </label>
-                  <input
-                    id="lastName"
-                    name="lastName"
-                    autoComplete="family-name"
-                    type="text"
-                    required
-                    className="mobile-touch-input w-full px-3 py-3 text-porcelain bg-onyx/80 outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm transition-colors"
-                    placeholder="Last"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label htmlFor="email" className="font-medium text-porcelain text-sm block mb-2 ml-1">Email</label>
-                <input
-                  id="email"
-                  name="email"
-                  autoComplete="email"
-                  type="email"
-                  required
-                  className="mobile-touch-input w-full px-3 py-3 text-porcelain bg-onyx/80 outline-none border border-onyx/30 focus:border-champagne rounded-md text-base sm:text-sm transition-colors"
-                  placeholder="name@example.com"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="phone" className="font-medium text-porcelain text-sm block mb-2 ml-1">Phone</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-3 my-auto h-5 flex items-center border-r border-onyx/30 pr-3 z-10">
-                    <span className="text-sm text-porcelain/60 mr-1">🇳🇴</span>
-                  </div>
-                  <input
-                    id="phone"
-                    name="phone"
-                    autoComplete="tel"
-                    type="tel"
-                    placeholder="912 34 567"
-                    className="mobile-touch-input w-full pl-12 pr-3 py-3 bg-onyx/80 outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm transition-colors"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label htmlFor="message" className="font-medium text-porcelain text-sm block mb-2 ml-1">Message</label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  className="mobile-touch-input w-full min-h-[160px] px-3 py-3 resize-y bg-onyx/80 outline-none border border-onyx/30 focus:border-champagne rounded-md text-porcelain text-base sm:text-sm transition-colors"
-                  placeholder="How can we help?"
-                ></textarea>
-              </div>
-              
-              <div className="pt-2">
+                <p className="text-porcelain font-display font-semibold text-lg mb-2">Message sent</p>
+                <p className="text-porcelain/80 text-sm">Thank you for reaching out. We'll get back to you shortly.</p>
                 <button
-                  type="submit"
-                  className="w-full px-4 py-3 min-[400px]:py-4 text-night font-bold bg-champagne hover:bg-auric active:bg-champagne rounded-md transition-colors text-base font-display touch-manipulation"
+                  onClick={() => setStatus('idle')}
+                  className="mt-6 text-sm text-champagne hover:text-auric transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne rounded"
                 >
-                  Send Message
+                  Send another message
                 </button>
               </div>
-            </form>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4 min-[400px]:space-y-5 sm:space-y-6" noValidate>
+                {/* Error banner */}
+                {status === 'error' && (
+                  <div role="alert" aria-live="assertive" className="px-4 py-3 rounded-md bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                    Something went wrong. Please try again or email us directly.
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-4 sm:gap-4">
+                  <div>
+                    <label htmlFor="firstName" className="font-medium text-porcelain text-sm block mb-2 ml-1">
+                      First name
+                    </label>
+                    <input
+                      id="firstName"
+                      name="firstName"
+                      autoComplete="given-name"
+                      type="text"
+                      required
+                      className={inputBase}
+                      placeholder="First"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="lastName" className="font-medium text-porcelain text-sm block mb-2 ml-1">
+                      Last name
+                    </label>
+                    <input
+                      id="lastName"
+                      name="lastName"
+                      autoComplete="family-name"
+                      type="text"
+                      required
+                      className={inputBase}
+                      placeholder="Last"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="email" className="font-medium text-porcelain text-sm block mb-2 ml-1">Email</label>
+                  <input
+                    id="email"
+                    name="email"
+                    autoComplete="email"
+                    type="email"
+                    required
+                    className={inputBase}
+                    placeholder="name@example.com"
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="phone" className="font-medium text-porcelain text-sm block mb-2 ml-1">Phone <span className="text-porcelain/50 font-normal">(optional)</span></label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-3 my-auto h-5 flex items-center border-r border-onyx/30 pr-3 z-10">
+                      <span className="text-sm text-porcelain/60 mr-1">🇳🇴</span>
+                    </div>
+                    <input
+                      id="phone"
+                      name="phone"
+                      autoComplete="tel"
+                      type="tel"
+                      placeholder="912 34 567"
+                      className={`${inputBase} pl-12`}
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="message" className="font-medium text-porcelain text-sm block mb-2 ml-1">Message</label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    required
+                    className={`${inputBase} min-h-[130px] resize-y`}
+                    placeholder="How can we help?"
+                  />
+                </div>
+                
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={status === 'loading'}
+                    className="w-full px-4 py-3 min-[400px]:py-4 text-night font-bold bg-champagne hover:bg-auric active:bg-champagne disabled:opacity-60 disabled:cursor-not-allowed rounded-md transition-colors text-base font-display touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne focus-visible:ring-offset-2 focus-visible:ring-offset-night flex items-center justify-center gap-2"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                        </svg>
+                        Sending…
+                      </>
+                    ) : (
+                      'Send Message'
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       </section>

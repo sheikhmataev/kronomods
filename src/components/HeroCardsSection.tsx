@@ -151,6 +151,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const imageSliderRef = useRef<HTMLDivElement | null>(null)
   const contactRef = useRef<HTMLDivElement | null>(null)
+  const scrollIndicatorRef = useRef<HTMLDivElement | null>(null)
   const scrollBackCleanupRef = useRef<(() => void) | null>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const videoPlayAttemptedRef = useRef(false)
@@ -424,6 +425,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           { y: getResponsiveY(180, 230, 280), opacity: 0, ease: 'power2.inOut', duration: 0.5 },
           0,
         )
+
+        const scrollIndicator = scrollIndicatorRef.current
+        if (scrollIndicator) {
+          timeline.to(scrollIndicator, { autoAlpha: 0, duration: 0.3, ease: 'power2.in' }, 0)
+        }
 
         if (background) {
           timeline.to(
@@ -845,6 +851,11 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
           0,
         )
 
+        const scrollIndicator = scrollIndicatorRef.current
+        if (scrollIndicator) {
+          timeline.to(scrollIndicator, { autoAlpha: 0, duration: 0.3, ease: 'power2.in' }, 0)
+        }
+
         timeline.to(
           background,
           { backgroundColor: '#0B0D12', duration: 0.8, ease: 'power2.inOut' },
@@ -1129,7 +1140,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
   )
 
   return (
-    <section ref={sectionRef} className="relative h-[400vh]">
+    <section ref={sectionRef} className="relative h-[400vh] animate-fade-in">
       {/* Animated background color layer */}
       <div
         ref={backgroundRef}
@@ -1141,18 +1152,18 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
       />
       {/* Background texture - removed parallax to prevent conflicts */}
       <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-grain opacity-[0.06]"
+        className="pointer-events-none absolute inset-0 z-[1] bg-grain opacity-[0.09]"
         aria-hidden="true"
       />
       <div 
         ref={containerRef}
-        className="sticky top-0 flex h-screen flex-col items-center justify-start overflow-hidden px-2 sm:px-6 lg:px-8 pt-24 pb-8 sm:pt-12 sm:pb-12 lg:pt-16 lg:pb-16"
+        className="sticky top-0 flex h-screen flex-col items-center justify-start overflow-hidden px-2 sm:px-6 lg:px-8 pt-24 pb-8 sm:pt-12 sm:pb-12 lg:pt-6 lg:pb-16"
       >
         <div className="relative grid w-full grid-cols-3 lg:grid-cols-3 content-center items-center gap-2 sm:gap-6 md:max-w-6xl md:gap-8 lg:gap-10 grow md:grow-0">
           {cards.map((card, index) => {
             // Enhanced CSS classes with 3D transform hints
             const baseClasses =
-              'glass-card flex h-[150px] min-[400px]:h-[170px] sm:h-[320px] md:h-[380px] lg:h-[420px] w-full overflow-hidden'
+              'glass-card relative flex h-[190px] min-[400px]:h-[210px] sm:h-[320px] md:h-[380px] lg:h-[420px] w-full overflow-hidden'
             
             const roleClasses: Record<CardRole, string> = {
               // Mobile: explicitly place in columns 1/2/3
@@ -1174,7 +1185,7 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
                   cardsRef.current[index] = el
                 }}
                 data-role={card.role}
-                className={`${baseClasses} ${roleClasses[card.role]}`}
+                className={`group ${baseClasses} ${roleClasses[card.role]}`}
                 style={
                   card.role === 'center'
                     ? {
@@ -1186,11 +1197,16 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
               >
                 <img
                   src={card.image}
-                  alt={card.title}
+                  alt={`${card.title} — ${card.subtitle}`}
                   width={420}
                   height={420}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
+                {/* Card info overlay — visible on center card always, side cards on hover */}
+                <div className={`absolute bottom-0 left-0 right-0 px-2 py-2 sm:px-3 sm:py-3 bg-gradient-to-t from-night/90 via-night/50 to-transparent transition-opacity duration-300 ${card.role === 'center' ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                  <p className="text-champagne font-display font-semibold text-[10px] min-[400px]:text-xs sm:text-sm leading-tight truncate">{card.title}</p>
+                  <p className="text-porcelain/70 font-sans text-[8px] min-[400px]:text-[9px] sm:text-xs leading-tight truncate hidden min-[400px]:block">{card.subtitle}</p>
+                </div>
               </div>
             )
           })}
@@ -1199,11 +1215,23 @@ const HeroCardsSection = ({ pin = true }: HeroCardsSectionProps) => {
         {/* Heading - removed parallax to prevent text glitches, GSAP handles animation */}
         <div
           ref={headingRef}
-          className="w-full max-w-3xl text-center pt-0 sm:pt-0 md:pt-64 lg:pt-80 pb-16 sm:pb-20 md:pb-20 lg:pb-24"
+          className="w-full max-w-3xl text-center pt-4 sm:pt-8 md:pt-60 lg:pt-80 pb-16 sm:pb-20 md:pb-20 lg:pb-24"
         >
-          <h2 className="font-display text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-white sm:text-porcelain">
+          <h2 className="font-display text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-porcelain">
             Time converges where precision finds its counterpart.
           </h2>
+        </div>
+
+        {/* Scroll indicator — fades out once user starts scrolling */}
+        <div
+          ref={scrollIndicatorRef}
+          className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 pointer-events-none animate-bounce-slow"
+          aria-hidden="true"
+        >
+          <span className="text-porcelain/40 font-sans text-[10px] tracking-widest uppercase">Scroll</span>
+          <svg className="w-4 h-4 text-porcelain/40" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
 
         {/* Macbook Pro - appears after cards disappear */}

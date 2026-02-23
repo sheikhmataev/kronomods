@@ -7,17 +7,17 @@ export const Footer: React.FC = () => {
       style={{ backgroundColor: '#5F5A56' }}
     >
       <div className="mx-auto max-w-7xl">
-        <p className="text-center text-sm text-porcelain/60 font-sans">
-          Designet for Kronomods - laget av{' '}
+        <p className="text-center text-sm text-porcelain/80 font-sans">
+          Designed for Kronomods · Built by{' '}
           <a
             href="http://sheikhmataev.github.io/mash/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-champagne/80 hover:text-champagne transition-colors"
+            className="text-champagne hover:text-auric transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne rounded"
           >
             MASH Partners AS
           </a>{' '}
-          - © 2025
+          · © 2026
         </p>
       </div>
     </footer>

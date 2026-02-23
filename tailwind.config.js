@@ -14,6 +14,7 @@ export default {
         champagne: '#E9D5A1',
         auric: '#B89648',
         porcelain: '#F5F1E6',
+        umber: '#5F5A56',
       },
       fontFamily: {
         sans: ['"Space Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
@@ -21,6 +22,20 @@ export default {
       },
       boxShadow: {
         'card-glow': '0 40px 80px -30px rgba(12, 15, 24, 0.85)',
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.6s ease-out both',
+        'bounce-slow': 'bounceSlow 2s ease-in-out infinite',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        bounceSlow: {
+          '0%, 100%': { transform: 'translate(-50%, 0)' },
+          '50%': { transform: 'translate(-50%, 6px)' },
+        },
       },
       backgroundImage: {
         grain:
